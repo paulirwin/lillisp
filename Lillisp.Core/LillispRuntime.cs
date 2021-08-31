@@ -23,8 +23,11 @@ namespace Lillisp.Core
             ["<="] = BooleanExpressions.LessThanOrEqual,
             ["="] = BooleanExpressions.Equal,
             ["=="] = BooleanExpressions.Equal,
+            ["abs"] = MathExpressions.Abs,
             ["car"] = ListExpressions.Car,
             ["cdr"] = ListExpressions.Cdr,
+            ["max"] = MathExpressions.Max,
+            ["min"] = MathExpressions.Min,
         };
 
         public object? EvaluateProgram(string program)

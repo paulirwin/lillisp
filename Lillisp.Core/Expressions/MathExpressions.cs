@@ -105,5 +105,59 @@ namespace Lillisp.Core.Expressions
 
             return result;
         }
+
+        public static object? Abs(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("abs requires one argument");
+            }
+
+            return Math.Abs(Convert.ToDouble(args[0]));
+        }
+
+        public static object? Max(object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                throw new ArgumentException("max requires at least one argument");
+            }
+
+            double max = Convert.ToDouble(args[0]);
+
+            if (args.Length == 1)
+            {
+                return max;
+            }
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                max = Math.Max(max, Convert.ToDouble(args[i]));
+            }
+
+            return max;
+        }
+
+        public static object? Min(object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                throw new ArgumentException("max requires at least one argument");
+            }
+
+            double min = Convert.ToDouble(args[0]);
+
+            if (args.Length == 1)
+            {
+                return min;
+            }
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                min = Math.Min(min, Convert.ToDouble(args[i]));
+            }
+
+            return min;
+        }
     }
 }
