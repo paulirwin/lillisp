@@ -32,6 +32,13 @@ namespace Lillisp.Repl
                     break;
                 }
 
+                if (input.Equals("clear", StringComparison.OrdinalIgnoreCase)
+                    || input.Equals("cls", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.Clear();
+                    continue;
+                }
+
                 try
                 {
                     var lexer = new LillispLexer(new AntlrInputStream(input));
