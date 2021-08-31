@@ -10,14 +10,14 @@ namespace Lillisp.Core
 {
     public class LillispRuntime
     {
-        private static readonly IDictionary<string, MacroExpression> _systemMacros = new Dictionary<string, MacroExpression>
+        private static readonly IReadOnlyDictionary<string, MacroExpression> _systemMacros = new Dictionary<string, MacroExpression>
         {
             ["quote"] = SystemMacros.Quote,
             ["apply"] = SystemMacros.Apply,
             ["list"] = SystemMacros.List,
         };
 
-        private static readonly IDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
+        private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
         {
             ["+"] = MathExpressions.Plus,
             ["-"] = MathExpressions.Minus,
@@ -37,6 +37,13 @@ namespace Lillisp.Core
             ["cons"] = ListExpressions.Cons,
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
+        };
+
+        private static readonly IReadOnlyDictionary<string, object?> _systemGlobals = new Dictionary<string, object?>
+        {
+            ["pi"] = Math.PI,
+            ["e"] = Math.E,
+            ["tau"] = Math.Tau,
         };
 
         public object? EvaluateProgram(string program)
@@ -89,6 +96,9 @@ namespace Lillisp.Core
 
             if (symbol == null)
                 return null;
+            
+            if (_systemGlobals.TryGetValue(symbol, out var global))
+                return global;
 
             if (_systemMacros.TryGetValue(symbol, out var macro))
                 return macro;
