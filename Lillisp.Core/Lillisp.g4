@@ -2,11 +2,15 @@ grammar Lillisp;
 
 prog: expr* EOF ;
 
-expr: LPAREN (atom | expr)* RPAREN ;
+expr: (list | atom) ;
 
-atom: NUMBER | IDENTIFIER | OPERATOR ;
+list: LPAREN expr* RPAREN ;
 
-OPERATOR: SYMBOL* ;
+atom: NUMBER | SYMBOL ;
+
+SYMBOL: OPERATOR | IDENTIFIER;
+
+OPERATOR: SYMBOL_CHAR+ ;
 
 IDENTIFIER: LETTER (LETTER | NUMBER | UNDERSCORE)* ;
 
@@ -20,7 +24,7 @@ LETTER: LOWER | UPPER ;
 DIGIT: '0'..'9' ;
 LOWER: 'a'..'z' ;
 UPPER: 'A'..'Z' ;
-SYMBOL: '+' | '-' | '*' | '/' | '%' | '^' | '<' | '>' | '=' ;
+SYMBOL_CHAR: '+' | '-' | '*' | '/' | '%' | '^' | '<' | '>' | '=' ;
 LPAREN: '(' ;
 RPAREN: ')' ;
 NEGATE: '-';

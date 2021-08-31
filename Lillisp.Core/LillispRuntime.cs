@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 using Lillisp.Core.Expressions;
+using Lillisp.Core.Macros;
 using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core
 {
     public class LillispRuntime
     {
-        private static readonly IDictionary<string, Expression> _expressions = new Dictionary<string, Expression>()
+        private static readonly IDictionary<string, Expression> _systemMacros = new Dictionary<string, Expression>
+        {
+        };
+
+        private static readonly IDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
         {
             ["+"] = MathExpressions.Add,
             ["-"] = MathExpressions.Subtract,
@@ -46,22 +51,22 @@ namespace Lillisp.Core
             switch (node.Type)
             {
                 case NodeType.Program:
-                    return EvaluateProgram((ProgramNode)node);
+                    return EvaluateProgram((Program)node);
                 case NodeType.Expression:
-                    return EvaluateExpression((ExpressionNode)node);
+                    return EvaluateExpression((List)node);
                 case NodeType.Atom:
-                    return EvaluateAtom((AtomNode)node);
+                    return EvaluateAtom((Atom)node);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private object? EvaluateAtom(AtomNode node)
+        private object? EvaluateAtom(Atom node)
         {
-            return node.Value; // TODO: support numbers, variables, etc.
+            return node.Value;
         }
 
-        private object? EvaluateExpression(ExpressionNode node)
+        private object? EvaluateExpression(List node)
         {
             if (node.Children.Count == 0)
             {
@@ -78,13 +83,13 @@ namespace Lillisp.Core
             if (sop == "quote")
             {
                 // special form
-                return node.Children[1];
+                return new Atom(AtomType.List, node.Children[1]);
             }
 
             var args = node.Children.Skip(1).Select(Evaluate).ToArray();
 
             // HACK
-            if (!_expressions.TryGetValue(op.ToString()!, out var expr))
+            if (!_systemFunctions.TryGetValue(op.ToString()!, out var expr))
             {
                 throw new InvalidOperationException($"Unknown operation: {op}");
             }
@@ -92,7 +97,7 @@ namespace Lillisp.Core
             return expr(args);
         }
 
-        private object? EvaluateProgram(ProgramNode node)
+        private object? EvaluateProgram(Program node)
         {
             object? result = null;
 

@@ -1,8 +1,8 @@
 ﻿namespace Lillisp.Core.Syntax
 {
-    public class AtomNode : Node
+    public class Atom : Node
     {
-        public AtomNode(AtomType atomType, object value)
+        public Atom(AtomType atomType, object value)
             : base(NodeType.Atom)
         {
             AtomType = atomType;

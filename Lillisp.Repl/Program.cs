@@ -16,9 +16,15 @@ namespace Lillisp.Repl
 
                 string? input = Console.ReadLine();
 
-                if (input == null)
+                if (string.IsNullOrWhiteSpace(input))
                 {
-                    break;
+                    continue;
+                }
+                
+                if (input.Equals("exit", StringComparison.OrdinalIgnoreCase) 
+                    || input.Equals("quit", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
                 }
 
                 try
@@ -40,8 +46,10 @@ namespace Lillisp.Repl
 
                     object? result = runtime.Evaluate(prog);
 
+                    Console.ForegroundColor = ConsoleColor.Gray;
                     Console.Write("-> ");
-                    Console.WriteLine(result ?? "(null)");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine(result ?? "null");
                 }
                 catch (Exception ex)
                 {

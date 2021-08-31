@@ -1,20 +1,24 @@
-﻿namespace Lillisp.Core.Syntax
+﻿using System.Collections.Generic;
+
+namespace Lillisp.Core.Syntax
 {
-    public class ExpressionNode : Node
+    public class List : Node
     {
-        public ExpressionNode()
+        public List()
             : base(NodeType.Expression)
         {
         }
 
-        public ExpressionNode(Node[] nodes)
+        public List(IEnumerable<Node> nodes)
             : this()
         {
             foreach (var node in nodes)
             {
-                this.Children.Add(node);
+                Children.Add(node);
             }
         }
+
+        public IList<Node> Children { get; } = new List<Node>();
 
         public override string ToString() => $"({string.Join(' ', Children)})";
     }

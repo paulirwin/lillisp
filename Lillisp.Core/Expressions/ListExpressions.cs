@@ -8,22 +8,32 @@ namespace Lillisp.Core.Expressions
     {
         public static object? Car(object?[] args)
         {
-            if (args.Length == 0 || args[0] is not ExpressionNode expr)
+            if (args.Length == 0)
             {
                 throw new ArgumentException("List must contain an expression");
             }
 
-            return expr.Children[0];
+            return args[0] switch
+            {
+                List list => list.Children[0],
+                Atom { Value: List atomList } => atomList.Children[0],
+                _ => throw new ArgumentException("Argument to car must be a list")
+            };
         }
 
         public static object? Cdr(object?[] args)
         {
-            if (args.Length == 0 || args[0] is not ExpressionNode expr)
+            if (args.Length == 0)
             {
                 throw new ArgumentException("List must contain an expression");
             }
 
-            return new ExpressionNode(expr.Children.Skip(1).ToArray());
+            return args[0] switch
+            {
+                List list => new Atom(AtomType.List, list.Children.Skip(1).ToListNode()),
+                Atom { Value: List atomList } => new Atom(AtomType.List, atomList.Children.Skip(1).ToListNode()),
+                _ => throw new ArgumentException("Argument to cdr must be a list")
+            };
         }
     }
 }

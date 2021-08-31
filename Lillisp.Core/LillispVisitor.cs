@@ -7,7 +7,7 @@ namespace Lillisp.Core
     {
         public override Node VisitProg(LillispParser.ProgContext context)
         {
-            var node = new ProgramNode();
+            var node = new Program();
 
             foreach (var child in context.children)
             {
@@ -22,9 +22,9 @@ namespace Lillisp.Core
             return node;
         }
 
-        public override Node VisitExpr(LillispParser.ExprContext context)
+        public override Node VisitList(LillispParser.ListContext context)
         {
-            var node = new ExpressionNode();
+            var node = new List();
 
             foreach (var child in context.children)
             {
@@ -41,26 +41,19 @@ namespace Lillisp.Core
 
         public override Node VisitAtom(LillispParser.AtomContext context)
         {
-            var symbol = context.OPERATOR();
-
-            if (symbol != null)
-            {
-                return new AtomNode(AtomType.Operator, symbol.GetText());
-            }
-
             var number = context.NUMBER();
 
             if (number != null)
             {
                 double num = Convert.ToDouble(number.GetText());
-                return new AtomNode(AtomType.Number, num);
+                return new Atom(AtomType.Number, num);
             }
 
-            var ident = context.IDENTIFIER();
+            var symbol = context.SYMBOL();
 
-            if (ident != null)
+            if (symbol != null)
             {
-                return new AtomNode(AtomType.Identifier, ident.GetText());
+                return new Atom(AtomType.Symbol, symbol.GetText());
             }
 
             throw new NotImplementedException("Unknown atom type");

@@ -2,8 +2,8 @@
 {
     public enum AtomType
     {
-        Operator,
+        Symbol,
         Number,
-        Identifier
+        List
     }
 }

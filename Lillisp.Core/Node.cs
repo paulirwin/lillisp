@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Lillisp.Core
+﻿namespace Lillisp.Core
 {
     public abstract class Node
     {
@@ -10,7 +8,5 @@ namespace Lillisp.Core
         }
 
         public NodeType Type { get; }
-
-        public IList<Node> Children { get; } = new List<Node>();
     }
 }
