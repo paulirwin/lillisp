@@ -19,5 +19,17 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(sqrt 25)", 5)]
+        [InlineData("(sqrt (+ 2 2))", 2)]
+        [Theory]
+        public void SqrtTests(string input, double expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }

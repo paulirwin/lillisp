@@ -7,6 +7,7 @@ namespace Lillisp.Tests
     public class MacroTests
     {
         [InlineData("(quote (1 2 3))", new object[] { 1d, 2d, 3d })]
+        [InlineData("'(1 2 3)", new object[] { 1d, 2d, 3d })]
         [Theory]
         public void QuoteTests(string input, object[] expected)
         {

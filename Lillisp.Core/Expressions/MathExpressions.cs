@@ -169,5 +169,15 @@ namespace Lillisp.Core.Expressions
 
             return min;
         }
+
+        public static object? Sqrt(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("sqrt requires one argument");
+            }
+
+            return Math.Sqrt(Convert.ToDouble(args[0]));
+        }
     }
 }

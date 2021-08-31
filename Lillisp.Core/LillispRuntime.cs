@@ -38,6 +38,7 @@ namespace Lillisp.Core
             ["cons"] = ListExpressions.Cons,
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
+            ["sqrt"] = MathExpressions.Sqrt,
         };
 
         private static readonly IReadOnlyDictionary<string, object?> _systemGlobals = new Dictionary<string, object?>
