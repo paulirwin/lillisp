@@ -58,5 +58,21 @@ namespace Lillisp.Core
 
             throw new NotImplementedException("Unknown atom type");
         }
+
+        public override Node VisitMacro(LillispParser.MacroContext context)
+        {
+            var quote = context.quote();
+
+            if (quote != null)
+            {
+                var child = quote.children[1];
+
+                var node = Visit(child);
+
+                return new Quote(node);
+            }
+
+            throw new NotImplementedException("Unknown macro type");
+        }
     }
 }

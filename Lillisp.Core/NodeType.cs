@@ -4,6 +4,7 @@
     {
         Program,
         List,
-        Atom
+        Atom,
+        Quote
     }
 }

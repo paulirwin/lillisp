@@ -68,6 +68,8 @@ namespace Lillisp.Core
                     return ((List) node).Children.Select(Quote).ToArray();
                 case NodeType.Atom:
                     return ((Atom) node).Value;
+                case NodeType.Quote:
+                    return Quote(((Quote) node).Value);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -83,9 +85,22 @@ namespace Lillisp.Core
                     return EvaluateExpression((List) node);
                 case NodeType.Atom:
                     return EvaluateAtom((Atom) node);
+                case NodeType.Quote:
+                    return EvaluateQuote((Quote) node);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private object? EvaluateQuote(Quote node)
+        {
+            return node.Value switch
+            {
+                List list => list.Children.Select(Quote).ToArray(),
+                Atom { AtomType: AtomType.Number, Value: { } value } => value,
+                Atom { AtomType: AtomType.Symbol, Value: { } value } => value.ToString(),
+                _ => null
+            };
         }
 
         private object? EvaluateAtom(Atom node)

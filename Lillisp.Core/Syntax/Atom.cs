@@ -1,4 +1,6 @@
-﻿namespace Lillisp.Core.Syntax
+﻿using System.Collections.Generic;
+
+namespace Lillisp.Core.Syntax
 {
     public class Atom : Node
     {
