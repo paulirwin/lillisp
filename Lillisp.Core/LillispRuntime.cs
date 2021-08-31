@@ -32,6 +32,7 @@ namespace Lillisp.Core
             ["="] = BooleanExpressions.Equal,
             ["=="] = BooleanExpressions.Equal,
             ["abs"] = MathExpressions.Abs,
+            ["append"] = ListExpressions.Append,
             ["car"] = ListExpressions.Car,
             ["cdr"] = ListExpressions.Cdr,
             ["cons"] = ListExpressions.Cons,

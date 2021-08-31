@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Lillisp.Core.Syntax;
 
@@ -48,6 +49,36 @@ namespace Lillisp.Core.Expressions
             var first = args[0];
 
             return new[] { first }.Concat(objArray).ToArray();
+        }
+
+        public static object? Append(object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                return Array.Empty<object>();
+            }
+
+            var result = new List<object?>();
+
+            for (int i = 0; i < args.Length; i++)
+            {
+                object? arg = args[i];
+
+                if (arg is object[] objArray)
+                {
+                    result.AddRange(objArray);
+                }
+                else if (i == args.Length - 1)
+                {
+                    result.Add(arg);
+                }
+                else
+                {
+                    throw new ArgumentException($"{arg ?? "null"} is not of type list");
+                }
+            }
+
+            return result.ToArray();
         }
     }
 }
