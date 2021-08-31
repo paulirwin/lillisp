@@ -7,6 +7,8 @@ namespace Lillisp.Tests
     {
         [InlineData("(+ 2 4)", 6)]
         [InlineData("(+ 2.5 3.5)", 6)]
+        [InlineData("(+ -1 3)", 2)]
+        [InlineData("(+ 4 -1.5)", 2.5)]
         [Theory]
         public void AddTests(string input, double expected)
         {

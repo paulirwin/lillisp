@@ -12,8 +12,8 @@ IDENTIFIER: LETTER (LETTER | NUMBER | UNDERSCORE)* ;
 
 NUMBER: INTEGER | FLOAT | RATIO ;
 
-INTEGER: (DIGIT)+ ;
-FLOAT: (DIGIT | '.')+ ;
+INTEGER: NEGATE? (DIGIT)+ ;
+FLOAT: NEGATE? (DIGIT | '.')+ ;
 RATIO: INTEGER '/' INTEGER;
 
 LETTER: LOWER | UPPER ;
@@ -23,6 +23,7 @@ UPPER: 'A'..'Z' ;
 SYMBOL: '+' | '-' | '*' | '/' | '%' | '^' | '<' | '>' | '=' ;
 LPAREN: '(' ;
 RPAREN: ')' ;
+NEGATE: '-';
 UNDERSCORE: '_' ;
 
 WHITESPACE: [ \r\n\t]+ -> channel(HIDDEN) ;
