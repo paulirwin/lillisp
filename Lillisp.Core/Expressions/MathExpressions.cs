@@ -4,14 +4,19 @@ namespace Lillisp.Core.Expressions
 {
     public static class MathExpressions
     {
-        public static object? Add(object?[] args)
+        public static object? Plus(object?[] args)
         {
-            if (args.Length < 2)
+            if (args.Length == 0)
             {
-                throw new ArgumentException("+ requires at least two arguments");
+                throw new ArgumentException("+ requires at least one argument");
             }
 
             var sum = Convert.ToDouble(args[0]);
+
+            if (args.Length == 1)
+            {
+                return sum < 0 ? sum * -1 : sum;
+            }
 
             for (int i = 1; i < args.Length; i++)
             {
@@ -21,14 +26,19 @@ namespace Lillisp.Core.Expressions
             return sum;
         }
 
-        public static object? Subtract(object?[] args)
+        public static object? Minus(object?[] args)
         {
-            if (args.Length < 2)
+            if (args.Length == 0)
             {
-                throw new ArgumentException("- requires at least two arguments");
+                throw new ArgumentException("- requires at least one argument");
             }
 
             var difference = Convert.ToDouble(args[0]);
+
+            if (args.Length == 1)
+            {
+                return difference * -1;
+            }
 
             for (int i = 1; i < args.Length; i++)
             {

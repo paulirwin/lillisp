@@ -10,14 +10,17 @@ namespace Lillisp.Core
 {
     public class LillispRuntime
     {
-        private static readonly IDictionary<string, Expression> _systemMacros = new Dictionary<string, Expression>
+        private static readonly IDictionary<string, MacroExpression> _systemMacros = new Dictionary<string, MacroExpression>
         {
+            ["quote"] = SystemMacros.Quote,
+            ["apply"] = SystemMacros.Apply,
+            ["list"] = SystemMacros.List,
         };
 
         private static readonly IDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
         {
-            ["+"] = MathExpressions.Add,
-            ["-"] = MathExpressions.Subtract,
+            ["+"] = MathExpressions.Plus,
+            ["-"] = MathExpressions.Minus,
             ["*"] = MathExpressions.Multiply,
             ["/"] = MathExpressions.Divide,
             ["%"] = MathExpressions.Modulo,
@@ -31,6 +34,7 @@ namespace Lillisp.Core
             ["abs"] = MathExpressions.Abs,
             ["car"] = ListExpressions.Car,
             ["cdr"] = ListExpressions.Cdr,
+            ["cons"] = ListExpressions.Cons,
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
         };
@@ -46,16 +50,31 @@ namespace Lillisp.Core
             return Evaluate(prog);
         }
 
+        public object? Quote(Node node)
+        {
+            switch (node.Type)
+            {
+                case NodeType.Program:
+                    return ((Program) node).Children.Select(Quote).ToArray();
+                case NodeType.List:
+                    return ((List) node).Children.Select(Quote).ToArray();
+                case NodeType.Atom:
+                    return ((Atom) node).Value;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         public object? Evaluate(Node node)
         {
             switch (node.Type)
             {
                 case NodeType.Program:
-                    return EvaluateProgram((Program)node);
-                case NodeType.Expression:
-                    return EvaluateExpression((List)node);
+                    return EvaluateProgram((Program) node);
+                case NodeType.List:
+                    return EvaluateExpression((List) node);
                 case NodeType.Atom:
-                    return EvaluateAtom((Atom)node);
+                    return EvaluateAtom((Atom) node);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -63,36 +82,46 @@ namespace Lillisp.Core
 
         private object? EvaluateAtom(Atom node)
         {
-            return node.Value;
+            if (node.AtomType != AtomType.Symbol || node.Value == null)
+                return node.Value;
+
+            string? symbol = node.Value.ToString();
+
+            if (symbol == null)
+                return null;
+
+            if (_systemMacros.TryGetValue(symbol, out var macro))
+                return macro;
+
+            if (_systemFunctions.TryGetValue(symbol, out var fn))
+                return fn;
+
+            if (symbol == "nil")
+                return Array.Empty<object>();
+
+            return symbol;
         }
 
         private object? EvaluateExpression(List node)
         {
             if (node.Children.Count == 0)
             {
-                return null; // TODO: empty list instead?
+                return Array.Empty<object>();
             }
 
             var op = Evaluate(node.Children[0]);
 
-            if (op is not string sop)
+            if (op is MacroExpression macro)
+            {
+                return macro(this, node.Children.Skip(1).Cast<object>().ToArray());
+            }
+
+            if (op is not Expression expr)
             {
                 throw new InvalidOperationException($"Invalid operation format: {op}");
             }
 
-            if (sop == "quote")
-            {
-                // special form
-                return new Atom(AtomType.List, node.Children[1]);
-            }
-
             var args = node.Children.Skip(1).Select(Evaluate).ToArray();
-
-            // HACK
-            if (!_systemFunctions.TryGetValue(op.ToString()!, out var expr))
-            {
-                throw new InvalidOperationException($"Unknown operation: {op}");
-            }
 
             return expr(args);
         }

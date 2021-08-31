@@ -2,7 +2,7 @@
 {
     public class Atom : Node
     {
-        public Atom(AtomType atomType, object value)
+        public Atom(AtomType atomType, object? value)
             : base(NodeType.Atom)
         {
             AtomType = atomType;
@@ -11,7 +11,7 @@
 
         public AtomType AtomType { get; }
 
-        public object Value { get; }
+        public object? Value { get; }
 
         public override string ToString() => Value?.ToString() ?? "null";
     }

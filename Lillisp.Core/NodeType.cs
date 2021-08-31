@@ -3,7 +3,7 @@
     public enum NodeType
     {
         Program,
-        Expression,
+        List,
         Atom
     }
 }

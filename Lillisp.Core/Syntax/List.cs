@@ -5,7 +5,7 @@ namespace Lillisp.Core.Syntax
     public class List : Node
     {
         public List()
-            : base(NodeType.Expression)
+            : base(NodeType.List)
         {
         }
 
