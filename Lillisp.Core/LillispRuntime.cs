@@ -15,6 +15,7 @@ namespace Lillisp.Core
             ["quote"] = SystemMacros.Quote,
             ["apply"] = SystemMacros.Apply,
             ["list"] = SystemMacros.List,
+            ["if"] = SystemMacros.If,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>

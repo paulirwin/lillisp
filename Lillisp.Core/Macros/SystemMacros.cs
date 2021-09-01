@@ -49,5 +49,34 @@ namespace Lillisp.Core.Macros
 
             return args.Cast<Node>().Select(runtime.Quote).ToArray();
         }
+
+        public static object? If(LillispRuntime runtime, object?[] args)
+        {
+            if (args.Length is < 2 or > 3 || args[0] is not Node cond || args[1] is not Node consequence)
+            {
+                throw new ArgumentException("if requires 2 or 3 arguments");
+            }
+
+            Node? alt = null;
+
+            if (args.Length == 3)
+            {
+                if (args[2] is not Node altNode)
+                {
+                    throw new ArgumentException("argument 3 must be a node");
+                }
+
+                alt = altNode;
+            }
+
+            var result = runtime.Evaluate(cond);
+
+            if (result.IsTruthy())
+            {
+                return runtime.Evaluate(consequence);
+            }
+            
+            return alt != null ? runtime.Evaluate(alt) : Array.Empty<object>();
+        }
     }
 }

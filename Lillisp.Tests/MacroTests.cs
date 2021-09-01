@@ -43,5 +43,20 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+
+        [InlineData("(if (> 3 2) 7 4)", 7d)]
+        [InlineData("(if (> 2 3) 7 4)", 4d)]
+        [InlineData("(if (> 3 2) (+ 3 4) (+ 2 2))", 7d)]
+        [InlineData("(if (> 2 3) (+ 3 4) (+ 2 2))", 4d)]
+        [Theory]
+        public void IfTests(string input, object expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }
