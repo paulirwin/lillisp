@@ -145,5 +145,28 @@ namespace Lillisp.Core.Macros
             // TODO: return a reference to this symbol
             return runtime.Quote(atom);
         }
+
+
+        public static object? Lambda(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length != 2)
+            {
+                throw new ArgumentException("lambda requires two arguments");
+            }
+
+            if (args[0] is not List parameters || !parameters.Children.All(i => i is Atom { AtomType: AtomType.Symbol }))
+            {
+                throw new ArgumentException("lambda's first argument must be a list of symbols");
+            }
+
+            if (args[1] is not Node body)
+            {
+                throw new ArgumentException("lambda's second argument must be a node");
+            }
+
+            string text = $"(lambda {parameters} {body})"; // TODO: get access to actual AST node here
+
+            return new Procedure(text, parameters.Children.OfType<Atom>().ToArray(), body);
+        }
     }
 }

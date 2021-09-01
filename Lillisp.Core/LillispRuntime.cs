@@ -19,6 +19,7 @@ namespace Lillisp.Core
             ["begin"] = SystemMacros.Begin,
             ["define"] = SystemMacros.Define,
             ["set!"] = SystemMacros.Set,
+            ["lambda"] = SystemMacros.Lambda,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
@@ -149,12 +150,17 @@ namespace Lillisp.Core
                 return macro(this, scope, node.Children.Skip(1).Cast<object>().ToArray());
             }
 
-            if (op is not Expression expr)
+            var args = node.Children.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
+
+            if (op is Procedure proc)
             {
-                throw new InvalidOperationException($"Invalid operation format: {op}");
+                return proc.Invoke(this, scope, args);
             }
 
-            var args = node.Children.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
+            if (op is not Expression expr)
+            {
+                throw new InvalidOperationException($"Invalid operation: {op}");
+            }
 
             return expr(scope, args);
         }

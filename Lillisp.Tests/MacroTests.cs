@@ -83,5 +83,17 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("((lambda (x) (^ x 2)) 4)", 16d)]
+        [InlineData("(begin (define square (lambda (x) (^ x 2))) (square 4))", 16d)]
+        [Theory]
+        public void LambdaTests(string input, object expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }

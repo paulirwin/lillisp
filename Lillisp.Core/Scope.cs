@@ -59,5 +59,7 @@ namespace Lillisp.Core
 
             Env[key] = value;
         }
+
+        public Scope CreateChildScope() => new(this);
     }
 }
