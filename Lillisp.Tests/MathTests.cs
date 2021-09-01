@@ -45,5 +45,19 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(log 1000)", 3d)]
+        [InlineData("(log 144 12)", 2d)]
+        [InlineData("(ln e)", 1d)]
+        [Theory]
+        public void LogarithmTests(string input, double expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.NotNull(result);
+            Assert.Equal(expected, (double)result, 6);
+        }
     }
 }

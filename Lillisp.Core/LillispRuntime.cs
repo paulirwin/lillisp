@@ -38,6 +38,8 @@ namespace Lillisp.Core
             ["car"] = ListExpressions.Car,
             ["cdr"] = ListExpressions.Cdr,
             ["cons"] = ListExpressions.Cons,
+            ["ln"] = MathExpressions.Ln,
+            ["log"] = MathExpressions.Log,
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
             ["sqrt"] = MathExpressions.Sqrt,

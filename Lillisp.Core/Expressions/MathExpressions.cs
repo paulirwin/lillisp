@@ -213,5 +213,25 @@ namespace Lillisp.Core.Expressions
 
             return result;
         }
+
+        public static object? Ln(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("ln requires one argument");
+            }
+
+            return Math.Log(Convert.ToDouble(args[0]), Math.E);
+        }
+
+        public static object? Log(object?[] args)
+        {
+            if (args.Length is 0 or > 2)
+            {
+                throw new ArgumentException("log requires one or two arguments");
+            }
+
+            return Math.Log(Convert.ToDouble(args[0]), args.Length == 2 ? Convert.ToDouble(args[1]) : 10);
+        }
     }
 }
