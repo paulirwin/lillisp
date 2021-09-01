@@ -52,6 +52,8 @@ namespace Lillisp.Core
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
             ["not"] = BooleanExpressions.Not,
+            ["print"] = StringExpressions.Print,
+            ["println"] = StringExpressions.PrintLn,
             ["sqrt"] = MathExpressions.Sqrt,
         };
 
@@ -126,7 +128,7 @@ namespace Lillisp.Core
             return node.Value switch
             {
                 List list => list.Children.Select(Quote).ToArray(),
-                Atom { AtomType: AtomType.Number, Value: { } value } => value,
+                Atom { AtomType: AtomType.Number or AtomType.String, Value: { } value } => value,
                 Atom { AtomType: AtomType.Symbol, Value: { } value } => value.ToString(),
                 _ => null
             };

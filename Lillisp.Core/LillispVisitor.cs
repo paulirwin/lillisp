@@ -49,6 +49,14 @@ namespace Lillisp.Core
                 return new Atom(AtomType.Number, num);
             }
 
+            var str = context.STRING();
+
+            if (str != null)
+            {
+                string strValue = str.GetText().Replace("\\\"", "\"")[1..^1];
+                return new Atom(AtomType.String, strValue);
+            }
+
             var symbol = context.SYMBOL();
 
             if (symbol != null)

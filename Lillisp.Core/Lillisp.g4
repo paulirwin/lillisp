@@ -6,11 +6,13 @@ expr: list | atom | macro;
 
 list: LPAREN expr* RPAREN;
 
-atom: (NUMBER | SYMBOL);
+atom: (NUMBER | STRING | SYMBOL);
 
 macro: quote;
 
 quote: QUOTE expr;
+
+STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 
 SYMBOL: OPERATOR | IDENTIFIER;
 
@@ -49,5 +51,6 @@ RPAREN: ')';
 NEGATE: '-';
 UNDERSCORE: '_';
 QUOTE: '\'';
+DQUOTE: '\"';
 
 WHITESPACE: [ \r\n\t]+ -> channel(HIDDEN);
