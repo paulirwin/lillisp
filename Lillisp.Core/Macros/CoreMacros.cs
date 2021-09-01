@@ -93,7 +93,7 @@ namespace Lillisp.Core.Macros
                 result = runtime.Evaluate(scope, node);
             }
 
-            return result ?? Nil.Value;
+            return result;
         }
 
         public static object? Define(LillispRuntime runtime, Scope scope, object?[] args)

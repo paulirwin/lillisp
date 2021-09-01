@@ -51,6 +51,8 @@ namespace Lillisp.Core
             ["car"] = ListExpressions.Car,
             ["cdr"] = ListExpressions.Cdr,
             ["cons"] = ListExpressions.Cons,
+            ["count"] = DynamicExpressions.Count,
+            ["length"] = DynamicExpressions.Count,
             ["ln"] = MathExpressions.Ln,
             ["log"] = MathExpressions.Log,
             ["max"] = MathExpressions.Max,
@@ -59,6 +61,7 @@ namespace Lillisp.Core
             ["print"] = StringExpressions.Print,
             ["println"] = StringExpressions.PrintLn,
             ["sqrt"] = MathExpressions.Sqrt,
+            ["str"] = StringExpressions.Str,
         };
 
         private static readonly IReadOnlyDictionary<string, object?> _systemGlobals = new Dictionary<string, object?>
@@ -145,7 +148,7 @@ namespace Lillisp.Core
 
             string? symbol = node.Value.ToString();
 
-            if (symbol == null)
+            if (symbol is null or "null")
                 return null;
 
             if (symbol == "nil")
@@ -153,7 +156,7 @@ namespace Lillisp.Core
 
             object? value = scope.Resolve(symbol);
 
-            return value ?? Nil.Value;
+            return value;
         }
 
         private object? EvaluateExpression(Scope scope, List node)
