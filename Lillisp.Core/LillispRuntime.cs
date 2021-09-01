@@ -12,23 +12,24 @@ namespace Lillisp.Core
     {
         private static readonly IReadOnlyDictionary<string, MacroExpression> _systemMacros = new Dictionary<string, MacroExpression>
         {
-            ["quote"] = CoreMacros.Quote,
-            ["apply"] = CoreMacros.Apply,
-            ["list"] = CoreMacros.List,
-            ["if"] = CoreMacros.If,
-            ["begin"] = CoreMacros.Begin,
-            ["def"] = CoreMacros.Define,
-            ["define"] = CoreMacros.Define,
-            ["set!"] = CoreMacros.Set,
-            ["lambda"] = CoreMacros.Lambda,
-            ["defun"] = CoreMacros.Defun,
-            ["let"] = CoreMacros.Let,
             ["++!"] = MathMacros.Increment,
             ["--!"] = MathMacros.Decrement,
             ["&&"] = BooleanMacros.And,
-            ["and"] = BooleanMacros.And,
             ["||"] = BooleanMacros.Or,
+            ["and"] = BooleanMacros.And,
+            ["apply"] = CoreMacros.Apply,
+            ["begin"] = CoreMacros.Begin,
+            ["def"] = CoreMacros.Define,
+            ["define"] = CoreMacros.Define,
+            ["defun"] = CoreMacros.Defun,
+            ["if"] = CoreMacros.If,
+            ["lambda"] = CoreMacros.Lambda,
+            ["let"] = CoreMacros.Let,
+            ["list"] = CoreMacros.List,
+            ["map"] = CoreMacros.Map,
             ["or"] = BooleanMacros.Or,
+            ["quote"] = CoreMacros.Quote,
+            ["set!"] = CoreMacros.Set,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>

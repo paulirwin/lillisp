@@ -250,5 +250,37 @@ namespace Lillisp.Core.Macros
 
             return result;
         }
+
+        public static object? Map(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            // TODO: support returning transducer fn if one arg, or multiple lists if > 2
+            if (args.Length < 2 || args[0] is not Node source || args[1] is not Node target)
+            {
+                throw new InvalidOperationException("map requires a fn and a list as arguments");
+            }
+
+            var sourceValue = runtime.Evaluate(scope, source);
+
+            if (sourceValue is not Expression expr)
+            {
+                throw new InvalidOperationException("First parameter to `map` must evaluate to a fn");
+            }
+
+            var list = runtime.Evaluate(scope, target);
+
+            if (list is not object[] objArray)
+            {
+                throw new InvalidOperationException("Second parameter to `map` must evaluate to a list");
+            }
+
+            var result = new object?[objArray.Length];
+
+            for (int i = 0; i < objArray.Length; i++)
+            {
+                result[i] = expr(new[] {objArray[i]});
+            }
+
+            return result;
+        }
     }
 }
