@@ -17,6 +17,8 @@ namespace Lillisp.Core
             ["list"] = SystemMacros.List,
             ["if"] = SystemMacros.If,
             ["begin"] = SystemMacros.Begin,
+            ["define"] = SystemMacros.Define,
+            ["set!"] = SystemMacros.Set,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
@@ -57,6 +59,16 @@ namespace Lillisp.Core
             ["false"] = false,
         };
 
+        private readonly Scope _globalScope;
+
+        public LillispRuntime()
+        {
+            _globalScope = new Scope();
+            _globalScope.AddAllFrom(_systemMacros);
+            _globalScope.AddAllFrom(_systemFunctions);
+            _globalScope.AddAllFrom(_systemGlobals);
+        }
+
         public object? EvaluateProgram(string program)
         {
             var lexer = new LillispLexer(new AntlrInputStream(program));
@@ -65,41 +77,33 @@ namespace Lillisp.Core
 
             var prog = visitor.Visit(parser.prog());
 
-            return Evaluate(prog);
+            return Evaluate(_globalScope, prog);
         }
 
         public object? Quote(Node node)
         {
-            switch (node.Type)
+            return node switch
             {
-                case NodeType.Program:
-                    return ((Program) node).Children.Select(Quote).ToArray();
-                case NodeType.List:
-                    return ((List) node).Children.Select(Quote).ToArray();
-                case NodeType.Atom:
-                    return ((Atom) node).Value;
-                case NodeType.Quote:
-                    return Quote(((Quote) node).Value);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                Program program => program.Children.Select(Quote).ToArray(),
+                List list => list.Children.Select(Quote).ToArray(),
+                Atom atom => atom.Value,
+                Quote quote => quote.Value,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
-        public object? Evaluate(Node node)
+        public object? Evaluate(Node node) => Evaluate(_globalScope, node);
+
+        public object? Evaluate(Scope scope, Node node)
         {
-            switch (node.Type)
+            return node switch
             {
-                case NodeType.Program:
-                    return EvaluateProgram((Program) node);
-                case NodeType.List:
-                    return EvaluateExpression((List) node);
-                case NodeType.Atom:
-                    return EvaluateAtom((Atom) node);
-                case NodeType.Quote:
-                    return EvaluateQuote((Quote) node);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+                Program program => EvaluateProgram(scope, program),
+                List list => EvaluateExpression(scope, list),
+                Atom atom => EvaluateAtom(scope, atom),
+                Quote quote => EvaluateQuote(quote),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         private object? EvaluateQuote(Quote node)
@@ -113,7 +117,7 @@ namespace Lillisp.Core
             };
         }
 
-        private object? EvaluateAtom(Atom node)
+        private object? EvaluateAtom(Scope scope, Atom node)
         {
             if (node.AtomType != AtomType.Symbol || node.Value == null)
                 return node.Value;
@@ -122,34 +126,27 @@ namespace Lillisp.Core
 
             if (symbol == null)
                 return null;
-            
-            if (_systemGlobals.TryGetValue(symbol, out var global))
-                return global;
-
-            if (_systemMacros.TryGetValue(symbol, out var macro))
-                return macro;
-
-            if (_systemFunctions.TryGetValue(symbol, out var fn))
-                return fn;
 
             if (symbol == "nil")
                 return Nil.Value;
 
-            return symbol;
+            object? value = scope.Resolve(symbol);
+
+            return value ?? Nil.Value;
         }
 
-        private object? EvaluateExpression(List node)
+        private object? EvaluateExpression(Scope scope, List node)
         {
             if (node.Children.Count == 0)
             {
                 return Nil.Value;
             }
 
-            var op = Evaluate(node.Children[0]);
+            var op = Evaluate(scope, node.Children[0]);
 
             if (op is MacroExpression macro)
             {
-                return macro(this, node.Children.Skip(1).Cast<object>().ToArray());
+                return macro(this, scope, node.Children.Skip(1).Cast<object>().ToArray());
             }
 
             if (op is not Expression expr)
@@ -157,18 +154,18 @@ namespace Lillisp.Core
                 throw new InvalidOperationException($"Invalid operation format: {op}");
             }
 
-            var args = node.Children.Skip(1).Select(Evaluate).ToArray();
+            var args = node.Children.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
 
-            return expr(args);
+            return expr(scope, args);
         }
 
-        private object? EvaluateProgram(Program node)
+        private object? EvaluateProgram(Scope scope, Program node)
         {
             object? result = null;
 
             foreach (var child in node.Children)
             {
-                result = Evaluate(child);
+                result = Evaluate(scope, child);
             }
 
             return result;

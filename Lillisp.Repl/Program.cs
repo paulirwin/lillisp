@@ -8,6 +8,9 @@ namespace Lillisp.Repl
     {
         public static void Main(string[] args)
         {
+            var runtime = new LillispRuntime();
+            var visitor = new LillispVisitor();
+
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
@@ -43,7 +46,6 @@ namespace Lillisp.Repl
                 {
                     var lexer = new LillispLexer(new AntlrInputStream(input));
                     var parser = new LillispParser(new CommonTokenStream(lexer));
-                    var visitor = new LillispVisitor();
 
                     var prog = visitor.Visit(parser.prog());
 
@@ -53,8 +55,6 @@ namespace Lillisp.Repl
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(prog);
 #endif
-
-                    var runtime = new LillispRuntime();
 
                     object? result = runtime.Evaluate(prog);
 

@@ -4,7 +4,7 @@ namespace Lillisp.Core.Expressions
 {
     public static class MathExpressions
     {
-        public static object? Plus(object?[] args)
+        public static object? Plus(Scope scope, object?[] args)
         {
             if (args.Length == 0)
             {
@@ -26,7 +26,7 @@ namespace Lillisp.Core.Expressions
             return sum;
         }
 
-        public static object? Minus(object?[] args)
+        public static object? Minus(Scope scope, object?[] args)
         {
             if (args.Length == 0)
             {
@@ -48,7 +48,7 @@ namespace Lillisp.Core.Expressions
             return difference;
         }
 
-        public static object? Multiply(object?[] args)
+        public static object? Multiply(Scope scope, object?[] args)
         {
             if (args.Length < 2)
             {
@@ -65,7 +65,7 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
-        public static object? Divide(object?[] args)
+        public static object? Divide(Scope scope, object?[] args)
         {
             if (args.Length < 2)
             {
@@ -82,7 +82,7 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
-        public static object? Modulo(object?[] args)
+        public static object? Modulo(Scope scope, object?[] args)
         {
             if (args.Length < 2)
             {
@@ -99,7 +99,7 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
-        public static object? Power(object?[] args)
+        public static object? Power(Scope scope, object?[] args)
         {
             if (args.Length < 2)
             {
@@ -116,7 +116,7 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
-        public static object? Abs(object?[] args)
+        public static object? Abs(Scope scope, object?[] args)
         {
             if (args.Length != 1)
             {
@@ -126,7 +126,7 @@ namespace Lillisp.Core.Expressions
             return Math.Abs(Convert.ToDouble(args[0]));
         }
 
-        public static object? Max(object?[] args)
+        public static object? Max(Scope scope, object?[] args)
         {
             if (args.Length == 0)
             {
@@ -148,7 +148,7 @@ namespace Lillisp.Core.Expressions
             return max;
         }
 
-        public static object? Min(object?[] args)
+        public static object? Min(Scope scope, object?[] args)
         {
             if (args.Length == 0)
             {
@@ -170,7 +170,7 @@ namespace Lillisp.Core.Expressions
             return min;
         }
 
-        public static object? Sqrt(object?[] args)
+        public static object? Sqrt(Scope scope, object?[] args)
         {
             if (args.Length != 1)
             {
@@ -180,7 +180,7 @@ namespace Lillisp.Core.Expressions
             return Math.Sqrt(Convert.ToDouble(args[0]));
         }
 
-        public static object? ShiftRight(object?[] args)
+        public static object? ShiftRight(Scope scope, object?[] args)
         {
             if (args.Length < 2)
             {
@@ -197,7 +197,7 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
-        public static object? ShiftLeft(object?[] args)
+        public static object? ShiftLeft(Scope scope, object?[] args)
         {
             if (args.Length < 2)
             {
@@ -214,7 +214,7 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
-        public static object? Ln(object?[] args)
+        public static object? Ln(Scope scope, object?[] args)
         {
             if (args.Length != 1)
             {
@@ -224,7 +224,7 @@ namespace Lillisp.Core.Expressions
             return Math.Log(Convert.ToDouble(args[0]), Math.E);
         }
 
-        public static object? Log(object?[] args)
+        public static object? Log(Scope scope, object?[] args)
         {
             if (args.Length is 0 or > 2)
             {

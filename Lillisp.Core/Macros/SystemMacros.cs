@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Macros
 {
     public static class SystemMacros
     {
-        public static object? Quote(LillispRuntime runtime, object?[] args)
+        public static object? Quote(LillispRuntime runtime, Scope scope, object?[] args)
         {
             if (args.Length == 0 || args[0] is not Node node)
             {
@@ -15,31 +16,31 @@ namespace Lillisp.Core.Macros
             return runtime.Quote(node);
         }
 
-        public static object? Apply(LillispRuntime runtime, object?[] args)
+        public static object? Apply(LillispRuntime runtime, Scope scope, object?[] args)
         {
             if (args.Length < 2 || args[0] is not Node source || args[1] is not Node target)
             {
                 throw new InvalidOperationException("apply requires a fn and a list as arguments");
             }
 
-            var sourceValue = runtime.Evaluate(source);
+            var sourceValue = runtime.Evaluate(scope, source);
 
             if (sourceValue is not Expression expr)
             {
                 throw new InvalidOperationException("First parameter to `apply` must evaluate to a fn");
             }
 
-            var list = runtime.Evaluate(target);
+            var list = runtime.Evaluate(scope, target);
 
             if (list is not object[] objArray)
             {
                 throw new InvalidOperationException("Second parameter to `apply` must evaluate to a list");
             }
 
-            return expr(objArray);
+            return expr(scope, objArray);
         }
 
-        public static object? List(LillispRuntime runtime, object?[] args)
+        public static object? List(LillispRuntime runtime, Scope scope, object?[] args)
         {
             if (args.Length == 0)
             {
@@ -49,7 +50,7 @@ namespace Lillisp.Core.Macros
             return args.Cast<Node>().Select(runtime.Quote).ToArray();
         }
 
-        public static object? If(LillispRuntime runtime, object?[] args)
+        public static object? If(LillispRuntime runtime, Scope scope, object?[] args)
         {
             if (args.Length is < 2 or > 3 || args[0] is not Node cond || args[1] is not Node consequence)
             {
@@ -68,17 +69,17 @@ namespace Lillisp.Core.Macros
                 alt = altNode;
             }
 
-            var result = runtime.Evaluate(cond);
+            var result = runtime.Evaluate(scope, cond);
 
             if (result.IsTruthy())
             {
-                return runtime.Evaluate(consequence);
+                return runtime.Evaluate(scope, consequence);
             }
-            
-            return alt != null ? runtime.Evaluate(alt) : Nil.Value;
+
+            return alt != null ? runtime.Evaluate(scope, alt) : Nil.Value;
         }
 
-        public static object? Begin(LillispRuntime runtime, object?[] args)
+        public static object? Begin(LillispRuntime runtime, Scope scope, object?[] args)
         {
             object? result = null;
 
@@ -89,10 +90,60 @@ namespace Lillisp.Core.Macros
                     throw new ArgumentException("invalid node");
                 }
 
-                result = runtime.Evaluate(node);
+                result = runtime.Evaluate(scope, node);
             }
 
             return result ?? Nil.Value;
+        }
+
+        public static object? Define(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length != 2)
+            {
+                throw new ArgumentException("define requires two arguments");
+            }
+
+            if (args[0] is not Atom {AtomType: AtomType.Symbol, Value: string symbol} atom)
+            {
+                throw new ArgumentException("define's first argument must be a symbol");
+            }
+
+            if (args[1] is not Node node)
+            {
+                throw new ArgumentException("define's second argument must be a node");
+            }
+
+            object? value = runtime.Evaluate(node);
+
+            scope.Define(symbol, value);
+
+            // TODO: return a reference to this symbol
+            return runtime.Quote(atom);
+        }
+
+        public static object? Set(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length != 2)
+            {
+                throw new ArgumentException("set! requires two arguments");
+            }
+
+            if (args[0] is not Atom { AtomType: AtomType.Symbol, Value: string symbol } atom)
+            {
+                throw new ArgumentException("set!'s first argument must be a symbol");
+            }
+
+            if (args[1] is not Node node)
+            {
+                throw new ArgumentException("set!'s second argument must be a node");
+            }
+
+            object? value = runtime.Evaluate(node);
+
+            scope.Set(symbol, value);
+
+            // TODO: return a reference to this symbol
+            return runtime.Quote(atom);
         }
     }
 }

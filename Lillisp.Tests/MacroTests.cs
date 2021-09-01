@@ -69,5 +69,19 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(begin (define x 10) (+ x 2))", 12d)]
+        [InlineData("(begin (define x (- 12 2)) (+ x 2))", 12d)]
+        [InlineData("(begin (define x (- 12 2)) (set! x 20) (+ x 2))", 22d)]
+        [InlineData("(begin (define x (- 12 2)) (set! x (* 10 2)) (+ x 2))", 22d)]
+        [Theory]
+        public void DefineSetTests(string input, object expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }
