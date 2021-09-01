@@ -15,7 +15,22 @@ namespace Lillisp.Core
         }
 
         public static implicit operator object[](Nil _) => _empty;
+
         public static implicit operator bool(Nil _) => false;
+
+        public override int GetHashCode() => _empty.GetHashCode();
+
+        public override bool Equals(object? obj)
+        {
+            return obj switch
+            {
+                Nil => true,
+                object[] {Length: 0} => true,
+                null => true,
+                false => true,
+                _ => false
+            };
+        }
 
         public IEnumerator<object> GetEnumerator()
         {

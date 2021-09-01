@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Expressions
 {
@@ -14,14 +13,24 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("car requires an argument");
             }
 
+            if (objects.Count == 0)
+            {
+                throw new ArgumentException("Attempt to apply car on nil");
+            }
+
             return objects[0];
         }
 
         public static object? Cdr(Scope scope, object?[] args)
         {
-            if (args.Length == 0 || args[0] is not IEnumerable<object> objects)
+            if (args.Length == 0 || args[0] is not IList<object> objects)
             {
                 throw new ArgumentException("cdr requires a list argument");
+            }
+
+            if (objects.Count == 0)
+            {
+                throw new ArgumentException("Attempt to apply cdr on nil");
             }
 
             return objects.Skip(1).ToArray();
