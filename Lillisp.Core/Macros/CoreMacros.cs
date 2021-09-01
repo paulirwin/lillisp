@@ -37,7 +37,7 @@ namespace Lillisp.Core.Macros
                 throw new InvalidOperationException("Second parameter to `apply` must evaluate to a list");
             }
 
-            return expr(scope, objArray);
+            return expr(objArray);
         }
 
         public static object? List(LillispRuntime runtime, Scope scope, object?[] args)
@@ -201,6 +201,54 @@ namespace Lillisp.Core.Macros
             scope.Define(symbol, procedure);
 
             return runtime.Quote(atom);
+        }
+
+        public static object? Let(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                throw new ArgumentException("let requires at least one argument");
+            }
+
+            if (args[0] is not List bindings)
+            {
+                throw new ArgumentException("let's first parameter must be a list");
+            }
+
+            var childScope = scope.CreateChildScope();
+
+            foreach (var binding in bindings.Children)
+            {
+                if (binding is Atom {AtomType: AtomType.Symbol, Value: string symbol})
+                {
+                    childScope[symbol] = Nil.Value;
+                }
+                else if (binding is List {Children: {Count: 2}} list 
+                         && list.Children[0] is Atom { AtomType: AtomType.Symbol, Value: string listSymbol })
+                {
+                    childScope[listSymbol] = runtime.Evaluate(list.Children[1]);
+                }
+                else
+                {
+                    throw new ArgumentException($"Unknown binding format: {binding}");
+                }
+            }
+
+            object? result = Nil.Value;
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                if (args[i] is Node node)
+                {
+                    result = runtime.Evaluate(childScope, node);
+                }
+                else
+                {
+                    result = args[i]; // should not happen?
+                }
+            }
+
+            return result;
         }
     }
 }

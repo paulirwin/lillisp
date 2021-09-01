@@ -21,6 +21,7 @@ namespace Lillisp.Core
             ["set!"] = CoreMacros.Set,
             ["lambda"] = CoreMacros.Lambda,
             ["defun"] = CoreMacros.Defun,
+            ["let"] = CoreMacros.Let,
             ["++!"] = MathMacros.Increment,
             ["--!"] = MathMacros.Decrement,
         };
@@ -71,6 +72,16 @@ namespace Lillisp.Core
             _globalScope.AddAllFrom(_systemMacros);
             _globalScope.AddAllFrom(_systemFunctions);
             _globalScope.AddAllFrom(_systemGlobals);
+        }
+
+        public void RegisterGlobal(string symbol, object? value)
+        {
+            _globalScope.Define(symbol, value);
+        }
+
+        public void RegisterFunction(string symbol, Expression func)
+        {
+            _globalScope.Define(symbol, func);
         }
 
         public object? EvaluateProgram(string program)
@@ -165,7 +176,7 @@ namespace Lillisp.Core
                 throw new InvalidOperationException($"Invalid operation: {op}");
             }
 
-            return expr(scope, args);
+            return expr(args);
         }
 
         private object? EvaluateProgram(Scope scope, Program node)

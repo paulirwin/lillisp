@@ -4,7 +4,7 @@ namespace Lillisp.Core.Expressions
 {
     public static class BooleanExpressions
     {
-        public static object? LessThan(Scope scope, object?[] args)
+        public static object? LessThan(object?[] args)
         {
             if (args.Length < 2)
             {
@@ -26,7 +26,7 @@ namespace Lillisp.Core.Expressions
             return true;
         }
 
-        public static object? GreaterThan(Scope scope, object?[] args)
+        public static object? GreaterThan(object?[] args)
         {
             if (args.Length < 2)
             {
@@ -48,7 +48,7 @@ namespace Lillisp.Core.Expressions
             return true;
         }
 
-        public static object? LessThanOrEqual(Scope scope, object?[] args)
+        public static object? LessThanOrEqual(object?[] args)
         {
             if (args.Length < 2)
             {
@@ -70,7 +70,7 @@ namespace Lillisp.Core.Expressions
             return true;
         }
 
-        public static object? GreaterThanOrEqual(Scope scope, object?[] args)
+        public static object? GreaterThanOrEqual(object?[] args)
         {
             if (args.Length < 2)
             {
@@ -92,7 +92,7 @@ namespace Lillisp.Core.Expressions
             return true;
         }
 
-        public static object? Equal(Scope scope, object?[] args)
+        public static object? Equal(object?[] args)
         {
             if (args.Length < 2)
             {
@@ -112,7 +112,7 @@ namespace Lillisp.Core.Expressions
             return true;
         }
 
-        public static object? Not(Scope scope, object?[] args)
+        public static object? Not(object?[] args)
         {
             if (args.Length != 1)
             {

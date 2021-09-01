@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Antlr4.Runtime;
 using Lillisp.Core;
 
@@ -8,7 +9,10 @@ namespace Lillisp.Repl
     {
         public static void Main(string[] args)
         {
-            var runtime = new LillispRuntime();
+            var options = new ReplOptions();
+
+            var runtime = CreateRuntime(options);
+
             var visitor = new LillispVisitor();
 
             while (true)
@@ -28,8 +32,8 @@ namespace Lillisp.Repl
                 {
                     continue;
                 }
-                
-                if (input.Equals("exit", StringComparison.OrdinalIgnoreCase) 
+
+                if (input.Equals("exit", StringComparison.OrdinalIgnoreCase)
                     || input.Equals("quit", StringComparison.OrdinalIgnoreCase))
                 {
                     break;
@@ -42,6 +46,13 @@ namespace Lillisp.Repl
                     continue;
                 }
 
+                if (input.Equals("reset", StringComparison.OrdinalIgnoreCase))
+                {
+                    runtime = CreateRuntime(options);
+                    Console.WriteLine("Runtime environment reset to defaults.");
+                    continue;
+                }
+
                 try
                 {
                     var lexer = new LillispLexer(new AntlrInputStream(input));
@@ -49,12 +60,13 @@ namespace Lillisp.Repl
 
                     var prog = visitor.Visit(parser.prog());
 
-#if DEBUG
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.Write("AST: ");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine(prog);
-#endif
+                    if (options.ShowAst)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write("AST: ");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine(prog);
+                    }
 
                     object? result = runtime.Evaluate(prog);
 
@@ -71,6 +83,29 @@ namespace Lillisp.Repl
                     Console.WriteLine(ex.Message);
                 }
             }
+        }
+
+        private static LillispRuntime CreateRuntime(ReplOptions options)
+        {
+            var runtime = new LillispRuntime();
+
+            runtime.RegisterGlobal("show-ast", nameof(options.ShowAst));
+
+            runtime.RegisterFunction("repl-config!", cargs =>
+            {
+                var prop = typeof(ReplOptions).GetProperty(cargs[0]?.ToString() ?? "unknown", BindingFlags.Public | BindingFlags.Instance);
+
+                if (prop == null)
+                {
+                    throw new ArgumentException("Unknown repl-config! property");
+                }
+
+                prop.SetValue(options, cargs[1]);
+
+                return Nil.Value;
+            });
+
+            return runtime;
         }
     }
 }

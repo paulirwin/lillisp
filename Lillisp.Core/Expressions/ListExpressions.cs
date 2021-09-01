@@ -6,7 +6,7 @@ namespace Lillisp.Core.Expressions
 {
     public static class ListExpressions
     {
-        public static object? Car(Scope scope, object?[] args)
+        public static object? Car(object?[] args)
         {
             if (args.Length == 0 || args[0] is not IList<object> objects)
             {
@@ -21,7 +21,7 @@ namespace Lillisp.Core.Expressions
             return objects[0];
         }
 
-        public static object? Cdr(Scope scope, object?[] args)
+        public static object? Cdr(object?[] args)
         {
             if (args.Length == 0 || args[0] is not IList<object> objects)
             {
@@ -36,7 +36,7 @@ namespace Lillisp.Core.Expressions
             return objects.Skip(1).ToArray();
         }
 
-        public static object? Cons(Scope scope, object?[] args)
+        public static object? Cons(object?[] args)
         {
             if (args.Length != 2 || args[1] is not IEnumerable<object> objects)
             {
@@ -48,7 +48,7 @@ namespace Lillisp.Core.Expressions
             return new[] { first }.Concat(objects).ToArray();
         }
 
-        public static object? Append(Scope scope, object?[] args)
+        public static object? Append(object?[] args)
         {
             if (args.Length == 0)
             {
