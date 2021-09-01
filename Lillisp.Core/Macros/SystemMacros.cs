@@ -128,7 +128,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("set! requires two arguments");
             }
 
-            if (args[0] is not Atom { AtomType: AtomType.Symbol, Value: string symbol } atom)
+            if (args[0] is not Atom {AtomType: AtomType.Symbol, Value: string symbol} atom)
             {
                 throw new ArgumentException("set!'s first argument must be a symbol");
             }
@@ -164,9 +164,43 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("lambda's second argument must be a node");
             }
 
+            return CreateProcedure(parameters, body);
+        }
+
+        private static Procedure CreateProcedure(List parameters, Node body)
+        {
             string text = $"(lambda {parameters} {body})"; // TODO: get access to actual AST node here
 
             return new Procedure(text, parameters.Children.OfType<Atom>().ToArray(), body);
+        }
+
+        public static object? Defun(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length != 3)
+            {
+                throw new ArgumentException("defun requires three arguments");
+            }
+
+            if (args[0] is not Atom { AtomType: AtomType.Symbol, Value: string symbol } atom)
+            {
+                throw new ArgumentException("defun's first argument must be a symbol");
+            }
+
+            if (args[1] is not List parameters || !parameters.Children.All(i => i is Atom { AtomType: AtomType.Symbol }))
+            {
+                throw new ArgumentException("defun's first argument must be a list of symbols");
+            }
+
+            if (args[2] is not Node body)
+            {
+                throw new ArgumentException("defun's second argument must be a node");
+            }
+
+            var procedure = CreateProcedure(parameters, body);
+
+            scope.Define(symbol, procedure);
+
+            return runtime.Quote(atom);
         }
     }
 }

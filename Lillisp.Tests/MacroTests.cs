@@ -95,5 +95,16 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(begin (defun square (x) (^ x 2)) (square 4))", 16d)]
+        [Theory]
+        public void DefunTests(string input, object expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }

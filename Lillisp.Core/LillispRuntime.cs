@@ -20,6 +20,7 @@ namespace Lillisp.Core
             ["define"] = SystemMacros.Define,
             ["set!"] = SystemMacros.Set,
             ["lambda"] = SystemMacros.Lambda,
+            ["defun"] = SystemMacros.Defun,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
