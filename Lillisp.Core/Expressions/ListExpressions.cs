@@ -9,53 +9,41 @@ namespace Lillisp.Core.Expressions
     {
         public static object? Car(object?[] args)
         {
-            if (args.Length == 0)
+            if (args.Length == 0 || args[0] is not IList<object> objects)
             {
                 throw new ArgumentException("car requires an argument");
             }
 
-            return args[0] switch
-            {
-                List list => list.Children[0],
-                Atom { Value: List atomList } => atomList.Children[0],
-                object[] objArr => objArr[0],
-                _ => throw new ArgumentException("Argument to car must be a list")
-            };
+            return objects[0];
         }
 
         public static object? Cdr(object?[] args)
         {
-            if (args.Length == 0)
+            if (args.Length == 0 || args[0] is not IEnumerable<object> objects)
             {
-                throw new ArgumentException("cdr requires an argument");
+                throw new ArgumentException("cdr requires a list argument");
             }
 
-            return args[0] switch
-            {
-                List list => list.Children.Skip(1).Cast<object>().ToArray(),
-                Atom { Value: List atomList } => atomList.Children.Skip(1).Cast<object>().ToArray(),
-                object[] objArr => objArr.Skip(1).ToArray(),
-                _ => throw new ArgumentException("Argument to cdr must be a list")
-            };
+            return objects.Skip(1).ToArray();
         }
 
         public static object? Cons(object?[] args)
         {
-            if (args.Length != 2 || args[1] is not object[] objArray)
+            if (args.Length != 2 || args[1] is not IEnumerable<object> objects)
             {
                 throw new ArgumentException("cons requires two arguments");
             }
 
             var first = args[0];
 
-            return new[] { first }.Concat(objArray).ToArray();
+            return new[] { first }.Concat(objects).ToArray();
         }
 
         public static object? Append(object?[] args)
         {
             if (args.Length == 0)
             {
-                return Array.Empty<object>();
+                return Nil.Value;
             }
 
             var result = new List<object?>();

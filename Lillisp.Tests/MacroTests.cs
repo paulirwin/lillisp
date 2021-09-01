@@ -58,5 +58,16 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(begin 4 2)", 2d)]
+        [Theory]
+        public void BeginTests(string input, object expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }

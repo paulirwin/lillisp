@@ -16,6 +16,7 @@ namespace Lillisp.Core
             ["apply"] = SystemMacros.Apply,
             ["list"] = SystemMacros.List,
             ["if"] = SystemMacros.If,
+            ["begin"] = SystemMacros.Begin,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
@@ -43,6 +44,7 @@ namespace Lillisp.Core
             ["log"] = MathExpressions.Log,
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
+            ["not"] = BooleanExpressions.Not,
             ["sqrt"] = MathExpressions.Sqrt,
         };
 
@@ -131,7 +133,7 @@ namespace Lillisp.Core
                 return fn;
 
             if (symbol == "nil")
-                return Array.Empty<object>();
+                return Nil.Value;
 
             return symbol;
         }
@@ -140,7 +142,7 @@ namespace Lillisp.Core
         {
             if (node.Children.Count == 0)
             {
-                return Array.Empty<object>();
+                return Nil.Value;
             }
 
             var op = Evaluate(node.Children[0]);

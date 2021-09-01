@@ -111,5 +111,15 @@ namespace Lillisp.Core.Expressions
 
             return true;
         }
+
+        public static object? Not(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("not needs one argument");
+            }
+
+            return !args[0].IsTruthy() ? true : Nil.Value;
+        }
     }
 }

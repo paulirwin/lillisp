@@ -15,7 +15,6 @@ namespace Lillisp.Core.Macros
             return runtime.Quote(node);
         }
 
-
         public static object? Apply(LillispRuntime runtime, object?[] args)
         {
             if (args.Length < 2 || args[0] is not Node source || args[1] is not Node target)
@@ -76,7 +75,24 @@ namespace Lillisp.Core.Macros
                 return runtime.Evaluate(consequence);
             }
             
-            return alt != null ? runtime.Evaluate(alt) : Array.Empty<object>();
+            return alt != null ? runtime.Evaluate(alt) : Nil.Value;
+        }
+
+        public static object? Begin(LillispRuntime runtime, object?[] args)
+        {
+            object? result = null;
+
+            foreach (var arg in args)
+            {
+                if (arg is not Node node)
+                {
+                    throw new ArgumentException("invalid node");
+                }
+
+                result = runtime.Evaluate(node);
+            }
+
+            return result ?? Nil.Value;
         }
     }
 }
