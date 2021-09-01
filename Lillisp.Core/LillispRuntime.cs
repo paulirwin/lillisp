@@ -24,6 +24,10 @@ namespace Lillisp.Core
             ["let"] = CoreMacros.Let,
             ["++!"] = MathMacros.Increment,
             ["--!"] = MathMacros.Decrement,
+            ["&&"] = BooleanMacros.And,
+            ["and"] = BooleanMacros.And,
+            ["||"] = BooleanMacros.Or,
+            ["or"] = BooleanMacros.Or,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>

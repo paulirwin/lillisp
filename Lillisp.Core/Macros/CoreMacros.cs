@@ -113,7 +113,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("define's second argument must be a node");
             }
 
-            object? value = runtime.Evaluate(node);
+            object? value = runtime.Evaluate(scope, node);
 
             scope.Define(symbol, value);
 
@@ -138,7 +138,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("set!'s second argument must be a node");
             }
 
-            object? value = runtime.Evaluate(node);
+            object? value = runtime.Evaluate(scope, node);
 
             scope.Set(symbol, value);
 
@@ -226,7 +226,7 @@ namespace Lillisp.Core.Macros
                 else if (binding is List {Children: {Count: 2}} list 
                          && list.Children[0] is Atom { AtomType: AtomType.Symbol, Value: string listSymbol })
                 {
-                    childScope[listSymbol] = runtime.Evaluate(list.Children[1]);
+                    childScope[listSymbol] = runtime.Evaluate(childScope, list.Children[1]);
                 }
                 else
                 {
