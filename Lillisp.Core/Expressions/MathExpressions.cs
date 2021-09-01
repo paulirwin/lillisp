@@ -233,5 +233,25 @@ namespace Lillisp.Core.Expressions
 
             return Math.Log(Convert.ToDouble(args[0]), args.Length == 2 ? Convert.ToDouble(args[1]) : 10);
         }
+
+        public static object? Decrement(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("dec requires one argument");
+            }
+
+            return Convert.ToDouble(args[0]) - 1;
+        }
+
+        public static object? Increment(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("inc requires one argument");
+            }
+
+            return Convert.ToDouble(args[0]) + 1;
+        }
     }
 }
