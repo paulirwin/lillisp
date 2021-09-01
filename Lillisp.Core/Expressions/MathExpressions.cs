@@ -179,5 +179,39 @@ namespace Lillisp.Core.Expressions
 
             return Math.Sqrt(Convert.ToDouble(args[0]));
         }
+
+        public static object? ShiftRight(object?[] args)
+        {
+            if (args.Length < 2)
+            {
+                throw new ArgumentException(">> requires at least two arguments");
+            }
+
+            var result = Convert.ToInt32(args[0]);
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                result >>= Convert.ToInt32(args[i]);
+            }
+
+            return result;
+        }
+
+        public static object? ShiftLeft(object?[] args)
+        {
+            if (args.Length < 2)
+            {
+                throw new ArgumentException(">> requires at least two arguments");
+            }
+
+            var result = Convert.ToInt32(args[0]);
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                result <<= Convert.ToInt32(args[i]);
+            }
+
+            return result;
+        }
     }
 }

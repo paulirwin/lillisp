@@ -31,6 +31,8 @@ namespace Lillisp.Core
             ["<="] = BooleanExpressions.LessThanOrEqual,
             ["="] = BooleanExpressions.Equal,
             ["=="] = BooleanExpressions.Equal,
+            [">>"] = MathExpressions.ShiftRight,
+            ["<<"] = MathExpressions.ShiftLeft,
             ["abs"] = MathExpressions.Abs,
             ["append"] = ListExpressions.Append,
             ["car"] = ListExpressions.Car,
@@ -46,6 +48,8 @@ namespace Lillisp.Core
             ["pi"] = Math.PI,
             ["e"] = Math.E,
             ["tau"] = Math.Tau,
+            ["true"] = true,
+            ["false"] = false,
         };
 
         public object? EvaluateProgram(string program)

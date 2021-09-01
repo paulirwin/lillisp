@@ -31,5 +31,19 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(>> 42 2)", 10)]
+        [InlineData("(>> 42 2 1)", 5)]
+        [InlineData("(<< 1 2)", 4)]
+        [InlineData("(<< 1 2 7)", 512)]
+        [Theory]
+        public void ShiftTests(string input, int expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }
