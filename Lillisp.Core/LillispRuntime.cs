@@ -12,15 +12,17 @@ namespace Lillisp.Core
     {
         private static readonly IReadOnlyDictionary<string, MacroExpression> _systemMacros = new Dictionary<string, MacroExpression>
         {
-            ["quote"] = SystemMacros.Quote,
-            ["apply"] = SystemMacros.Apply,
-            ["list"] = SystemMacros.List,
-            ["if"] = SystemMacros.If,
-            ["begin"] = SystemMacros.Begin,
-            ["define"] = SystemMacros.Define,
-            ["set!"] = SystemMacros.Set,
-            ["lambda"] = SystemMacros.Lambda,
-            ["defun"] = SystemMacros.Defun,
+            ["quote"] = CoreMacros.Quote,
+            ["apply"] = CoreMacros.Apply,
+            ["list"] = CoreMacros.List,
+            ["if"] = CoreMacros.If,
+            ["begin"] = CoreMacros.Begin,
+            ["define"] = CoreMacros.Define,
+            ["set!"] = CoreMacros.Set,
+            ["lambda"] = CoreMacros.Lambda,
+            ["defun"] = CoreMacros.Defun,
+            ["++!"] = MathMacros.Increment,
+            ["--!"] = MathMacros.Decrement,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
