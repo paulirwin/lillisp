@@ -73,7 +73,7 @@ namespace Lillisp.Repl
                     Console.ForegroundColor = ConsoleColor.Gray;
                     Console.Write("-> ");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine(OutputFormatter.FormatRepl(result));
+                    Console.WriteLine(OutputFormatter.FormatRepl(result) ?? "null");
                 }
                 catch (Exception ex)
                 {

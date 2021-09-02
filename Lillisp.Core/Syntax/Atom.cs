@@ -16,7 +16,7 @@ namespace Lillisp.Core.Syntax
 
         public object? Value { get; }
 
-        public override string ToString() => Value?.ToString() ?? "null";
+        public override string? ToString() => Value?.ToString();
 
         public TypeCode GetTypeCode()
         {

@@ -70,6 +70,8 @@ namespace Lillisp.Core
             ["pow"] = MathExpressions.Power,
             ["print"] = StringExpressions.Print,
             ["println"] = StringExpressions.PrintLn,
+            ["pr"] = StringExpressions.Pr,
+            ["prn"] = StringExpressions.Prn,
             ["range"] = ListExpressions.Range,
             ["sqrt"] = MathExpressions.Sqrt,
             ["str"] = StringExpressions.Str,

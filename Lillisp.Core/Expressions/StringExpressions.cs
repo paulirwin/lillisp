@@ -30,7 +30,25 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("str needs exactly one argument");
             }
 
-            return args[0]?.ToString() ?? "";
+            return OutputFormatter.FormatPrint(args[0]);
+        }
+
+        public static object? Prn(object?[] args)
+        {
+            string output = string.Join(' ', args.Select(OutputFormatter.FormatPr));
+
+            Console.WriteLine(output);
+
+            return Nil.Value;
+        }
+
+        public static object? Pr(object?[] args)
+        {
+            string output = string.Join(' ', args.Select(OutputFormatter.FormatPr));
+
+            Console.Write(output);
+
+            return Nil.Value;
         }
     }
 }

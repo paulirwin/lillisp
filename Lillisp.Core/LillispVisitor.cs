@@ -61,7 +61,8 @@ namespace Lillisp.Core
 
             if (symbol != null)
             {
-                return new Atom(AtomType.Symbol, symbol.GetText());
+                var symbolText = symbol.GetText();
+                return new Atom(AtomType.Symbol, symbolText == "null" ? null : symbolText);
             }
 
             throw new NotImplementedException("Unknown atom type");
