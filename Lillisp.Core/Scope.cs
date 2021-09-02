@@ -7,14 +7,19 @@ namespace Lillisp.Core
     {
         public Scope()
         {
+            InteropNamespaces = new HashSet<string>(Interop.DefaultNamespaces);
         }
 
-        public Scope(Scope? parent)
+        public Scope(Scope parent)
         {
             Parent = parent;
+            // TODO: implement copy on write or parent traversal for namespaces
+            InteropNamespaces = new HashSet<string>(parent.InteropNamespaces);
         }
 
         public Scope? Parent { get; }
+
+        public ISet<string> InteropNamespaces { get; }
 
         public IDictionary<string, object?> Env { get; } = new Dictionary<string, object?>();
 

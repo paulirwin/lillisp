@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Antlr4.Runtime;
 using Lillisp.Core.Expressions;
 using Lillisp.Core.Macros;
@@ -30,6 +31,7 @@ namespace Lillisp.Core
             ["or"] = BooleanMacros.Or,
             ["quote"] = CoreMacros.Quote,
             ["set!"] = CoreMacros.Set,
+            ["use"] = InteropMacros.Use,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
@@ -162,6 +164,11 @@ namespace Lillisp.Core
 
             object? value = scope.Resolve(symbol);
 
+            if (value != null)
+                return value;
+
+            value = Interop.ResolveSymbol(scope, symbol);
+
             return value;
         }
 
@@ -184,6 +191,12 @@ namespace Lillisp.Core
             if (op is Procedure proc)
             {
                 return proc.Invoke(this, scope, args);
+            }
+
+            if (op is MethodInfo method)
+            {
+                // HACK: only static methods for now
+                return method.Invoke(null, args);
             }
 
             if (op is not Expression expr)
