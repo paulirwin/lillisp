@@ -84,8 +84,8 @@ namespace Lillisp.Tests
             Assert.Equal(expected, result);
         }
 
-        [InlineData("((lambda (x) (^ x 2)) 4)", 16d)]
-        [InlineData("(begin (define square (lambda (x) (^ x 2))) (square 4))", 16d)]
+        [InlineData("((lambda (x) (pow x 2)) 4)", 16d)]
+        [InlineData("(begin (define square (lambda (x) (pow x 2))) (square 4))", 16d)]
         [Theory]
         public void LambdaTests(string input, object expected)
         {
@@ -96,7 +96,7 @@ namespace Lillisp.Tests
             Assert.Equal(expected, result);
         }
 
-        [InlineData("(begin (defun square (x) (^ x 2)) (square 4))", 16d)]
+        [InlineData("(begin (defun square (x) (pow x 2)) (square 4))", 16d)]
         [Theory]
         public void DefunTests(string input, object expected)
         {

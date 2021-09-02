@@ -9,6 +9,51 @@ namespace Lillisp.Core
     {
         public static readonly string[] DefaultNamespaces = { "System" };
 
+        public static object? InvokeMember(LillispRuntime runtime, Scope scope, string symbol, object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                throw new ArgumentException("Invoking a .NET instance method requires at least a target");
+            }
+
+            if (args[0] is null)
+            {
+                throw new ArgumentException("First parameter must be an object instance");
+            }
+
+            object?[]? restArgs = args.Length > 1 ? args.Skip(1).ToArray() : null;
+
+            symbol = symbol.TrimStart('.');
+
+            var type = args[0].GetType();
+
+            var members = type.GetMember(symbol, BindingFlags.Public | BindingFlags.Instance);
+
+            if (members.Length == 0)
+            {
+                throw new ArgumentException($"Could not find member {symbol} on type {type}");
+            }
+            
+            var member = members[0];
+
+            if (member is MethodInfo)
+            {
+                return type.InvokeMember(symbol, BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance, null, args[0], restArgs);
+            }
+
+            if (member is PropertyInfo prop)
+            {
+                return prop.GetValue(args[0], restArgs);
+            }
+
+            if (member is FieldInfo field)
+            {
+                return field.GetValue(args[0]);
+            }
+
+            throw new NotImplementedException($"Unhandled member type {member.GetType()}");
+        }
+
         public static object? ResolveSymbol(Scope scope, string symbol)
         {
             string? staticMember = null;

@@ -170,7 +170,10 @@ namespace Lillisp.Core
 
             value = Interop.ResolveSymbol(scope, symbol);
 
-            return value;
+            if (value != null)
+                return value;
+
+            throw new ArgumentException($"Unable to resolve symbol {symbol}");
         }
 
         private object? EvaluateExpression(Scope scope, List node)
@@ -178,6 +181,14 @@ namespace Lillisp.Core
             if (node.Children.Count == 0)
             {
                 return Nil.Value;
+            }
+
+            if (node.Children[0] is Atom {AtomType: AtomType.Symbol, Value: string memberSymbol} 
+                && memberSymbol.StartsWith('.'))
+            {
+                var memberArgs = node.Children.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
+
+                return Interop.InvokeMember(this, scope, memberSymbol, memberArgs);
             }
 
             var op = Evaluate(scope, node.Children[0]);
