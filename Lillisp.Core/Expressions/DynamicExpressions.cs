@@ -25,5 +25,26 @@ namespace Lillisp.Core.Expressions
                 _ => throw new ArgumentException($"Not sure how to get the count of that")
             };
         }
+
+        public static object? Get(object?[] args)
+        {
+            if (args.Length != 2)
+            {
+                throw new ArgumentException("get requires two arguments");
+            }
+
+            var index = Convert.ToInt32(args[1]);
+
+            return args[0] switch
+            {
+                null => Nil.Value,
+                Nil => Nil.Value,
+                List list => list.Children[index],
+                string str => str[index],
+                IList coll => coll[index],
+                IEnumerable enumerable => enumerable.Cast<object>().ElementAt(index),
+                _ => throw new ArgumentException($"Not sure how to get the index of that")
+            };
+        }
     }
 }

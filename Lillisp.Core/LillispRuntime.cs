@@ -54,10 +54,12 @@ namespace Lillisp.Core
             ["abs"] = MathExpressions.Abs,
             ["append"] = ListExpressions.Append,
             ["car"] = ListExpressions.Car,
+            ["cast"] = TypeExpressions.Cast,
             ["cdr"] = ListExpressions.Cdr,
             ["cons"] = ListExpressions.Cons,
             ["count"] = DynamicExpressions.Count,
             ["dec"] = MathExpressions.Decrement,
+            ["get"] = DynamicExpressions.Get,
             ["inc"] = MathExpressions.Increment,
             ["length"] = DynamicExpressions.Count,
             ["ln"] = MathExpressions.Ln,
@@ -71,6 +73,7 @@ namespace Lillisp.Core
             ["range"] = ListExpressions.Range,
             ["sqrt"] = MathExpressions.Sqrt,
             ["str"] = StringExpressions.Str,
+            ["typeof"] = TypeExpressions.TypeOf,
         };
 
         private static readonly IReadOnlyDictionary<string, object?> _systemGlobals = new Dictionary<string, object?>

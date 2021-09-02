@@ -116,9 +116,8 @@ namespace Lillisp.Core.Macros
             object? value = runtime.Evaluate(scope, node);
 
             scope.Define(symbol, value);
-
-            // TODO: return a reference to this symbol
-            return runtime.Quote(atom);
+            
+            return atom;
         }
 
         public static object? Set(LillispRuntime runtime, Scope scope, object?[] args)
@@ -142,8 +141,7 @@ namespace Lillisp.Core.Macros
 
             scope.Set(symbol, value);
 
-            // TODO: return a reference to this symbol
-            return runtime.Quote(atom);
+            return atom;
         }
 
 
@@ -199,8 +197,8 @@ namespace Lillisp.Core.Macros
             var procedure = CreateProcedure(parameters, body);
 
             scope.Define(symbol, procedure);
-
-            return runtime.Quote(atom);
+            
+            return atom;
         }
 
         public static object? Let(LillispRuntime runtime, Scope scope, object?[] args)

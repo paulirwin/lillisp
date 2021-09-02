@@ -20,12 +20,39 @@ namespace Lillisp.Core
             {
                 throw new ArgumentException("First parameter must be an object instance");
             }
-
-            object?[]? restArgs = args.Length > 1 ? args.Skip(1).ToArray() : null;
-
+            
             symbol = symbol.TrimStart('.');
 
             var type = args[0].GetType();
+
+            object?[]? restArgs = args.Length > 1 ? args.Skip(1).ToArray() : null;
+
+            if (symbol == "[]")
+            {
+                // indexer syntax
+                var indexers = type.GetProperties().Where(i => i.GetIndexParameters().Length > 0).ToList();
+
+                if (indexers.Count == 0)
+                {
+                    throw new ArgumentException($"Type {type} does not have an indexer property");
+                }
+                
+                if (indexers.Count > 1)
+                {
+                    throw new NotImplementedException("Support for multiple indexer properties is not implemented");
+                }
+
+                if (restArgs == null)
+                {
+                    throw new ArgumentException("Indexer access must have at least one index parameter");
+                }
+
+                var indexes = restArgs.Zip(indexers[0].GetIndexParameters())
+                    .Select(i => Convert.ChangeType(i.First, i.Second.ParameterType))
+                    .ToArray();
+
+                return indexers[0].GetValue(args[0], indexes);
+            }
 
             var members = type.GetMember(symbol, BindingFlags.Public | BindingFlags.Instance);
 
@@ -43,11 +70,21 @@ namespace Lillisp.Core
 
             if (member is PropertyInfo prop)
             {
-                return prop.GetValue(args[0], restArgs);
+                if (args.Length > 1)
+                {
+                    throw new ArgumentException("Can't pass parameters to a property getter");
+                }
+
+                return prop.GetValue(args[0]);
             }
 
             if (member is FieldInfo field)
             {
+                if (args.Length > 1)
+                {
+                    throw new ArgumentException("Can't pass parameters to a field");
+                }
+
                 return field.GetValue(args[0]);
             }
 

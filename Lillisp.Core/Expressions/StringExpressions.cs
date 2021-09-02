@@ -7,7 +7,7 @@ namespace Lillisp.Core.Expressions
     {
         public static object? Print(object?[] args)
         {
-            string output = string.Join(' ', args.Select(ReplOutputFormatter.Format));
+            string output = string.Join(' ', args.Select(OutputFormatter.FormatPrint));
 
             Console.Write(output);
 
@@ -16,7 +16,7 @@ namespace Lillisp.Core.Expressions
 
         public static object? PrintLn(object?[] args)
         {
-            string output = string.Join(' ', args.Select(ReplOutputFormatter.Format));
+            string output = string.Join(' ', args.Select(OutputFormatter.FormatPrint));
 
             Console.WriteLine(output);
 
