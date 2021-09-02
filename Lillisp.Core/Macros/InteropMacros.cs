@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using BindingFlags = System.Reflection.BindingFlags;
 
 namespace Lillisp.Core.Macros
 {
@@ -37,6 +39,27 @@ namespace Lillisp.Core.Macros
             }
 
             return Nil.Value;
+        }
+
+        public static object? New(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length == 0 || args[0] is not Node typeNode)
+            {
+                throw new ArgumentException("new requires at least one argument");
+            }
+
+            var typeValue = runtime.Evaluate(typeNode);
+
+            if (typeValue is not Type type)
+            {
+                throw new ArgumentException("First parameter must evaluate to a System.Type");
+            }
+
+            var ctorParams = args.Skip(1)
+                .Select(i => i is Node node ? runtime.Evaluate(node) : i)
+                .ToArray();
+
+            return Activator.CreateInstance(type, ctorParams);
         }
     }
 }

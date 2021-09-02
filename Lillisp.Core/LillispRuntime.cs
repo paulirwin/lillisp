@@ -28,6 +28,7 @@ namespace Lillisp.Core
             ["let"] = CoreMacros.Let,
             ["list"] = CoreMacros.List,
             ["map"] = CoreMacros.Map,
+            ["new"] = InteropMacros.New,
             ["or"] = BooleanMacros.Or,
             ["quote"] = CoreMacros.Quote,
             ["set!"] = CoreMacros.Set,

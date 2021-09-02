@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -56,26 +57,35 @@ namespace Lillisp.Core
 
         private static Type? FindType(Scope scope, string name)
         {
-            var type = Type.GetType(name);
+            var matches = new List<Type>();
 
-            if (type != null)
-                return type;
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var assyType = assembly.GetType(name);
+
+                if (assyType != null)
+                {
+                    matches.Add(assyType);
+                }
+
+                var assyMatches = scope.InteropNamespaces
+                    .Select(i => $"{i}.{name}")
+                    .Select(i => assembly.GetType(i))
+                    .Where(i => i != null)
+                    .ToList();
+
+                matches.AddRange(assyMatches!);
+            }
             
-            var matches = scope.InteropNamespaces
-                .Select(i => $"{i}.{name}")
-                .Select(Type.GetType)
-                .Where(i => i != null)
-                .ToList();
-
-            if (matches.Count == 1)
+            if (matches.Count >= 1)
             {
                 return matches[0];
             }
             
-            if (matches.Count > 1)
-            {
-                throw new AmbiguousMatchException($"More than one .NET type matched the symbol: {string.Join(", ", matches)}");
-            }
+            //if (matches.Count > 1)
+            //{
+            //    throw new AmbiguousMatchException($"More than one .NET type matched the symbol: {string.Join(", ", matches)}");
+            //}
 
             return null;
         }
