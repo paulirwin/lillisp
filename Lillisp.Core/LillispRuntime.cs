@@ -20,10 +20,13 @@ namespace Lillisp.Core
             ["and"] = BooleanMacros.And,
             ["apply"] = CoreMacros.Apply,
             ["begin"] = CoreMacros.Begin,
+            ["cond"] = CoreMacros.Cond,
             ["def"] = CoreMacros.Define,
             ["define"] = CoreMacros.Define,
             ["defun"] = CoreMacros.Defun,
             ["if"] = CoreMacros.If,
+            //["include"] = CoreMacros.Include, // TODO
+            //["include-ci"] = CoreMacros.Include, // TODO
             ["lambda"] = CoreMacros.Lambda,
             ["let"] = CoreMacros.Let,
             ["list"] = CoreMacros.List,
@@ -33,6 +36,7 @@ namespace Lillisp.Core
             ["quote"] = CoreMacros.Quote,
             ["set!"] = CoreMacros.Set,
             ["use"] = InteropMacros.Use,
+            ["when"] = BooleanMacros.When,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
@@ -53,12 +57,16 @@ namespace Lillisp.Core
             ["<<"] = MathExpressions.ShiftLeft,
             ["abs"] = MathExpressions.Abs,
             ["append"] = ListExpressions.Append,
+            ["boolean?"] = TypeExpressions.IsBoolean,
+            //["bytevector?"] = TypeExpressions.IsByteVector, // TODO: bytevector support
             ["car"] = ListExpressions.Car,
             ["cast"] = TypeExpressions.Cast,
             ["cdr"] = ListExpressions.Cdr,
+            ["char?"] = TypeExpressions.IsChar,
             ["cons"] = ListExpressions.Cons,
             ["count"] = DynamicExpressions.Count,
             ["dec"] = MathExpressions.Decrement,
+            //["eof-object?"] = TypeExpressions.IsEofObject, // TODO
             ["get"] = DynamicExpressions.Get,
             ["inc"] = MathExpressions.Increment,
             ["length"] = DynamicExpressions.Count,
@@ -67,7 +75,12 @@ namespace Lillisp.Core
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
             ["not"] = BooleanExpressions.Not,
+            ["null?"] = TypeExpressions.IsNull,
+            ["number?"] = TypeExpressions.IsNumber,
+            ["pair?"] = TypeExpressions.IsPair,
+            //["port?"] = TypeExpressions.IsPort, // TODO
             ["pow"] = MathExpressions.Power,
+            ["procedure?"] = TypeExpressions.IsProcedure,
             ["print"] = StringExpressions.Print,
             ["println"] = StringExpressions.PrintLn,
             ["pr"] = StringExpressions.Pr,
@@ -75,7 +88,10 @@ namespace Lillisp.Core
             ["range"] = ListExpressions.Range,
             ["sqrt"] = MathExpressions.Sqrt,
             ["str"] = StringExpressions.Str,
+            ["string?"] = TypeExpressions.IsString,
+            ["symbol?"] = TypeExpressions.IsSymbol,
             ["typeof"] = TypeExpressions.TypeOf,
+            //["vector?"] = TypeExpressions.IsVector, // TODO
         };
 
         private static readonly IReadOnlyDictionary<string, object?> _systemGlobals = new Dictionary<string, object?>
@@ -83,6 +99,10 @@ namespace Lillisp.Core
             ["pi"] = Math.PI,
             ["e"] = Math.E,
             ["tau"] = Math.Tau,
+            ["#t"] = true,
+            ["#f"] = false,
+            ["#true"] = true,
+            ["#false"] = false,
             ["true"] = true,
             ["false"] = false,
         };

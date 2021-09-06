@@ -39,5 +39,30 @@ namespace Lillisp.Core.Macros
 
             return false;
         }
+
+        public static object? When(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length < 2 || args[0] is not Node test)
+            {
+                throw new ArgumentException("when requires at least a test and an expression argument");
+            }
+
+            var result = runtime.Evaluate(test);
+
+            if (!result.IsTruthy())
+            {
+                return Nil.Value;
+            }
+
+            foreach (var arg in args[1..])
+            {
+                if (arg is Node node)
+                {
+                    runtime.Evaluate(node);
+                }
+            }
+
+            return Nil.Value;
+        }
     }
 }

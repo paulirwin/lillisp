@@ -18,11 +18,10 @@ SYMBOL: OPERATOR | IDENTIFIER;
 
 OPERATOR: SYMBOL_CHAR+;
 
-IDENTIFIER: (LETTER | DOT) (
+IDENTIFIER: (LETTER | DOT | HASH) (
 		LETTER
 		| NUMBER
 		| SYMBOL_CHAR
-		| UNDERSCORE
 	)*;
 
 NUMBER: INTEGER | FLOAT | RATIO;
@@ -49,7 +48,14 @@ SYMBOL_CHAR:
 	| '&'
 	| '|'
 	| '['
-	| ']';
+	| ']'
+	| '$'
+	| '.'
+	| ':'
+	| '?'
+	| '@'
+	| '~'
+	| '_';
 LPAREN: '(';
 RPAREN: ')';
 NEGATE: '-';
@@ -57,5 +63,6 @@ UNDERSCORE: '_';
 QUOTE: '\'';
 DQUOTE: '\"';
 DOT: '.';
+HASH: '#';
 
 WHITESPACE: [ \r\n\t]+ -> channel(HIDDEN);

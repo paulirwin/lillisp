@@ -280,5 +280,53 @@ namespace Lillisp.Core.Macros
 
             return result;
         }
+
+        public static object? Cond(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length == 0 || !args.All(i => i is List { Children: { Count: > 1 }}))
+            {
+                throw new ArgumentException("cond requires at least one clause argument");
+            }
+
+            var clauses = args.Cast<List>().ToArray();
+            List? elseClause = null;
+
+            if (clauses[^1].Children[0] is Atom {AtomType: AtomType.Symbol, Value: "else"})
+            {
+                elseClause = clauses[^1];
+                clauses = clauses[..^1];
+            }
+
+            foreach (var clause in clauses)
+            {
+                var test = runtime.Evaluate(clause.Children[0]);
+
+                if (test.IsTruthy())
+                {
+                    object? result = Nil.Value;
+
+                    foreach (var expr in clause.Children.Skip(1))
+                    {
+                        result = runtime.Evaluate(expr);
+                    }
+
+                    return result;
+                }
+            }
+
+            if (elseClause != null)
+            {
+                object? result = Nil.Value;
+
+                foreach (var expr in elseClause.Children.Skip(1))
+                {
+                    result = runtime.Evaluate(expr);
+                }
+
+                return result;
+            }
+
+            throw new InvalidOperationException("No clause matched for the cond expression");
+        }
     }
 }
