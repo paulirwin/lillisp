@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Lillisp.Core.Syntax;
 
@@ -214,17 +215,30 @@ namespace Lillisp.Core.Macros
             }
 
             var childScope = scope.CreateChildScope();
+            var evaluatedSymbols = new HashSet<string>();
 
             foreach (var binding in bindings.Children)
             {
                 if (binding is Atom {AtomType: AtomType.Symbol, Value: string symbol})
                 {
+                    if (evaluatedSymbols.Contains(symbol))
+                    {
+                        throw new ArgumentException($"Variable {symbol} has already been defined in this scope");
+                    }
+
                     childScope[symbol] = Nil.Value;
+                    evaluatedSymbols.Add(symbol);
                 }
                 else if (binding is List {Children: {Count: 2}} list 
                          && list.Children[0] is Atom { AtomType: AtomType.Symbol, Value: string listSymbol })
                 {
+                    if (evaluatedSymbols.Contains(listSymbol))
+                    {
+                        throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
+                    }
+
                     childScope[listSymbol] = runtime.Evaluate(childScope, list.Children[1]);
+                    evaluatedSymbols.Add(listSymbol);
                 }
                 else
                 {
