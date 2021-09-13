@@ -152,8 +152,8 @@ namespace Lillisp.Core.Macros
             {
                 throw new ArgumentException("lambda requires two arguments");
             }
-
-            if (args[0] is not List parameters || !parameters.Children.All(i => i is Atom { AtomType: AtomType.Symbol }))
+            
+            if (args[0] is not Node parameters)
             {
                 throw new ArgumentException("lambda's first argument must be a list of symbols");
             }
@@ -166,11 +166,11 @@ namespace Lillisp.Core.Macros
             return CreateProcedure(parameters, body);
         }
 
-        private static Procedure CreateProcedure(List parameters, Node body)
+        private static Procedure CreateProcedure(Node parameters, Node body)
         {
             string text = $"(lambda {parameters} {body})"; // TODO: get access to actual AST node here
-
-            return new Procedure(text, parameters.Children.OfType<Atom>().ToArray(), body);
+            
+            return new Procedure(text, parameters, body);
         }
 
         public static object? Defun(LillispRuntime runtime, Scope scope, object?[] args)

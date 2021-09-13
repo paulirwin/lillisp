@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Lillisp.Core;
 using Xunit;
 
@@ -42,6 +44,26 @@ namespace Lillisp.Tests
             var result = runtime.EvaluateProgram(prog);
 
             Assert.Equal(10d, result);
+        }
+
+        [Fact]
+        public void R7RS_4_1_4_Lambda_Rest_Example_1()
+        {
+            var runtime = new LillispRuntime();
+
+            var prog = "((lambda x x) 3 4 5 6)";
+
+            var result = runtime.EvaluateProgram(prog);
+
+            Assert.IsAssignableFrom<IEnumerable<object>>(result);
+
+            var list = (result as IEnumerable<object>)!.ToList();
+
+            Assert.Equal(4, list.Count);
+            Assert.Equal(3d, list[0]);
+            Assert.Equal(4d, list[1]);
+            Assert.Equal(5d, list[2]);
+            Assert.Equal(6d, list[3]);
         }
 
         // HACK: the actual examples use quoted symbols, but those aren't 100% correct yet here.

@@ -6,7 +6,7 @@ namespace Lillisp.Core
 {
     public class Procedure
     {
-        public Procedure(string text, IList<Atom> parameters, Node body)
+        public Procedure(string text, Node parameters, Node body)
         {
             Text = text;
             Parameters = parameters;
@@ -15,7 +15,7 @@ namespace Lillisp.Core
 
         public string Text { get; }
 
-        public IList<Atom> Parameters { get; }
+        public Node Parameters { get; }
 
         public Node Body { get; }
 
@@ -23,19 +23,26 @@ namespace Lillisp.Core
 
         public object? Invoke(LillispRuntime runtime, Scope scope, object?[] arguments)
         {
-            if (Parameters.Count != arguments.Length)
-            {
-                throw new ArgumentException("Arguments provided do not match parameter count");
-            }
-
             var childScope = scope.CreateChildScope();
 
-            for (int i = 0; i < Parameters.Count; i++)
+            if (Parameters is Atom pAtom)
             {
-                var parm = Parameters[i];
-                var arg = arguments[i];
+                childScope[pAtom.Value!.ToString()!] = arguments;
+            }
+            else if (Parameters is List list)
+            {
+                for (int i = 0; i < list.Children.Count; i++)
+                {
+                    if (list.Children[i] is not Atom {AtomType: AtomType.Symbol} atom)
+                        throw new ArgumentException($"Unhandled parameter node type: {list.Children[i].Type}");
 
-                childScope[parm.Value!.ToString()!] = arg;
+                    if (arguments.Length > i)
+                    {
+                        var arg = arguments[i];
+
+                        childScope[atom.Value!.ToString()!] = arg;
+                    }
+                }
             }
 
             return runtime.Evaluate(childScope, Body);
