@@ -66,6 +66,24 @@ namespace Lillisp.Tests
             Assert.Equal(6d, list[3]);
         }
 
+        [Fact]
+        public void R7RS_4_1_4_Lambda_Rest_Example_2()
+        {
+            var runtime = new LillispRuntime();
+
+            var prog = "((lambda (x y . z) z) 3 4 5 6)";
+
+            var result = runtime.EvaluateProgram(prog);
+
+            Assert.IsAssignableFrom<IEnumerable<object>>(result);
+
+            var list = (result as IEnumerable<object>)!.ToList();
+
+            Assert.Equal(2, list.Count);
+            Assert.Equal(5d, list[0]);
+            Assert.Equal(6d, list[1]);
+        }
+
         // HACK: the actual examples use quoted symbols, but those aren't 100% correct yet here.
         // The point of the example is more about the conditionals, so using strings instead for now.
         [InlineData("(if (> 3 2) \"yes\" \"no\")", "yes")]

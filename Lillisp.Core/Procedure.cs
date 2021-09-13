@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core
@@ -34,7 +34,26 @@ namespace Lillisp.Core
                 for (int i = 0; i < list.Children.Count; i++)
                 {
                     if (list.Children[i] is not Atom {AtomType: AtomType.Symbol} atom)
+                    {
                         throw new ArgumentException($"Unhandled parameter node type: {list.Children[i].Type}");
+                    }
+
+                    if (atom.Value is ".")
+                    {
+                        if (list.Children.Count > i + 2 || list.Children.Count == i + 1)
+                        {
+                            throw new ArgumentException("One variable must follow the dot in lambda parameters");
+                        }
+
+                        if (list.Children[i + 1] is not Atom {AtomType: AtomType.Symbol} restAtom)
+                        {
+                            throw new ArgumentException("Variable must follow the dot in lambda parameters");
+                        }
+
+                        childScope[restAtom.Value!.ToString()!] = arguments.Skip(i).ToArray();
+                        
+                        break;
+                    }
 
                     if (arguments.Length > i)
                     {
