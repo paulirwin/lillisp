@@ -2,24 +2,28 @@
 
 namespace Lillisp.Core.Syntax
 {
-    public class List : Node
+    public static class List
     {
-        public List()
-            : base(NodeType.List)
+        public static Node FromNodes(IEnumerable<Node> nodes)
         {
-        }
+            Pair? first = null, current = null;
 
-        public List(IEnumerable<Node> nodes)
-            : this()
-        {
             foreach (var node in nodes)
             {
-                Children.Add(node);
+                if (first == null)
+                {
+                    first = new Pair(node, Nil.Value);
+                    current = first;
+                }
+                else
+                {
+                    var p = new Pair(node, Nil.Value);
+                    current!.Cdr = p;
+                    current = p;
+                }
             }
+
+            return (Node?)first ?? Nil.Value;
         }
-
-        public IList<Node> Children { get; } = new List<Node>();
-
-        public override string ToString() => $"({string.Join(' ', Children)})";
     }
 }

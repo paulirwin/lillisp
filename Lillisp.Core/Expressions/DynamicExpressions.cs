@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
-using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Expressions
 {
@@ -18,7 +17,7 @@ namespace Lillisp.Core.Expressions
             {
                 null => 0,
                 Nil => 0,
-                List list => list.Children.Count,
+                Pair pair => pair.Count(),
                 string str => str.Length,
                 ICollection coll => coll.Count,
                 IEnumerable enumerable => enumerable.Cast<object>().Count(),
@@ -39,7 +38,7 @@ namespace Lillisp.Core.Expressions
             {
                 null => Nil.Value,
                 Nil => Nil.Value,
-                List list => list.Children[index],
+                Pair pair => pair.ElementAt(index),
                 string str => str[index],
                 IList coll => coll[index],
                 IEnumerable enumerable => enumerable.Cast<object>().ElementAt(index),

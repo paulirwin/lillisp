@@ -143,7 +143,7 @@ namespace Lillisp.Core
             return node switch
             {
                 Program program => program.Children.Select(Quote).ToArray(),
-                List list => list.Children.Select(Quote).ToArray(),
+                Pair pair => pair.Select(Quote).ToArray(),
                 Atom atom => atom.Value,
                 Quote quote => quote.Value,
                 _ => throw new ArgumentOutOfRangeException()
@@ -157,9 +157,10 @@ namespace Lillisp.Core
             return node switch
             {
                 Program program => EvaluateProgram(scope, program),
-                List list => EvaluateExpression(scope, list),
+                Pair pair => EvaluateExpression(scope, pair),
                 Atom atom => EvaluateAtom(scope, atom),
                 Quote quote => EvaluateQuote(quote),
+                Nil nil => nil,
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
@@ -168,7 +169,7 @@ namespace Lillisp.Core
         {
             return node.Value switch
             {
-                List list => list.Children.Select(Quote).ToArray(),
+                Pair pair => pair.Select(Quote).ToArray(),
                 Atom { AtomType: AtomType.Number or AtomType.String, Value: { } value } => value,
                 Atom { AtomType: AtomType.Symbol, Value: { } value } => value.ToString(),
                 _ => null
@@ -201,29 +202,29 @@ namespace Lillisp.Core
             throw new ArgumentException($"Unable to resolve symbol {symbol}");
         }
 
-        private object? EvaluateExpression(Scope scope, List node)
+        private object? EvaluateExpression(Scope scope, Pair pair)
         {
-            if (node.Children.Count == 0)
+            if (pair.Car is Nil)
             {
                 return Nil.Value;
             }
 
-            if (node.Children[0] is Atom {AtomType: AtomType.Symbol, Value: string memberSymbol} 
+            if (pair.Car is Atom {AtomType: AtomType.Symbol, Value: string memberSymbol} 
                 && memberSymbol.StartsWith('.'))
             {
-                var memberArgs = node.Children.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
+                var memberArgs = pair.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
 
                 return Interop.InvokeMember(this, scope, memberSymbol, memberArgs);
             }
 
-            var op = Evaluate(scope, node.Children[0]);
+            var op = Evaluate(scope, pair.Car);
 
             if (op is MacroExpression macro)
             {
-                return macro(this, scope, node.Children.Skip(1).Cast<object>().ToArray());
+                return macro(this, scope, pair.Skip(1).Cast<object>().ToArray());
             }
 
-            var args = node.Children.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
+            var args = pair.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
 
             if (op is Procedure proc)
             {

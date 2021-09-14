@@ -185,7 +185,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("defun's first argument must be a symbol");
             }
 
-            if (args[1] is not List parameters || !parameters.Children.All(i => i is Atom { AtomType: AtomType.Symbol }))
+            if (args[1] is not Pair parameters || !parameters.All(i => i is Atom { AtomType: AtomType.Symbol }))
             {
                 throw new ArgumentException("defun's first argument must be a list of symbols");
             }
@@ -209,7 +209,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("let requires at least one argument");
             }
 
-            if (args[0] is not List bindings)
+            if (args[0] is not Pair bindings)
             {
                 throw new ArgumentException("let's first parameter must be a list");
             }
@@ -217,7 +217,7 @@ namespace Lillisp.Core.Macros
             var childScope = scope.CreateChildScope();
             var evaluatedSymbols = new HashSet<string>();
 
-            foreach (var binding in bindings.Children)
+            foreach (var binding in bindings)
             {
                 if (binding is Atom {AtomType: AtomType.Symbol, Value: string symbol})
                 {
@@ -229,15 +229,15 @@ namespace Lillisp.Core.Macros
                     childScope[symbol] = Nil.Value;
                     evaluatedSymbols.Add(symbol);
                 }
-                else if (binding is List {Children: {Count: 2}} list 
-                         && list.Children[0] is Atom { AtomType: AtomType.Symbol, Value: string listSymbol })
+                else if (binding is Pair { IsList: true } list 
+                         && list.Car is Atom { AtomType: AtomType.Symbol, Value: string listSymbol })
                 {
                     if (evaluatedSymbols.Contains(listSymbol))
                     {
                         throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
                     }
 
-                    childScope[listSymbol] = runtime.Evaluate(childScope, list.Children[1]);
+                    childScope[listSymbol] = runtime.Evaluate(childScope, list.Cdr);
                     evaluatedSymbols.Add(listSymbol);
                 }
                 else
@@ -297,15 +297,15 @@ namespace Lillisp.Core.Macros
 
         public static object? Cond(LillispRuntime runtime, Scope scope, object?[] args)
         {
-            if (args.Length == 0 || !args.All(i => i is List { Children: { Count: > 1 }}))
+            if (args.Length == 0 || !args.All(i => i is Pair { IsList: true }))
             {
                 throw new ArgumentException("cond requires at least one clause argument");
             }
 
-            var clauses = args.Cast<List>().ToArray();
-            List? elseClause = null;
+            var clauses = args.Cast<Pair>().ToArray();
+            Pair? elseClause = null;
 
-            if (clauses[^1].Children[0] is Atom {AtomType: AtomType.Symbol, Value: "else"})
+            if (clauses[^1].Car is Atom {AtomType: AtomType.Symbol, Value: "else"})
             {
                 elseClause = clauses[^1];
                 clauses = clauses[..^1];
@@ -313,13 +313,13 @@ namespace Lillisp.Core.Macros
 
             foreach (var clause in clauses)
             {
-                var test = runtime.Evaluate(clause.Children[0]);
+                var test = runtime.Evaluate(clause.Car);
 
                 if (test.IsTruthy())
                 {
                     object? result = Nil.Value;
 
-                    foreach (var expr in clause.Children.Skip(1))
+                    foreach (var expr in clause.Skip(1))
                     {
                         result = runtime.Evaluate(expr);
                     }
@@ -332,7 +332,7 @@ namespace Lillisp.Core.Macros
             {
                 object? result = Nil.Value;
 
-                foreach (var expr in elseClause.Children.Skip(1))
+                foreach (var expr in elseClause.Skip(1))
                 {
                     result = runtime.Evaluate(expr);
                 }

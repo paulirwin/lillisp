@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core
@@ -24,7 +25,7 @@ namespace Lillisp.Core
 
         public override Node VisitList(LillispParser.ListContext context)
         {
-            var node = new List();
+            var nodes = new List<Node>();
 
             foreach (var child in context.children)
             {
@@ -32,11 +33,11 @@ namespace Lillisp.Core
 
                 if (childNode != null)
                 {
-                    node.Children.Add(childNode);
+                    nodes.Add(childNode);
                 }
             }
 
-            return node;
+            return List.FromNodes(nodes);
         }
 
         public override Node VisitAtom(LillispParser.AtomContext context)

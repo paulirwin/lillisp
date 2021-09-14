@@ -29,23 +29,25 @@ namespace Lillisp.Core
             {
                 childScope[pAtom.Value!.ToString()!] = arguments;
             }
-            else if (Parameters is List list)
+            else if (Parameters is Pair {IsList: true} parms)
             {
-                for (int i = 0; i < list.Children.Count; i++)
+                var list = parms.ToList();
+
+                for (int i = 0; i < list.Count; i++)
                 {
-                    if (list.Children[i] is not Atom {AtomType: AtomType.Symbol} atom)
+                    if (list.ElementAt(i) is not Atom {AtomType: AtomType.Symbol} atom)
                     {
-                        throw new ArgumentException($"Unhandled parameter node type: {list.Children[i].Type}");
+                        throw new ArgumentException($"Unhandled parameter node type: {list[i].GetType()}");
                     }
 
                     if (atom.Value is ".")
                     {
-                        if (list.Children.Count > i + 2 || list.Children.Count == i + 1)
+                        if (list.Count > i + 2 || list.Count == i + 1)
                         {
                             throw new ArgumentException("One variable must follow the dot in lambda parameters");
                         }
 
-                        if (list.Children[i + 1] is not Atom {AtomType: AtomType.Symbol} restAtom)
+                        if (list[i + 1] is not Atom {AtomType: AtomType.Symbol} restAtom)
                         {
                             throw new ArgumentException("Variable must follow the dot in lambda parameters");
                         }

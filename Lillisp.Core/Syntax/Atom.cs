@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Lillisp.Core.Syntax
 {
     public class Atom : Node, IConvertible
     {
         public Atom(AtomType atomType, object? value)
-            : base(NodeType.Atom)
         {
             AtomType = atomType;
             Value = value;

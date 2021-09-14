@@ -99,10 +99,10 @@ namespace Lillisp.Core.Expressions
         {
             if (args.Length != 1)
             {
-                throw new ArgumentException("null? requires one argument");
+                throw new ArgumentException("pair? requires one argument");
             }
 
-            return args[0] is Quote {Type: NodeType.List};
+            return args[0] is Quote { Value: Pair };
         }
 
         public static object? IsProcedure(object?[] args)
@@ -123,7 +123,7 @@ namespace Lillisp.Core.Expressions
             }
 
             // TODO: this does not currently work correctly
-            return args[0] is Quote { Type:NodeType.Atom, Value: Atom { AtomType:AtomType.Symbol}};
+            return args[0] is Quote { Value: Atom { AtomType:AtomType.Symbol}};
         }
     }
 }

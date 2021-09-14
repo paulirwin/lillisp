@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lillisp.Core
 {
-    public sealed class Nil : IList<object>
+    public sealed class Nil : Node, IList<object>
     {
         public static readonly Nil Value = new();
 

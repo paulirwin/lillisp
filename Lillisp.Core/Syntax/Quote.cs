@@ -2,8 +2,7 @@
 {
     public class Quote : Node
     {
-        public Quote(Node value) 
-            : base(NodeType.Quote)
+        public Quote(Node value)
         {
             Value = value;
         }
