@@ -123,7 +123,7 @@ namespace Lillisp.Core.Expressions
             }
 
             // TODO: this does not currently work correctly
-            return args[0] is Quote { Value: Atom { AtomType:AtomType.Symbol}};
+            return args[0] is Quote { Value: Symbol };
         }
     }
 }

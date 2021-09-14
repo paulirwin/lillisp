@@ -7,34 +7,34 @@ namespace Lillisp.Core.Macros
     {
         public static object? Increment(LillispRuntime runtime, Scope scope, object?[] args)
         {
-            if (args.Length != 1 || args[0] is not Atom { AtomType: AtomType.Symbol, Value: string symbol } atom)
+            if (args.Length != 1 || args[0] is not Symbol symbol)
             {
                 throw new ArgumentException("++! requires one symbol argument");
             }
 
-            object? value = scope.Resolve(symbol);
+            object? value = scope.Resolve(symbol.Value);
 
             double d = Convert.ToDouble(value) + 1;
 
-            scope.Set(symbol, d);
+            scope.Set(symbol.Value, d);
 
-            return atom;
+            return symbol;
         }
 
         public static object? Decrement(LillispRuntime runtime, Scope scope, object?[] args)
         {
-            if (args.Length != 1 || args[0] is not Atom { AtomType: AtomType.Symbol, Value: string symbol } atom)
+            if (args.Length != 1 || args[0] is not Symbol symbol)
             {
                 throw new ArgumentException("++! requires one symbol argument");
             }
 
-            object? value = scope.Resolve(symbol);
+            object? value = scope.Resolve(symbol.Value);
 
             double d = Convert.ToDouble(value) - 1;
 
-            scope.Set(symbol, d);
+            scope.Set(symbol.Value, d);
 
-            return atom;
+            return symbol;
         }
     }
 }

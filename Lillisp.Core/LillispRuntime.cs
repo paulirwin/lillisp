@@ -144,6 +144,7 @@ namespace Lillisp.Core
             {
                 Program program => program.Children.Select(Quote).ToArray(),
                 Pair pair => pair.Select(Quote).ToArray(),
+                Symbol symbol => symbol.Value,
                 Atom atom => atom.Value,
                 Quote quote => quote.Value,
                 _ => throw new ArgumentOutOfRangeException()
@@ -158,7 +159,8 @@ namespace Lillisp.Core
             {
                 Program program => EvaluateProgram(scope, program),
                 Pair pair => EvaluateExpression(scope, pair),
-                Atom atom => EvaluateAtom(scope, atom),
+                Symbol symbol => EvaluateSymbol(scope, symbol),
+                Atom atom => atom.Value,
                 Quote quote => EvaluateQuote(quote),
                 Nil nil => nil,
                 _ => throw new ArgumentOutOfRangeException()
@@ -171,17 +173,14 @@ namespace Lillisp.Core
             {
                 Pair pair => pair.Select(Quote).ToArray(),
                 Atom { AtomType: AtomType.Number or AtomType.String, Value: { } value } => value,
-                Atom { AtomType: AtomType.Symbol, Value: { } value } => value.ToString(),
+                Symbol symbol => symbol.Value,
                 _ => null
             };
         }
 
-        private object? EvaluateAtom(Scope scope, Atom node)
+        private object? EvaluateSymbol(Scope scope, Symbol node)
         {
-            if (node.AtomType != AtomType.Symbol || node.Value == null)
-                return node.Value;
-
-            string? symbol = node.Value.ToString();
+            string? symbol = node.Value;
 
             if (symbol is null or "null")
                 return null;
@@ -209,12 +208,11 @@ namespace Lillisp.Core
                 return Nil.Value;
             }
 
-            if (pair.Car is Atom {AtomType: AtomType.Symbol, Value: string memberSymbol} 
-                && memberSymbol.StartsWith('.'))
+            if (pair.Car is Symbol symbol && symbol.Value.StartsWith('.'))
             {
                 var memberArgs = pair.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
 
-                return Interop.InvokeMember(this, scope, memberSymbol, memberArgs);
+                return Interop.InvokeMember(this, scope, symbol.Value, memberArgs);
             }
 
             var op = Evaluate(scope, pair.Car);

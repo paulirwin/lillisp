@@ -104,7 +104,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("define requires two arguments");
             }
 
-            if (args[0] is not Atom {AtomType: AtomType.Symbol, Value: string symbol} atom)
+            if (args[0] is not Symbol symbol)
             {
                 throw new ArgumentException("define's first argument must be a symbol");
             }
@@ -116,9 +116,9 @@ namespace Lillisp.Core.Macros
 
             object? value = runtime.Evaluate(scope, node);
 
-            scope.Define(symbol, value);
+            scope.Define(symbol.Value, value);
             
-            return atom;
+            return symbol;
         }
 
         public static object? Set(LillispRuntime runtime, Scope scope, object?[] args)
@@ -128,7 +128,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("set! requires two arguments");
             }
 
-            if (args[0] is not Atom {AtomType: AtomType.Symbol, Value: string symbol} atom)
+            if (args[0] is not Symbol symbol)
             {
                 throw new ArgumentException("set!'s first argument must be a symbol");
             }
@@ -140,11 +140,10 @@ namespace Lillisp.Core.Macros
 
             object? value = runtime.Evaluate(scope, node);
 
-            scope.Set(symbol, value);
+            scope.Set(symbol.Value, value);
 
-            return atom;
+            return symbol;
         }
-
 
         public static object? Lambda(LillispRuntime runtime, Scope scope, object?[] args)
         {
@@ -180,12 +179,12 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("defun requires three arguments");
             }
 
-            if (args[0] is not Atom { AtomType: AtomType.Symbol, Value: string symbol } atom)
+            if (args[0] is not Symbol symbol)
             {
                 throw new ArgumentException("defun's first argument must be a symbol");
             }
 
-            if (args[1] is not Pair parameters || !parameters.All(i => i is Atom { AtomType: AtomType.Symbol }))
+            if (args[1] is not Pair parameters || !parameters.All(i => i is Symbol))
             {
                 throw new ArgumentException("defun's first argument must be a list of symbols");
             }
@@ -197,9 +196,9 @@ namespace Lillisp.Core.Macros
 
             var procedure = CreateProcedure(parameters, body);
 
-            scope.Define(symbol, procedure);
+            scope.Define(symbol.Value, procedure);
             
-            return atom;
+            return symbol;
         }
 
         public static object? Let(LillispRuntime runtime, Scope scope, object?[] args)
@@ -219,26 +218,25 @@ namespace Lillisp.Core.Macros
 
             foreach (var binding in bindings)
             {
-                if (binding is Atom {AtomType: AtomType.Symbol, Value: string symbol})
+                if (binding is Symbol symbol)
                 {
-                    if (evaluatedSymbols.Contains(symbol))
+                    if (evaluatedSymbols.Contains(symbol.Value))
                     {
                         throw new ArgumentException($"Variable {symbol} has already been defined in this scope");
                     }
 
-                    childScope[symbol] = Nil.Value;
-                    evaluatedSymbols.Add(symbol);
+                    childScope[symbol.Value] = Nil.Value;
+                    evaluatedSymbols.Add(symbol.Value);
                 }
-                else if (binding is Pair { IsList: true } list 
-                         && list.Car is Atom { AtomType: AtomType.Symbol, Value: string listSymbol })
+                else if (binding is Pair { IsList: true, Car: Symbol listSymbol} list)
                 {
-                    if (evaluatedSymbols.Contains(listSymbol))
+                    if (evaluatedSymbols.Contains(listSymbol.Value))
                     {
                         throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
                     }
 
-                    childScope[listSymbol] = runtime.Evaluate(childScope, list.Cdr);
-                    evaluatedSymbols.Add(listSymbol);
+                    childScope[listSymbol.Value] = runtime.Evaluate(childScope, list.Cdr);
+                    evaluatedSymbols.Add(listSymbol.Value);
                 }
                 else
                 {
@@ -305,7 +303,7 @@ namespace Lillisp.Core.Macros
             var clauses = args.Cast<Pair>().ToArray();
             Pair? elseClause = null;
 
-            if (clauses[^1].Car is Atom {AtomType: AtomType.Symbol, Value: "else"})
+            if (clauses[^1].Car is Symbol { Value: "else" })
             {
                 elseClause = clauses[^1];
                 clauses = clauses[..^1];

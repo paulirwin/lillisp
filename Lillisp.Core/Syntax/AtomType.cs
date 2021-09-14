@@ -2,7 +2,6 @@
 {
     public enum AtomType
     {
-        Symbol,
         Number,
         String
     }

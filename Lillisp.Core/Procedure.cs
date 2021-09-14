@@ -25,9 +25,9 @@ namespace Lillisp.Core
         {
             var childScope = scope.CreateChildScope();
 
-            if (Parameters is Atom pAtom)
+            if (Parameters is Symbol pSymbol)
             {
-                childScope[pAtom.Value!.ToString()!] = arguments;
+                childScope[pSymbol.Value] = arguments;
             }
             else if (Parameters is Pair {IsList: true} parms)
             {
@@ -35,24 +35,24 @@ namespace Lillisp.Core
 
                 for (int i = 0; i < list.Count; i++)
                 {
-                    if (list.ElementAt(i) is not Atom {AtomType: AtomType.Symbol} atom)
+                    if (list.ElementAt(i) is not Symbol symbol)
                     {
                         throw new ArgumentException($"Unhandled parameter node type: {list[i].GetType()}");
                     }
 
-                    if (atom.Value is ".")
+                    if (symbol.Value is ".")
                     {
                         if (list.Count > i + 2 || list.Count == i + 1)
                         {
                             throw new ArgumentException("One variable must follow the dot in lambda parameters");
                         }
 
-                        if (list[i + 1] is not Atom {AtomType: AtomType.Symbol} restAtom)
+                        if (list[i + 1] is not Symbol restSymbol)
                         {
                             throw new ArgumentException("Variable must follow the dot in lambda parameters");
                         }
 
-                        childScope[restAtom.Value!.ToString()!] = arguments.Skip(i).ToArray();
+                        childScope[restSymbol.Value] = arguments.Skip(i).ToArray();
                         
                         break;
                     }
@@ -61,7 +61,7 @@ namespace Lillisp.Core
                     {
                         var arg = arguments[i];
 
-                        childScope[atom.Value!.ToString()!] = arg;
+                        childScope[symbol.Value] = arg;
                     }
                 }
             }
