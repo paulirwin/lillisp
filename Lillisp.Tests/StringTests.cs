@@ -8,6 +8,7 @@ namespace Lillisp.Tests
         [InlineData("(str 100)", "100")]
         [InlineData("(str null)", null)]
         [InlineData("(str nil)", "nil")]
+        [InlineData("(str 'car)", "car")]
         [InlineData("(str '(1 2 3))", "(1 2 3)")]
         [InlineData("(str (new Uri \"https://www.google.com\"))", "https://www.google.com/")]
         [Theory]

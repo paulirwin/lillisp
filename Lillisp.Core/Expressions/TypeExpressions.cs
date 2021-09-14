@@ -102,7 +102,7 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("pair? requires one argument");
             }
 
-            return args[0] is Quote { Value: Pair };
+            return args[0] is Pair;
         }
 
         public static object? IsProcedure(object?[] args)
@@ -112,7 +112,7 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("procedure? requires one argument");
             }
 
-            return args[0] is Delegate; // TODO: this is most certainly not correct or exhaustive
+            return args[0] is Delegate or Procedure; // TODO: this is most certainly not correct or exhaustive
         }
 
         public static object? IsSymbol(object?[] args)
@@ -121,9 +121,8 @@ namespace Lillisp.Core.Expressions
             {
                 throw new ArgumentException("symbol? requires one argument");
             }
-
-            // TODO: this does not currently work correctly
-            return args[0] is Quote { Value: Symbol };
+            
+            return args[0] is Symbol;
         }
     }
 }

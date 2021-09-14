@@ -173,7 +173,7 @@ namespace Lillisp.Core
             {
                 Pair pair => pair.Select(Quote).ToArray(),
                 Atom { AtomType: AtomType.Number or AtomType.String, Value: { } value } => value,
-                Symbol symbol => symbol.Value,
+                Symbol symbol => symbol,
                 _ => null
             };
         }

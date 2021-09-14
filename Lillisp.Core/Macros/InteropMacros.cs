@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using BindingFlags = System.Reflection.BindingFlags;
 
 namespace Lillisp.Core.Macros
 {
@@ -20,12 +19,12 @@ namespace Lillisp.Core.Macros
                 {
                     var value = runtime.Evaluate(node);
 
-                    if (value is not string str)
+                    if (value is not Symbol str)
                     {
-                        throw new ArgumentException($"Argument {arg} did not evaluate to a string");
+                        throw new ArgumentException($"Argument {arg} did not evaluate to a symbol");
                     }
 
-                    scope.InteropNamespaces.Add(str);
+                    scope.InteropNamespaces.Add(str.Value);
                 }
                 else
                 {
