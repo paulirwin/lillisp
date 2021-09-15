@@ -37,7 +37,7 @@ namespace Lillisp.Core
             return ((IEnumerable<object>)_empty).GetEnumerator();
         }
 
-        public override string ToString() => "nil";
+        public override string ToString() => "()";
 
         IEnumerator IEnumerable.GetEnumerator()
         {

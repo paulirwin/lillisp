@@ -172,13 +172,14 @@ namespace Lillisp.Core
             return node.Value switch
             {
                 Pair pair => pair.Select(Quote).ToArray(),
-                Atom { AtomType: AtomType.Number or AtomType.String, Value: { } value } => value,
+                Atom { Value: { } value } => value,
                 Symbol symbol => symbol,
-                _ => null
+                Nil nil => nil,
+                _ => throw new ArgumentOutOfRangeException()
             };
         }
 
-        private object? EvaluateSymbol(Scope scope, Symbol node)
+        private static object? EvaluateSymbol(Scope scope, Symbol node)
         {
             string? symbol = node.Value;
 

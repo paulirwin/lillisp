@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Expressions
@@ -72,7 +73,7 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("null? requires one argument");
             }
 
-            return args[0] is null;
+            return args[0] is Nil;
         }
 
         public static object? IsNumber(object?[] args)
@@ -102,7 +103,7 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("pair? requires one argument");
             }
 
-            return args[0] is Pair;
+            return args[0] is not Nil && args[0] is Pair or IEnumerable<object>; // HACK: eventually remove object[]
         }
 
         public static object? IsProcedure(object?[] args)
