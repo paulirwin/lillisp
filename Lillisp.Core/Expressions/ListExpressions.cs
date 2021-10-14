@@ -120,5 +120,15 @@ namespace Lillisp.Core.Expressions
                 yield return i;
             }
         }
+
+        public static object? List(object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                return Nil.Value;
+            }
+
+            return args.ToArray();
+        }
     }
 }

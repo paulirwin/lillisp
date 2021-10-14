@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Lillisp.Core;
 using Lillisp.Core.Syntax;
@@ -11,7 +12,7 @@ namespace Lillisp.Tests
         [Fact]
         public void List_FromNodes_EmptyList()
         {
-            var list = List.FromNodes(new Node[0]);
+            var list = List.FromNodes(Array.Empty<Node>());
 
             Assert.Equal(Nil.Value, list);
         }

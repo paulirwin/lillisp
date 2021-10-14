@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lillisp.Core.Syntax;
+using System;
 using System.Collections;
 using System.Linq;
 
@@ -8,7 +9,7 @@ namespace Lillisp.Core
     {
         public static string? FormatPr(object? result) => Format(result, true, true);
 
-        public static string? FormatRepl(object? result) => Format(result, true, false);
+        public static string? FormatRepl(object? result) => Format(result, true, true);
 
         public static string? FormatPrint(object? result) => Format(result, false, false);
 
@@ -17,6 +18,11 @@ namespace Lillisp.Core
             if (result == null)
             {
                 return nullAsString ? "null" : null;
+            }
+
+            if (result is Vector vector)
+            {
+                return $"[{string.Join(" ", vector.Select(i => Format(i, quote, nullAsString)))}]";
             }
 
             if (result is ICollection objArray)

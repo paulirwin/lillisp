@@ -29,7 +29,6 @@ namespace Lillisp.Core
             //["include-ci"] = CoreMacros.Include, // TODO
             ["lambda"] = CoreMacros.Lambda,
             ["let"] = CoreMacros.Let,
-            ["list"] = CoreMacros.List,
             ["map"] = CoreMacros.Map,
             ["new"] = InteropMacros.New,
             ["or"] = BooleanMacros.Or,
@@ -70,8 +69,10 @@ namespace Lillisp.Core
             ["get"] = DynamicExpressions.Get,
             ["inc"] = MathExpressions.Increment,
             ["length"] = DynamicExpressions.Count,
+            ["list"] = ListExpressions.List,
             ["ln"] = MathExpressions.Ln,
             ["log"] = MathExpressions.Log,
+            ["make-vector"] = VectorExpressions.MakeVector,
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
             ["not"] = BooleanExpressions.Not,
@@ -91,7 +92,15 @@ namespace Lillisp.Core
             ["string?"] = TypeExpressions.IsString,
             ["symbol?"] = TypeExpressions.IsSymbol,
             ["typeof"] = TypeExpressions.TypeOf,
-            //["vector?"] = TypeExpressions.IsVector, // TODO
+            ["vector"] = VectorExpressions.Vector,
+            ["vector-append"] = VectorExpressions.Append,
+            ["vector-copy"] = VectorExpressions.VectorCopy,
+            ["vector-copy!"] = VectorExpressions.VectorCopyTo,
+            ["vector-fill!"] = VectorExpressions.VectorFill,
+            ["vector-length"] = VectorExpressions.VectorLength,
+            ["vector-ref"] = VectorExpressions.VectorRef,
+            ["vector-set!"] = VectorExpressions.VectorSet,
+            ["vector?"] = TypeExpressions.IsVector,
         };
 
         private static readonly IReadOnlyDictionary<string, object?> _systemGlobals = new Dictionary<string, object?>
@@ -143,6 +152,7 @@ namespace Lillisp.Core
             return node switch
             {
                 Program program => program.Children.Select(Quote).ToArray(),
+                Vector vector => vector, // TODO: is this correct?
                 Pair pair => pair.Select(Quote).ToArray(),
                 Symbol symbol => symbol.Value,
                 Atom atom => atom.Value,
@@ -158,6 +168,7 @@ namespace Lillisp.Core
             return node switch
             {
                 Program program => EvaluateProgram(scope, program),
+                Vector vector => EvaluateVector(scope, vector),
                 Pair pair => EvaluateExpression(scope, pair),
                 Symbol symbol => EvaluateSymbol(scope, symbol),
                 Atom atom => atom.Value,
@@ -167,10 +178,18 @@ namespace Lillisp.Core
             };
         }
 
+        private object? EvaluateVector(Scope scope, Vector vector)
+        {
+            var items = vector.Select(i => i is Node node ? Evaluate(scope, node) : i);
+
+            return new Vector(items);
+        }
+
         private object? EvaluateQuote(Quote node)
         {
             return node.Value switch
             {
+                Vector vector => new Vector(vector.Select(i => i is Node n ? Quote(n) : i)),
                 Pair pair => pair.Select(Quote).ToArray(),
                 Atom { Value: { } value } => value,
                 Symbol symbol => symbol,

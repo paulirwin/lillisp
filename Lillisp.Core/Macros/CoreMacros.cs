@@ -33,22 +33,12 @@ namespace Lillisp.Core.Macros
 
             var list = runtime.Evaluate(scope, target);
 
-            if (list is not object[] objArray)
+            if (list is not IEnumerable<object> objArray)
             {
                 throw new InvalidOperationException("Second parameter to `apply` must evaluate to a list");
             }
 
-            return expr(objArray);
-        }
-
-        public static object? List(LillispRuntime runtime, Scope scope, object?[] args)
-        {
-            if (args.Length == 0)
-            {
-                return Array.Empty<object>();
-            }
-
-            return args.Cast<Node>().Select(runtime.Quote).ToArray();
+            return expr(objArray.ToArray());
         }
 
         public static object? If(LillispRuntime runtime, Scope scope, object?[] args)
@@ -235,7 +225,14 @@ namespace Lillisp.Core.Macros
                         throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
                     }
 
-                    childScope[listSymbol.Value] = runtime.Evaluate(childScope, list.Cdr);
+                    Node bindingValue = list.Cdr;
+
+                    if (bindingValue is Pair { IsList: true } bindingValuePair)
+                    {
+                        bindingValue = bindingValuePair.Car; // HACK: wtf? well this is going away soon anyways
+                    }
+
+                    childScope[listSymbol.Value] = runtime.Evaluate(childScope, bindingValue);
                     evaluatedSymbols.Add(listSymbol.Value);
                 }
                 else
@@ -278,10 +275,12 @@ namespace Lillisp.Core.Macros
 
             var list = runtime.Evaluate(scope, target);
 
-            if (list is not object[] objArray)
+            if (list is not IEnumerable<object> objEnum)
             {
                 throw new InvalidOperationException("Second parameter to `map` must evaluate to a list");
             }
+
+            var objArray = objEnum.ToArray();
 
             var result = new object?[objArray.Length];
 

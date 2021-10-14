@@ -103,7 +103,7 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("pair? requires one argument");
             }
 
-            return args[0] is not Nil && args[0] is Pair or IEnumerable<object>; // HACK: eventually remove object[]
+            return args[0] is not Nil && args[0] is Pair or object?[]; // HACK: eventually remove "or object?[]"
         }
 
         public static object? IsProcedure(object?[] args)
@@ -124,6 +124,16 @@ namespace Lillisp.Core.Expressions
             }
             
             return args[0] is Symbol;
+        }
+
+        public static object? IsVector(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("vector? requires one argument");
+            }
+
+            return args[0] is Vector;
         }
     }
 }

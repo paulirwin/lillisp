@@ -40,6 +40,23 @@ namespace Lillisp.Core
             return List.FromNodes(nodes);
         }
 
+        public override Node VisitVector(LillispParser.VectorContext context)
+        {
+            var nodes = new List<Node>();
+
+            foreach (var child in context.children)
+            {
+                var childNode = Visit(child);
+
+                if (childNode != null)
+                {
+                    nodes.Add(childNode);
+                }
+            }
+
+            return new Vector(nodes);
+        }
+
         public override Node VisitAtom(LillispParser.AtomContext context)
         {
             var number = context.NUMBER();
@@ -69,7 +86,7 @@ namespace Lillisp.Core
             throw new NotImplementedException("Unknown atom type");
         }
 
-        public override Node VisitMacro(LillispParser.MacroContext context)
+        public override Node VisitMeta(LillispParser.MetaContext context)
         {
             var quote = context.quote();
 
@@ -80,6 +97,28 @@ namespace Lillisp.Core
                 var node = Visit(child);
 
                 return new Quote(node);
+            }
+
+            var quasiquote = context.quasiquote();
+
+            if (quasiquote != null)
+            {
+                var child = quasiquote.children[1];
+
+                var node = Visit(child);
+
+                return new Quasiquote(node);
+            }
+
+            var unquote = context.unquote();
+
+            if (unquote != null)
+            {
+                var child = unquote.children[1];
+
+                var node = Visit(child);
+
+                return new Unquote(node);
             }
 
             throw new NotImplementedException("Unknown macro type");

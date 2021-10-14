@@ -37,8 +37,9 @@ namespace Lillisp.Tests
         [InlineData("(boolean? \"cat\")", false)]
         [InlineData("(boolean? (lambda (x) x))", false)]
         [InlineData("(boolean? '(1 2 3))", false)]
+        [InlineData("(boolean? [1 2 3])", false)]
         [InlineData("(boolean? '())", false)]
-        [InlineData("(boolean? 'car)", false)]
+        [InlineData("(boolean? 'car)", false)]        
         [Theory]
         public void BooleanCheckTests(string input, bool expected)
         {
@@ -56,6 +57,7 @@ namespace Lillisp.Tests
         [InlineData("(char? \"cat\")", false)]
         [InlineData("(char? (lambda (x) x))", false)]
         [InlineData("(char? '(1 2 3))", false)]
+        [InlineData("(char? [1 2 3])", false)]
         [InlineData("(char? '())", false)]
         [InlineData("(char? 'car)", false)]
         [Theory]
@@ -75,6 +77,7 @@ namespace Lillisp.Tests
         [InlineData("(null? \"cat\")", false)]
         [InlineData("(null? (lambda (x) x))", false)]
         [InlineData("(null? '(1 2 3))", false)]
+        [InlineData("(null? [1 2 3])", false)]
         [InlineData("(null? '())", true)]
         [InlineData("(null? 'car)", false)]
         [Theory]
@@ -94,6 +97,7 @@ namespace Lillisp.Tests
         [InlineData("(number? \"cat\")", false)]
         [InlineData("(number? (lambda (x) x))", false)]
         [InlineData("(number? '(1 2 3))", false)]
+        [InlineData("(number? [1 2 3])", false)]
         [InlineData("(number? '())", false)]
         [InlineData("(number? 'car)", false)]
         [Theory]
@@ -113,6 +117,7 @@ namespace Lillisp.Tests
         [InlineData("(string? \"cat\")", true)]
         [InlineData("(string? (lambda (x) x))", false)]
         [InlineData("(string? '(1 2 3))", false)]
+        [InlineData("(string? [1 2 3])", false)]
         [InlineData("(string? '())", false)]
         [InlineData("(string? 'car)", false)]
         [Theory]
@@ -132,6 +137,7 @@ namespace Lillisp.Tests
         [InlineData("(pair? \"cat\")", false)]
         [InlineData("(pair? (lambda (x) x))", false)]
         [InlineData("(pair? '(1 2 3))", true)]
+        [InlineData("(pair? [1 2 3])", false)]
         [InlineData("(pair? '())", false)]
         [InlineData("(pair? 'car)", false)]
         [Theory]
@@ -151,6 +157,7 @@ namespace Lillisp.Tests
         [InlineData("(procedure? \"cat\")", false)]
         [InlineData("(procedure? (lambda (x) x))", true)]
         [InlineData("(procedure? '(1 2 3))", false)]
+        [InlineData("(procedure? [1 2 3])", false)]
         [InlineData("(procedure? '())", false)]
         [InlineData("(procedure? 'car)", false)]
         [Theory]
@@ -170,10 +177,31 @@ namespace Lillisp.Tests
         [InlineData("(symbol? \"cat\")", false)]
         [InlineData("(symbol? (lambda (x) x))", false)]
         [InlineData("(symbol? '(1 2 3))", false)]
+        [InlineData("(symbol? [1 2 3])", false)]
         [InlineData("(symbol? '())", false)]
         [InlineData("(symbol? 'car)", true)]
         [Theory]
         public void SymbolCheckTests(string input, bool expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
+
+        [InlineData("(vector? #t)", false)]
+        [InlineData("(vector? #f)", false)]
+        [InlineData("(vector? 0)", false)]
+        [InlineData("(vector? (get \"bar\" 1))", false)] // TODO: support char literals
+        [InlineData("(vector? \"cat\")", false)]
+        [InlineData("(vector? (lambda (x) x))", false)]
+        [InlineData("(vector? '(1 2 3))", false)]
+        [InlineData("(vector? [1 2 3])", true)]
+        [InlineData("(vector? '())", false)]
+        [InlineData("(vector? 'car)", false)]
+        [Theory]
+        public void VectorCheckTests(string input, bool expected)
         {
             var runtime = new LillispRuntime();
 

@@ -1,16 +1,22 @@
 grammar Lillisp;
 
-prog: expr* EOF;
+prog: form * EOF;
 
-expr: list | atom | macro;
+form: atom | list | vector | meta;
 
-list: LPAREN expr* RPAREN;
+list: LPAREN form* RPAREN;
+
+vector: '[' form* ']';
 
 atom: (NUMBER | STRING | SYMBOL);
 
-macro: quote;
+meta: quote | quasiquote | unquote;
 
-quote: QUOTE expr;
+quote: QUOTE form;
+
+quasiquote: BACKTICK form;
+
+unquote: COMMA form;
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 
@@ -47,8 +53,6 @@ SYMBOL_CHAR:
 	| '!'
 	| '&'
 	| '|'
-	| '['
-	| ']'
 	| '$'
 	| '.'
 	| ':'
@@ -58,10 +62,15 @@ SYMBOL_CHAR:
 	| '_';
 LPAREN: '(';
 RPAREN: ')';
+LBRACKET: '[';
+RBRACKET: ']';
 NEGATE: '-';
 UNDERSCORE: '_';
 QUOTE: '\'';
 DQUOTE: '\"';
+COMMA: ',';
+BACKTICK: '`';
+ATSIGN: '@';
 DOT: '.';
 HASH: '#';
 
