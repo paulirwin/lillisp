@@ -4,19 +4,19 @@ prog: form * EOF;
 
 form: atom | list | vector | meta;
 
-list: LPAREN form* RPAREN;
+list: '(' form* ')';
 
-vector: '[' form* ']';
+vector: '[' form* ']' | '#(' form* ')';
 
 atom: (NUMBER | STRING | SYMBOL);
 
 meta: quote | quasiquote | unquote;
 
-quote: QUOTE form;
+quote: '\'' form;
 
-quasiquote: BACKTICK form;
+quasiquote: '`' form;
 
-unquote: COMMA form;
+unquote: ',' form;
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 
@@ -67,7 +67,7 @@ RBRACKET: ']';
 NEGATE: '-';
 UNDERSCORE: '_';
 QUOTE: '\'';
-DQUOTE: '\"';
+DQUOTE: '"';
 COMMA: ',';
 BACKTICK: '`';
 ATSIGN: '@';

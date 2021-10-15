@@ -35,12 +35,15 @@ namespace Lillisp.Tests
             Assert.Equal(42d, vector[2]);
         }
 
-        [Fact]
-        public void Vector_Empty()
+        [InlineData("(vector)")]
+        [InlineData("[]")]
+        [InlineData("#()")]
+        [Theory]
+        public void Vector_Empty(string input)
         {
             var runtime = new LillispRuntime();
 
-            var result = runtime.EvaluateProgram("(vector)");
+            var result = runtime.EvaluateProgram(input);
 
             var vector = result as Vector;
 
@@ -48,12 +51,15 @@ namespace Lillisp.Tests
             Assert.Empty(vector);
         }
 
-        [Fact]
-        public void Vector_BasicNumbers()
+        [InlineData("(vector 1 2 3)")]
+        [InlineData("[1 2 3]")]
+        [InlineData("#(1 2 3)")]
+        [Theory]
+        public void Vector_BasicNumbers(string input)
         {
             var runtime = new LillispRuntime();
 
-            var result = runtime.EvaluateProgram("(vector 1 2 3)");
+            var result = runtime.EvaluateProgram(input);
 
             var vector = result as Vector;
 
