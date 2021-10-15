@@ -135,5 +135,27 @@ namespace Lillisp.Core.Expressions
 
             return args[0] is Vector;
         }
+
+        public static object? CharacterToInteger(object?[] args)
+        {
+            if (args.Length == 0 || args[0] is not char c)
+            {
+                throw new ArgumentException("char->integer requires one char argument");
+            }
+
+            return (int)c;
+        }
+
+        public static object? IntegerToCharacter(object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                throw new ArgumentException("integer->char requires one integer argument");
+            }
+
+            int value = Convert.ToInt32(args[0]);
+
+            return (char)value;
+        }
     }
 }

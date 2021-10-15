@@ -4,11 +4,11 @@ prog: form * EOF;
 
 form: atom | list | vector | meta;
 
+atom: (NUMBER | STRING | SYMBOL | CHARACTER);
+
 list: '(' form* ')';
 
 vector: '[' form* ']' | '#(' form* ')';
-
-atom: (NUMBER | STRING | SYMBOL | CHARACTER);
 
 meta: quote | quasiquote | unquote;
 
@@ -18,7 +18,7 @@ quasiquote: '`' form;
 
 unquote: ',' form;
 
-CHARACTER: '#\\' (LETTER | NUMBER | SYMBOL_CHAR)+;
+CHARACTER: '#\\' ((LETTER | NUMBER | SYMBOL_CHAR)* | '(' | ')');
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 

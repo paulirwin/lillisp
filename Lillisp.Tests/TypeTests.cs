@@ -209,5 +209,17 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(char->integer #\\=)", 61)]
+        [InlineData("(integer->char 61)", '=')]
+        [Theory]
+        public void TypeConversionTests(string input, object expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }

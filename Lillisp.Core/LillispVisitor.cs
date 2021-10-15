@@ -91,6 +91,7 @@ namespace Lillisp.Core
                 var charText = character.GetText()[2..];
                 char c = charText.ToLowerInvariant() switch
                 {
+                    "" => ' ',
                     "alarm" => '\u0007',
                     "backspace" => '\u0008',
                     "delete" => '\u007f',

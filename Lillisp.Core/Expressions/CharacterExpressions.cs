@@ -204,5 +204,45 @@ namespace Lillisp.Core.Expressions
 
             return args[0] is char c && char.IsLower(c);
         }
+
+        public static object? DigitValue(object?[] args)
+        {
+            if (args.Length == 0 || args[0] is not char c)
+            {
+                throw new ArgumentException("digit-value's first parameter must be a character");
+            }
+
+            return char.IsDigit(c) ? (int)char.GetNumericValue(c) : false;
+        }
+
+        public static object? Upcase(object?[] args)
+        {
+            if (args.Length == 0 || args[0] is not char c)
+            {
+                throw new ArgumentException("char-upcase's first parameter must be a character");
+            }
+
+            return char.ToUpper(c);
+        }
+
+        public static object? Downcase(object?[] args)
+        {
+            if (args.Length == 0 || args[0] is not char c)
+            {
+                throw new ArgumentException("char-downcase's first parameter must be a character");
+            }
+
+            return char.ToLower(c);
+        }
+
+        public static object? Foldcase(object?[] args)
+        {
+            if (args.Length == 0 || args[0] is not char c)
+            {
+                throw new ArgumentException("char-foldcase's first parameter must be a character");
+            }
+
+            return char.ToLowerInvariant(c);
+        }
     }
 }
