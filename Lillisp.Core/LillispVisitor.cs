@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core
@@ -81,6 +82,40 @@ namespace Lillisp.Core
             {
                 var symbolText = symbol.GetText();
                 return new Symbol(symbolText);
+            }
+
+            var character = context.CHARACTER();
+
+            if (character != null)
+            {
+                var charText = character.GetText()[2..];
+                char c = charText.ToLowerInvariant() switch
+                {
+                    "alarm" => '\u0007',
+                    "backspace" => '\u0008',
+                    "delete" => '\u007f',
+                    "escape" => '\u001b',
+                    "newline" => '\n',
+                    "null" => '\0',
+                    "return" => '\r',
+                    "space" => ' ',
+                    "tab" => '\t',
+                    _ => charText[0]
+                };
+
+                if (c == 'x' && charText.Length > 1)
+                {
+                    var hex = charText[1..];
+
+                    if (!ushort.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var hexCode))
+                    {
+                        throw new ArgumentException($"Invalid hex character escape: #\\{charText}");
+                    }
+
+                    c = (char)hexCode;
+                }
+
+                return new Atom(AtomType.Character, c);
             }
 
             throw new NotImplementedException("Unknown atom type");

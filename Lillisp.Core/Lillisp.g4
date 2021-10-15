@@ -8,7 +8,7 @@ list: '(' form* ')';
 
 vector: '[' form* ']' | '#(' form* ')';
 
-atom: (NUMBER | STRING | SYMBOL);
+atom: (NUMBER | STRING | SYMBOL | CHARACTER);
 
 meta: quote | quasiquote | unquote;
 
@@ -17,6 +17,8 @@ quote: '\'' form;
 quasiquote: '`' form;
 
 unquote: ',' form;
+
+CHARACTER: '#\\' (LETTER | NUMBER | SYMBOL_CHAR)+;
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 
