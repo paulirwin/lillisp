@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Lillisp.Core
 {
@@ -37,12 +38,12 @@ namespace Lillisp.Core
 
             if (result is string str)
             {
-                return quote ? $"\"{str}\"" : str;
+                return quote ? SymbolDisplay.FormatLiteral(str, true) : str;
             }
 
             if (result is char ch)
             {
-                return quote ? $"\'{ch}\'" : ch.ToString();
+                return quote ? SymbolDisplay.FormatLiteral(ch, true) : ch.ToString();
             }
 
             return result.ToString();

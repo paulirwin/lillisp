@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core
@@ -72,8 +73,9 @@ namespace Lillisp.Core
 
             if (str != null)
             {
-                string strValue = str.GetText().Replace("\\\"", "\"")[1..^1];
-                return new Atom(AtomType.String, strValue);
+                var strText = str.GetText()[1..^1]; // exclude start and end quotes
+                var unescapedStr = UnescapeString(strText);
+                return new Atom(AtomType.String, unescapedStr);
             }
 
             var symbol = context.SYMBOL();
@@ -158,6 +160,79 @@ namespace Lillisp.Core
             }
 
             throw new NotImplementedException("Unknown macro type");
+        }
+
+        private static string UnescapeString(string input)
+        {
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                char c = input[i];
+
+                if (c != '\\')
+                {
+                    sb.Append(c);
+                }
+                else if (i < input.Length - 1)
+                {
+                    char n = input[i + 1];
+                    char? u = n switch
+                    {
+                        'a' => '\a',
+                        'b' => '\b',
+                        'f' => '\f',
+                        'n' => '\n',
+                        'r' => '\r',
+                        't' => '\t',
+                        'v' => '\v',
+                        '0' => '\0',
+                        '\\' => '\\',
+                        '\"' => '\"',
+                        '|' => '|',
+                        _ => null
+                    };
+
+                    if (u != null)
+                    {
+                        sb.Append(u);
+                        i++;
+                        continue;
+                    }
+
+                    if (n == 'u')
+                    {
+                        if ((input.Length - 2 - i) < 4)
+                        {
+                            throw new InvalidOperationException("Not enough characters left in the string for a 16-bit unicode escape");
+                        }
+
+                        ushort val = ushort.Parse(input.Substring(i + 2, 4), NumberStyles.HexNumber);
+                        sb.Append((char)val);
+                        i += 5;
+                    }
+                    else if (n == 'x')
+                    {
+                        int scPos = input.IndexOf(';', i + 1);
+
+                        if (scPos < 0)
+                        {
+                            throw new InvalidOperationException("Unicode escape sequences starting with \\x must end in a semicolon.");
+                        }
+
+                        string seq = input.Substring(i + 2, scPos - i - 2);
+                        ushort val = ushort.Parse(seq, NumberStyles.HexNumber);
+                        sb.Append((char)val);
+                        i += 2 + seq.Length;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Unknown string escape sequence: \\{n}");
+                    }
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }
