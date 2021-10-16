@@ -210,6 +210,18 @@ namespace Lillisp.Tests
             Assert.Equal(expected, result);
         }
 
+        [InlineData("(promise? (delay 3))", true)]
+        [InlineData("(promise? (force (delay 3)))", false)]
+        [Theory]
+        public void PromiseCheckTests(string input, bool expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
+
         [InlineData("(char->integer #\\=)", 61)]
         [InlineData("(integer->char 61)", '=')]
         [InlineData("(string->list \"foo\")", new[] { 'f', 'o', 'o' })]

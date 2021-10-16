@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Macros
 {
@@ -338,6 +337,16 @@ namespace Lillisp.Core.Macros
             }
 
             throw new InvalidOperationException("No clause matched for the cond expression");
+        }
+
+        public static object? Delay(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length != 1 || args[0] is not Node node)
+            {
+                throw new ArgumentException("delay requires one expression argument");
+            }
+
+            return new Lazy<object?>(() => runtime.Evaluate(scope, node));
         }
     }
 }

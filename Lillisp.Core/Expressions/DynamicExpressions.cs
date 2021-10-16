@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Lillisp.Core.Expressions
 {
@@ -43,6 +44,36 @@ namespace Lillisp.Core.Expressions
                 IList coll => coll[index],
                 IEnumerable enumerable => enumerable.Cast<object>().ElementAt(index),
                 _ => throw new ArgumentException($"Not sure how to get the index of that")
+            };
+        }
+
+        public static object? Force(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("force requires one argument");
+            }
+
+            return args[0] switch
+            {
+                Lazy<object?> lazy => lazy.Value,
+                Task<object?> task => task.Result,
+                _ => args[0]
+            };
+        }
+
+        public static object? MakePromise(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("make-promise requires one argument");
+            }
+
+            return args[0] switch
+            {
+                Lazy<object?> lazy => lazy,
+                Task<object?> task => task,
+                _ => Task.FromResult(args[0])
             };
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Expressions
@@ -202,6 +203,16 @@ namespace Lillisp.Core.Expressions
             }
 
             return new string(list.Cast<char>().ToArray());
+        }
+
+        public static object? IsPromise(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("promise? requires one argument");
+            }
+
+            return args[0] is Lazy<object?> or Task<object?>;
         }
     }
 }

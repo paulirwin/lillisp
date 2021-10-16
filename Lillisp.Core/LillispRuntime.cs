@@ -24,6 +24,7 @@ namespace Lillisp.Core
             ["def"] = CoreMacros.Define,
             ["define"] = CoreMacros.Define,
             ["defun"] = CoreMacros.Defun,
+            ["delay"] = CoreMacros.Delay,
             ["if"] = CoreMacros.If,
             //["include"] = CoreMacros.Include, // TODO
             //["include-ci"] = CoreMacros.Include, // TODO
@@ -86,6 +87,7 @@ namespace Lillisp.Core
             ["dec"] = MathExpressions.Decrement,
             ["digit-value"] = CharacterExpressions.DigitValue,
             //["eof-object?"] = TypeExpressions.IsEofObject, // TODO
+            ["force"] = DynamicExpressions.Force,
             ["get"] = DynamicExpressions.Get,
             ["inc"] = MathExpressions.Increment,
             ["integer->char"] = TypeExpressions.IntegerToCharacter,
@@ -94,6 +96,7 @@ namespace Lillisp.Core
             ["list->string"] = TypeExpressions.ListToString,
             ["ln"] = MathExpressions.Ln,
             ["log"] = MathExpressions.Log,
+            ["make-promise"] = DynamicExpressions.MakePromise,
             ["make-string"] = StringExpressions.MakeString,
             ["make-vector"] = VectorExpressions.MakeVector,
             ["max"] = MathExpressions.Max,
@@ -105,6 +108,7 @@ namespace Lillisp.Core
             //["port?"] = TypeExpressions.IsPort, // TODO
             ["pow"] = MathExpressions.Power,
             ["procedure?"] = TypeExpressions.IsProcedure,
+            ["promise?"] = TypeExpressions.IsPromise,
             ["print"] = StringExpressions.Print,
             ["println"] = StringExpressions.PrintLn,
             ["pr"] = StringExpressions.Pr,

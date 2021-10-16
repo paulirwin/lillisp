@@ -109,5 +109,17 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(force (delay (+ 1 2)))", 3d)]
+        [InlineData("(let ((p (delay (+ 1 2)))) (list (force p) (force p)))", new[] { 3d, 3d })]
+        [Theory]
+        public void DelayTests(string input, object expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }
