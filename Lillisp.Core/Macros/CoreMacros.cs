@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Macros
 {
@@ -92,22 +93,40 @@ namespace Lillisp.Core.Macros
             {
                 throw new ArgumentException("define requires two arguments");
             }
-
-            if (args[0] is not Symbol symbol)
-            {
-                throw new ArgumentException("define's first argument must be a symbol");
-            }
-
+            
             if (args[1] is not Node node)
             {
                 throw new ArgumentException("define's second argument must be a node");
             }
 
-            object? value = runtime.Evaluate(scope, node);
+            if (args[0] is Symbol symbol)
+            {
+                object? value = runtime.Evaluate(scope, node);
 
-            scope.Define(symbol.Value, value);
-            
-            return symbol;
+                scope.Define(symbol.Value, value);
+
+                return symbol;
+            }
+
+            if (args[0] is Pair pair)
+            {
+                if (pair.Car is not Symbol ps)
+                {
+                    throw new ArgumentException("The first item of define's first argument must be a symbol");
+                }
+
+                var lambdaArgs = pair.Cdr is Pair cdrp
+                    ? cdrp
+                    : List.FromNodes(new [] { pair.Cdr });
+
+                var lambda = Lambda(runtime, scope, new object?[] { lambdaArgs, node });
+
+                scope.Define(ps.Value, lambda);
+
+                return ps;
+            }
+
+            throw new ArgumentException("define's first argument must be a symbol, a pair, or a list");
         }
 
         public static object? Set(LillispRuntime runtime, Scope scope, object?[] args)

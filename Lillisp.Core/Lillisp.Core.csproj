@@ -6,6 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Library\core.lisp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Library\core.lisp" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Antlr4.CodeGenerator" Version="4.6.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

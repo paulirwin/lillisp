@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Antlr4.Runtime;
@@ -174,6 +176,8 @@ namespace Lillisp.Core
             _globalScope.AddAllFrom(_systemMacros);
             _globalScope.AddAllFrom(_systemFunctions);
             _globalScope.AddAllFrom(_systemGlobals);
+
+            EvaluateLibraryResource("Lillisp.Core.Library.core.lisp");
         }
 
         public void RegisterGlobal(string symbol, object? value)
@@ -323,6 +327,22 @@ namespace Lillisp.Core
             }
 
             return result;
+        }
+
+        private void EvaluateLibraryResource(string name)
+        {
+            using var stream = typeof(LillispRuntime).Assembly.GetManifestResourceStream(name);
+
+            if (stream == null)
+            {
+                throw new InvalidOperationException($"Unable to find embedded resource with name {name}");
+            }
+
+            using var sr = new StreamReader(stream);
+
+            string text = sr.ReadToEnd();
+
+            EvaluateProgram(text);
         }
     }
 }
