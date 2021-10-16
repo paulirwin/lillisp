@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Lillisp.Core
@@ -39,6 +40,11 @@ namespace Lillisp.Core
             if (result is string str)
             {
                 return quote ? SymbolDisplay.FormatLiteral(str, true) : str;
+            }
+
+            if (result is StringBuilder sb)
+            {
+                return quote ? SymbolDisplay.FormatLiteral(sb.ToString(), true) : sb.ToString();
             }
 
             if (result is char ch)
