@@ -186,6 +186,30 @@ namespace Lillisp.Tests
         {
             var runtime = new LillispRuntime();
 
+            var result = runtime.EvaluateProgram(input)?.ToString();
+
+            Assert.Equal(expected, result);
+        }
+
+        [InlineData("(begin (def a \"12345\") (def b (string-copy \"abcde\")) (string-copy! b 1 a 0 2) (str b))", "a12de")]
+        [Theory]
+        public void StringCopyToTests(string input, string expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
+
+        [InlineData("(begin (def a (make-string 4)) (string-fill! a #\\*) (str a))", "****")]
+        [InlineData("(begin (def a (make-string 4 #\\a)) (string-fill! a #\\* 1) (str a))", "a***")]
+        [InlineData("(begin (def a (make-string 4 #\\a)) (string-fill! a #\\* 1 3) (str a))", "a**a")]
+        [Theory]
+        public void StringFillTests(string input, string expected)
+        {
+            var runtime = new LillispRuntime();
+
             var result = runtime.EvaluateProgram(input);
 
             Assert.Equal(expected, result);

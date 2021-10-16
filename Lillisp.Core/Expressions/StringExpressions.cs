@@ -457,7 +457,94 @@ namespace Lillisp.Core.Expressions
                 end = Convert.ToInt32(args[2]);
             }
 
-            return str[start..end];
+            return new StringBuilder(str[start..end]);
+        }
+
+        public static object? StringCopyTo(object?[] args)
+        {
+            if (args.Length is < 3 or > 5)
+            {
+                throw new ArgumentException("string-copy! requires 3 to 5 arguments");
+            }
+
+            if (args[0] is not StringBuilder to)
+            {
+                throw new ArgumentException("string-copy!'s first argument must be a mutable string");
+            }
+
+            if (args[2] is not string from)
+            {
+                if (args[2] is StringBuilder sbfrom)
+                {
+                    from = sbfrom.ToString(); // TODO: is there a more efficient way of doing this?
+                }
+                else
+                {
+                    throw new ArgumentException("string-copy!'s third argument must be a string");
+                }
+            }
+
+            var at = Convert.ToInt32(args[1]);
+            int start = 0, end = from.Length;
+
+            if (args.Length > 3)
+            {
+                start = Convert.ToInt32(args[3]);
+            }
+
+            if (args.Length == 5)
+            {
+                end = Convert.ToInt32(args[4]);
+            }
+
+            if ((to.Length - at) < (end - start))
+            {
+                throw new ArgumentException("(- (string-length to) at) must not be less than (- end start)");
+            }
+
+            for (int i = start; i < end; i++)
+            {
+                to[at++] = from[i];
+            }
+
+            return Nil.Value; // TODO: is this correct?
+        }
+
+        public static object? StringFill(object?[] args)
+        {
+            if (args.Length is < 2 or > 4)
+            {
+                throw new ArgumentException("string-fill! requires 2 to 4 arguments");
+            }
+
+            if (args[0] is not StringBuilder sb)
+            {
+                throw new ArgumentException("string-fill!'s first argument must be a mutable string");
+            }
+
+            if (args[1] is not char fill)
+            {
+                throw new ArgumentException("string-fill!'s second argument must be a character");
+            }
+
+            int start = 0, end = sb.Length;
+
+            if (args.Length > 2)
+            {
+                start = Convert.ToInt32(args[2]);
+            }
+
+            if (args.Length == 4)
+            {
+                end = Convert.ToInt32(args[3]);
+            }
+
+            for (int i = start; i < end; i++)
+            {
+                sb[i] = fill;
+            }
+
+            return Nil.Value; // TODO: is this correct?
         }
     }
 }
