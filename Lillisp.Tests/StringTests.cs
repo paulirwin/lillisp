@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Lillisp.Core;
 using Xunit;
+// ReSharper disable StringLiteralTypo
 
 namespace Lillisp.Tests
 {
@@ -141,6 +142,31 @@ namespace Lillisp.Tests
         [InlineData("(string-foldcase \"999\")", "999")]
         [Theory]
         public void CaseChangingTests(string input, string expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
+        
+        [InlineData("(substring \"abcde\" 0 3)", "abc")]
+        [InlineData("(substring \"abcde\" 1 3)", "bc")]
+        [InlineData("(substring \"abcde\" 1 4)", "bcd")]
+        [Theory]
+        public void SubstringTests(string input, string expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
+
+        [InlineData("(string-append \"foo\" \"bar\")", "foobar")]
+        [InlineData("(string-append \"foo\" \"bar\" \"baz\")", "foobarbaz")]
+        [Theory]
+        public void StringAppendTests(string input, string expected)
         {
             var runtime = new LillispRuntime();
 

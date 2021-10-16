@@ -395,5 +395,35 @@ namespace Lillisp.Core.Expressions
                 _ => throw new ArgumentException("string-foldcase's first argument must be a string")
             };
         }
+
+        public static object? Substring(object?[] args)
+        {
+            if (args.Length != 3)
+            {
+                throw new ArgumentException("substring requires three arguments");
+            }
+
+            int start = Convert.ToInt32(args[1]);
+            int end = Convert.ToInt32(args[2]);
+
+            return args[0] switch
+            {
+                string s => s[start..end],
+                StringBuilder sb => sb.ToString()[start..end], // HACK: could this be improved?
+                _ => throw new ArgumentException("substring's first argument must be a string")
+            };
+        }
+
+        public static object? StringAppend(object?[] args)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var arg in args.ArgsToStringlikes())
+            {
+                sb.Append(arg);
+            }
+
+            return sb.ToString();
+        }
     }
 }
