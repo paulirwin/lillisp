@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Lillisp.Core.Syntax
+namespace Lillisp.Core
 {
     public static class List
     {

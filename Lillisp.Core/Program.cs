@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lillisp.Core.Syntax
+namespace Lillisp.Core
 {
     public class Program : Node
     {

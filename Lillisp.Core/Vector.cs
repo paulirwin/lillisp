@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Lillisp.Core.Syntax
+namespace Lillisp.Core
 {
     public class Vector : Node, IList<object?>
     {

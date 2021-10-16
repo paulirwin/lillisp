@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lillisp.Core.Syntax
+namespace Lillisp.Core
 {
     public class Atom : Node, IConvertible
     {

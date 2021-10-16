@@ -1,5 +1,4 @@
-﻿using Lillisp.Core.Syntax;
-using System;
+﻿using System;
 using System.Linq;
 
 namespace Lillisp.Core.Expressions

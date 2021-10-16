@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core
 {

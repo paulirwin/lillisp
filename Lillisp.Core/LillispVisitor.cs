@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core
 {

@@ -1,4 +1,4 @@
-﻿namespace Lillisp.Core.Syntax
+﻿namespace Lillisp.Core
 {
     public class Quasiquote : Node
     {

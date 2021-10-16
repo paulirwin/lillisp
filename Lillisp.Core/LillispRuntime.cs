@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Antlr4.Runtime;
 using Lillisp.Core.Expressions;
 using Lillisp.Core.Macros;
-using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core
 {

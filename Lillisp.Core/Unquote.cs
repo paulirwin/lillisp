@@ -1,8 +1,8 @@
-﻿namespace Lillisp.Core.Syntax
+﻿namespace Lillisp.Core
 {
-    public class Quote : Node
+    public class Unquote : Node
     {
-        public Quote(Node value)
+        public Unquote(Node value)
         {
             Value = value;
         }

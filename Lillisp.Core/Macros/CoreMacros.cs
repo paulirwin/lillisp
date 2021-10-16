@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Macros
 {

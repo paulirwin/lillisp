@@ -1,5 +1,4 @@
 ﻿using System;
-using Lillisp.Core.Syntax;
 
 namespace Lillisp.Core.Macros
 {
