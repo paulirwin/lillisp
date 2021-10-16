@@ -425,5 +425,39 @@ namespace Lillisp.Core.Expressions
 
             return sb.ToString();
         }
+
+        public static object? StringCopy(object?[] args)
+        {
+            if (args.Length is 0 or > 3)
+            {
+                throw new ArgumentException("string-copy requires one to three arguments");
+            }
+
+            if (args[0] is not string str)
+            {
+                if (args[0] is StringBuilder sb)
+                {
+                    str = sb.ToString();
+                }
+                else
+                {
+                    throw new ArgumentException("string-copy's first argument must be a string");
+                }
+            }
+
+            int start = 0, end = str.Length;
+
+            if (args.Length > 1)
+            {
+                start = Convert.ToInt32(args[1]);
+            }
+
+            if (args.Length == 3)
+            {
+                end = Convert.ToInt32(args[2]);
+            }
+
+            return str[start..end];
+        }
     }
 }

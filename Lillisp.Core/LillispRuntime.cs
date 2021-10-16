@@ -128,6 +128,7 @@ namespace Lillisp.Core
             ["string-ref"] = StringExpressions.StringRef,
             ["string-set!"] = StringExpressions.StringSet,
             ["string-append"] = StringExpressions.StringAppend,
+            ["string-copy"] = StringExpressions.StringCopy,
             ["string-upcase"] = StringExpressions.Upcase,
             ["string-downcase"] = StringExpressions.Downcase,
             ["string-foldcase"] = StringExpressions.Foldcase,

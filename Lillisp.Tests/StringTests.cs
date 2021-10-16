@@ -174,5 +174,21 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        [InlineData("(string-copy (make-string 4 #\\*))", "****")]
+        [InlineData("(string-copy \"abcde\")", "abcde")]
+        [InlineData("(string-copy \"abcde\" 1)", "bcde")]
+        [InlineData("(string-copy \"abcde\" 0 3)", "abc")]
+        [InlineData("(string-copy \"abcde\" 1 3)", "bc")]
+        [InlineData("(string-copy \"abcde\" 1 4)", "bcd")]
+        [Theory]
+        public void StringCopyTests(string input, string expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }
