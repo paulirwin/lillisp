@@ -1,5 +1,7 @@
 # Lillisp
 
+[![.NET](https://github.com/paulirwin/lillisp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/paulirwin/lillisp/actions/workflows/dotnet.yml)
+
 This repo contains the Lillisp core runtime (which includes the standard library) and the Lillisp REPL.
 
 ## What is Lillisp?
