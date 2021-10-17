@@ -8,7 +8,7 @@ Lillisp (prounounced "lill-isp", like "lilly") is a prototype Lisp-based languag
 
 Currently, Lillisp can call some .NET code, but is not yet callable *from* .NET code. Also, Lillisp is currently only interpreted as a REPL. The short term plan is to allow for interpretation of Lillisp files too, and the long term plan is to support compilation of Lillisp code into a .NET assembly.
 
-Lillisp is a Scheme-based Lisp, and ultimately aims to be as R7RS compliant as possible. Being a Scheme, Lillisp is a Lisp-1, meaning functions and variables/parameters cannot share the same name.
+Lillisp is a Scheme-based Lisp, and ultimately aims to be as [R7RS-small](https://small.r7rs.org/) compliant as possible. Being a Scheme, Lillisp is a [Lisp-1](https://andersmurphy.com/2019/03/08/lisp-1-vs-lisp-2.html), meaning functions and variables/parameters cannot share the same name, and functions do not need to be quoted to be passed as values.
 
 Lillisp also draws inspiration from Clojure, and uses its syntax in part, such as with .NET interop.
 
