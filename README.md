@@ -14,6 +14,12 @@ Lillisp also draws inspiration from Clojure, and uses its syntax in part, such a
 
 Lillisp started as a C# implementation of Peter Norvig's lis.py from the blog post [(How to Write a (Lisp) Interpreter (in Python))](https://norvig.com/lispy.html). Many thanks to Peter for the excellent tutorial that inspired this project.
 
+## Screenshot
+
+![image](https://user-images.githubusercontent.com/1874103/137605342-15623f3f-9ca0-429c-b655-e02176ba6b9a.png)
+
+(Using the open-source [Windows Terminal](https://github.com/microsoft/terminal), [Powershell 7](https://github.com/PowerShell/PowerShell), and [Cascadia Code](https://github.com/microsoft/cascadia-code) font, running on .NET 5.)
+
 ## Using the REPL
 
 Build and run the Lillisp.Repl project in Visual Studio 2019 or later, or via the `dotnet` CLI.
@@ -44,7 +50,7 @@ An incomplete list of features currently supported:
 * Conditional logic (`if`, `cond`, `when`)
 * Sequential logic with `begin`
 * Lambda expressions with `lambda`
-* Shorthand for defining a lambda variable (aka a named function) with `defun` (or `define` with a list as the second parameter)
+* Shorthand for defining a lambda variable (aka a named function) with `defun` (or `define` with a list as the first parameter)
 * Block-scoping variables with `let`
 * Almost all of the Scheme base library string- and vector-related functions
 * Almost all of the Scheme `char`, `CxR`, and `lazy` library functions
@@ -163,3 +169,41 @@ Lillisp> (.Append x "foo")
 Lillisp> (.AppendLine x "bar!")
 -> "*foobar!\r\n"
 ```
+
+### .NET Types
+
+All variables are boxed to `System.Object`. Also, generic types are not yet supported.
+
+You can get the type of a variable with either `(.GetType var)` or `(typeof var)`. Notice how `typeof` operates more like JavaScript than C#. 
+There is no need to use a keyword to get a .NET `System.Type` reference: just use the type name directly. This enables convenient use of the `new` function. 
+This also potentially enables interesting runtime reflection scenarios, such as using `new` with a variable of the type to instantiate, without a bunch of `Activator.CreateInstance` boilerplate.
+
+You can also cast using the `cast` function. Examples:
+
+```lisp
+Lillisp> (.GetType "foo")
+-> System.String
+Lillisp> (typeof "foo")
+-> System.String
+Lillisp> Int32
+-> System.Int32
+Lillisp> (.GetType Int32)
+-> System.RuntimeType
+Lillisp> (def t Uri)
+-> t
+Lillisp> (new t "https://www.google.com")
+-> https://www.google.com/
+Lillisp> (typeof 7)
+-> System.Double
+Lillisp> (typeof (cast 7 Int32))
+-> System.Int32
+```
+
+Common Lillisp to .NET type mappings:
+| Lillisp type | .NET type |
+| --- | --- |
+| boolean | System.Boolean |
+| number | System.Double |
+| character | System.Char |
+| constant string | System.String |
+| mutable string (i.e. with `(make-string)`) | System.Text.StringBuilder |
