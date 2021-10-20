@@ -8,6 +8,22 @@ namespace Lillisp.Tests
 {
     public class R7RSTests
     {
+        /// <summary>
+        /// Tests tail recursion with a 10,000 iteration factorial. This quickly would stack overflow without tail calls.
+        /// </summary>
+        [Fact]
+        public void R7Rs_3_5_Tail_Recursion_Factorial()
+        {
+            var runtime = new LillispRuntime();
+
+            var prog = "(define (fact x) (begin (define (fact-tail x accum) (if (= x 0) accum (fact-tail (- x 1) (* x accum)))) (fact-tail x 1)))";
+            prog += "(fact 10000)";
+
+            var result = runtime.EvaluateProgram(prog);
+
+            Assert.IsType<double>(result);
+        }
+
         [Fact]
         public void R7RS_4_1_4_Lambda_Example()
         {

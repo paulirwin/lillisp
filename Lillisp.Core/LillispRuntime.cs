@@ -304,7 +304,7 @@ namespace Lillisp.Core
 
             while (result is TailCall tailCall)
             {
-                result = EvaluatePossibleTailCallExpression(tailCall.Scope.Parent ?? tailCall.Scope, tailCall.Node);
+                result = EvaluatePossibleTailCallExpression(tailCall.Scope, tailCall.Node);
             }
 
             return result;

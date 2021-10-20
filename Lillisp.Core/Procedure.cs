@@ -26,7 +26,7 @@ namespace Lillisp.Core
 
             if (Parameters is Symbol pSymbol)
             {
-                childScope[pSymbol.Value] = arguments;
+                childScope.Define(pSymbol.Value, arguments);
             }
             else if (Parameters is Pair {IsList: true} parms)
             {
@@ -51,7 +51,7 @@ namespace Lillisp.Core
                             throw new ArgumentException("Variable must follow the dot in lambda parameters");
                         }
 
-                        childScope[restSymbol.Value] = arguments.Skip(i).ToArray();
+                        childScope.Define(restSymbol.Value, arguments.Skip(i).ToArray());
                         
                         break;
                     }
@@ -60,12 +60,12 @@ namespace Lillisp.Core
                     {
                         var arg = arguments[i];
 
-                        childScope[symbol.Value] = arg;
+                        childScope.Define(symbol.Value, arg);
                     }
                 }
             }
 
-            return Body is Pair pair ? runtime.TailCall(childScope, pair) : runtime.Evaluate(scope, Body);
+            return Body is Pair pair ? runtime.TailCall(childScope, pair) : runtime.Evaluate(childScope, Body);
         }
     }
 }

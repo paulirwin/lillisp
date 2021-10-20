@@ -234,7 +234,7 @@ namespace Lillisp.Core.Macros
                         throw new ArgumentException($"Variable {symbol} has already been defined in this scope");
                     }
 
-                    childScope[symbol.Value] = Nil.Value;
+                    childScope.Define(symbol.Value, Nil.Value);
                     evaluatedSymbols.Add(symbol.Value);
                 }
                 else if (binding is Pair { IsList: true, Car: Symbol listSymbol} list)
@@ -251,7 +251,7 @@ namespace Lillisp.Core.Macros
                         bindingValue = bindingValuePair.Car; // HACK: wtf? well this is going away soon anyways
                     }
 
-                    childScope[listSymbol.Value] = runtime.Evaluate(childScope, bindingValue);
+                    childScope.Define(listSymbol.Value, runtime.Evaluate(childScope, bindingValue));
                     evaluatedSymbols.Add(listSymbol.Value);
                 }
                 else

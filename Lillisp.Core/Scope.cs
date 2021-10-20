@@ -23,15 +23,21 @@ namespace Lillisp.Core
 
         public IDictionary<string, object?> Env { get; } = new Dictionary<string, object?>();
 
-        public object? this[string key]
-        {
-            get => Resolve(key);
-            set => Env[key] = value;
-        }
+        public object? this[string key] => Resolve(key);
 
         public object? Resolve(string key)
         {
-            return Env.TryGetValue(key, out var value) ? value : Parent?.Resolve(key);
+            var scope = this;
+
+            while (scope != null)
+            {
+                if (scope.Env.TryGetValue(key, out var value))
+                    return value;
+
+                scope = scope.Parent;
+            }
+
+            return null;
         }
 
         public void AddAllFrom<TValue>(IReadOnlyDictionary<string, TValue> dict)
@@ -54,17 +60,23 @@ namespace Lillisp.Core
 
         public void Set(string key, object? value)
         {
-            if (Parent == null)
-            {
-                throw new InvalidOperationException("Global scope variables are immutable");
-            }
+            var scope = this;
 
-            if (!Env.ContainsKey(key))
+            while (true)
             {
-                Parent.Set(key, value);
-            }
+                if (scope.Env.ContainsKey(key))
+                {
+                    if (scope.Parent == null)
+                    {
+                        throw new InvalidOperationException("Global scope variables are immutable");
+                    }
 
-            Env[key] = value;
+                    scope.Env[key] = value;
+                    break;
+                }
+
+                scope = scope.Parent ?? throw new ArgumentException($"{key} has not been defined");
+            }
         }
 
         public Scope CreateChildScope() => new(this);

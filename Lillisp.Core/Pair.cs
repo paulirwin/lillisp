@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Lillisp.Core
@@ -50,6 +51,7 @@ namespace Lillisp.Core
             }
         }
 
+        [DebuggerStepThrough]
         public IEnumerator<Node> GetEnumerator()
         {
             return new PairEnumerator(this);
@@ -85,6 +87,7 @@ namespace Lillisp.Core
             return sb.ToString();
         }
 
+        [DebuggerStepThrough]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
@@ -102,6 +105,7 @@ namespace Lillisp.Core
                 _startPair = pair;
             }
 
+            [DebuggerStepThrough]
             public bool MoveNext()
             {
                 if (_pairStop)
