@@ -40,6 +40,18 @@ namespace Lillisp.Core.Macros
             return false;
         }
 
+        /// <summary>
+        /// The test is evaluated, and if it evaluates to
+        /// a true value, the expressions are evaluated in order.
+        /// </summary>
+        /// <remarks>
+        /// Scheme R7RS states that the return value is unspecified. In order to support tail recursion,
+        /// we are returning the result of the last expression if the test evaluates true, otherwise nil. 
+        /// </remarks>
+        /// <param name="runtime">The current runtime.</param>
+        /// <param name="scope">The current scope (environment)</param>
+        /// <param name="args">The arguments to `when`</param>
+        /// <returns>Returns the result of the last expression, or nil.</returns>
         public static object? When(LillispRuntime runtime, Scope scope, object?[] args)
         {
             if (args.Length < 2 || args[0] is not Node test)
@@ -54,15 +66,17 @@ namespace Lillisp.Core.Macros
                 return Nil.Value;
             }
 
-            foreach (var arg in args[1..])
+            for (int i = 1; i < args.Length; i++)
             {
+                var arg = args[i];
+
                 if (arg is Node node)
                 {
-                    runtime.Evaluate(scope, node);
+                    result = (i == args.Length - 1 && node is Pair pair) ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, node);
                 }
             }
 
-            return Nil.Value;
+            return result;
         }
     }
 }
