@@ -17,7 +17,7 @@ namespace Lillisp.Core.Macros
             {
                 if (arg is Node node)
                 {
-                    var value = runtime.Evaluate(node);
+                    var value = runtime.Evaluate(scope, node);
 
                     if (value is not Symbol str)
                     {
@@ -47,7 +47,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("new requires at least one argument");
             }
 
-            var typeValue = runtime.Evaluate(typeNode);
+            var typeValue = runtime.Evaluate(scope, typeNode);
 
             if (typeValue is not Type type)
             {
@@ -55,7 +55,7 @@ namespace Lillisp.Core.Macros
             }
 
             var ctorParams = args.Skip(1)
-                .Select(i => i is Node node ? runtime.Evaluate(node) : i)
+                .Select(i => i is Node node ? runtime.Evaluate(scope, node) : i)
                 .ToArray();
 
             return Activator.CreateInstance(type, ctorParams);

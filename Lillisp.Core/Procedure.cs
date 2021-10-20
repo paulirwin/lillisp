@@ -65,7 +65,7 @@ namespace Lillisp.Core
                 }
             }
 
-            return runtime.Evaluate(childScope, Body);
+            return Body is Pair pair ? runtime.TailCall(childScope, pair) : runtime.Evaluate(scope, Body);
         }
     }
 }

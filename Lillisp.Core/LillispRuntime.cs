@@ -229,7 +229,7 @@ namespace Lillisp.Core
             };
         }
 
-        public object? Evaluate(Node node) => Evaluate(_globalScope, node);
+        public object? EvaluateProgram(Node node) => Evaluate(_globalScope, node);
 
         public object? Evaluate(Scope scope, Node node)
         {
@@ -291,9 +291,26 @@ namespace Lillisp.Core
 
         private object? EvaluateExpression(Scope scope, Pair pair)
         {
+            var result = EvaluatePossibleTailCallExpression(scope, pair);
+
+            while (result is TailCall tailCall)
+            {
+                result = EvaluatePossibleTailCallExpression(tailCall.Scope.Parent ?? tailCall.Scope, tailCall.Node);
+            }
+
+            return result;
+        }
+
+        internal TailCall TailCall(Scope scope, Pair pair)
+        {
+            return new TailCall(scope, pair);
+        }
+
+        private object? EvaluatePossibleTailCallExpression(Scope scope, Pair pair)
+        {
             if (pair.Car is Nil)
             {
-                return Nil.Value;
+                throw new InvalidOperationException("nil is not a function");
             }
 
             if (pair.Car is Symbol symbol && symbol.Value.StartsWith('.'))
@@ -312,23 +329,13 @@ namespace Lillisp.Core
 
             var args = pair.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
 
-            if (op is Procedure proc)
+            return op switch
             {
-                return proc.Invoke(this, scope, args);
-            }
-
-            if (op is MethodInfo method)
-            {
-                // HACK: only static methods for now
-                return method.Invoke(null, args);
-            }
-
-            if (op is not Expression expr)
-            {
-                throw new InvalidOperationException($"Invalid operation: {op}");
-            }
-
-            return expr(args);
+                Procedure proc => proc.Invoke(this, scope, args),
+                MethodInfo method => method.Invoke(null, args),
+                Expression expr => expr(args),
+                _ => throw new InvalidOperationException($"Invalid operation: {op}")
+            };
         }
 
         private object? EvaluateProgram(Scope scope, Program node)

@@ -68,7 +68,7 @@ namespace Lillisp.Repl
                         Console.WriteLine(prog);
                     }
 
-                    object? result = runtime.Evaluate(prog);
+                    object? result = runtime.EvaluateProgram(prog);
 
                     Console.ForegroundColor = ConsoleColor.Gray;
                     Console.Write("-> ");

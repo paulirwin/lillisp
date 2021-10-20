@@ -63,24 +63,26 @@ namespace Lillisp.Core.Macros
 
             if (result.IsTruthy())
             {
-                return runtime.Evaluate(scope, consequence);
+                return consequence is Pair pair ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, consequence);
             }
 
-            return alt != null ? runtime.Evaluate(scope, alt) : Nil.Value;
+            return alt != null ? (alt is Pair altPair ? runtime.TailCall(scope, altPair) : runtime.Evaluate(scope, alt)) : Nil.Value;
         }
 
         public static object? Begin(LillispRuntime runtime, Scope scope, object?[] args)
         {
             object? result = null;
 
-            foreach (var arg in args)
+            for (int i = 0; i < args.Length; i++)
             {
+                var arg = args[i];
+
                 if (arg is not Node node)
                 {
                     throw new ArgumentException("invalid node");
                 }
 
-                result = runtime.Evaluate(scope, node);
+                result = (i == args.Length - 1 && arg is Pair pair) ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, node);
             }
 
             return result;
@@ -264,7 +266,7 @@ namespace Lillisp.Core.Macros
             {
                 if (args[i] is Node node)
                 {
-                    result = runtime.Evaluate(childScope, node);
+                    result = (i == args.Length - 1 && node is Pair pair) ? runtime.TailCall(childScope, pair) : runtime.Evaluate(childScope, node);
                 }
                 else
                 {
@@ -327,15 +329,19 @@ namespace Lillisp.Core.Macros
 
             foreach (var clause in clauses)
             {
-                var test = runtime.Evaluate(clause.Car);
+                var test = runtime.Evaluate(scope, clause.Car);
 
                 if (test.IsTruthy())
                 {
                     object? result = Nil.Value;
 
-                    foreach (var expr in clause.Skip(1))
+                    var clauseForms = clause.ToList();
+
+                    for (int i = 1; i < clauseForms.Count; i++)
                     {
-                        result = runtime.Evaluate(expr);
+                        var expr = clauseForms[i];
+
+                        result = (i == clauseForms.Count - 1 && expr is Pair pair) ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
                     }
 
                     return result;
@@ -346,9 +352,13 @@ namespace Lillisp.Core.Macros
             {
                 object? result = Nil.Value;
 
-                foreach (var expr in elseClause.Skip(1))
+                var clauseForms = elseClause.ToList();
+
+                for (int i = 1; i < clauseForms.Count; i++)
                 {
-                    result = runtime.Evaluate(expr);
+                    var expr = clauseForms[i];
+
+                    result = (i == clauseForms.Count - 1 && expr is Pair pair) ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
                 }
 
                 return result;

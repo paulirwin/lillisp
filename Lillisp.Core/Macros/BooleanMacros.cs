@@ -47,7 +47,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("when requires at least a test and an expression argument");
             }
 
-            var result = runtime.Evaluate(test);
+            var result = runtime.Evaluate(scope, test);
 
             if (!result.IsTruthy())
             {
@@ -58,7 +58,7 @@ namespace Lillisp.Core.Macros
             {
                 if (arg is Node node)
                 {
-                    runtime.Evaluate(node);
+                    runtime.Evaluate(scope, node);
                 }
             }
 
