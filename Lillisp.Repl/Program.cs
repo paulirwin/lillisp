@@ -92,7 +92,7 @@ namespace Lillisp.Repl
             // HACK.PI: use proper symbols to avoid polluting globals
             runtime.RegisterGlobal("show-ast", nameof(options.ShowAst));
 
-            runtime.RegisterFunction("repl-config!", cargs =>
+            runtime.RegisterGlobalFunction("repl-config!", cargs =>
             {
                 var prop = typeof(ReplOptions).GetProperty(cargs[0]?.ToString() ?? "unknown", BindingFlags.Public | BindingFlags.Instance);
 

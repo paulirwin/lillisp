@@ -54,11 +54,13 @@ namespace Lillisp.Core
 
         public void Set(string key, object? value)
         {
+            if (Parent == null)
+            {
+                throw new InvalidOperationException("Global scope variables are immutable");
+            }
+
             if (!Env.ContainsKey(key))
             {
-                if (Parent == null)
-                    throw new ArgumentException($"Variable {key} has not yet been defined");
-
                 Parent.Set(key, value);
             }
 
