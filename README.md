@@ -204,11 +204,13 @@ Lillisp> (typeof (cast 7 Int32))
 Common Lillisp to .NET type mappings:
 | Lillisp type | .NET type |
 | --- | --- |
-| list | `System.Object?[]` |
-| vector | `System.Collections.Generic.List<System.Object?>` |
+| list | `System.Object?[]`** |
+| vector | `Lillisp.Core.Vector` (wraps a `System.Collections.Generic.List<System.Object?>`) |
 | boolean | `System.Boolean` |
 | real/integer numbers (i.e. `7` or `42.03`) | `System.Double` |
 | complex (i.e. `-4+7i`) | `System.Numerics.Complex` |
 | character | `System.Char` |
 | constant string | `System.String` |
 | mutable string (i.e. with `(make-string)`) | `System.Text.StringBuilder` |
+
+** Note: lists are currently implemented as a singly-linked list of `Lillisp.Core.Pair` objects once parsed, until they are evaluated or returned from functions (such as `list`), at which point they are from then on `object?[]`. The plan is to change this to use the `Pair` linked list top to bottom, from syntax parsing all the way through execution.
