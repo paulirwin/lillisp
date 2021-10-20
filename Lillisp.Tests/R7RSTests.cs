@@ -11,7 +11,7 @@ namespace Lillisp.Tests
         /// <summary>
         /// Tests tail recursion with a 10,000 iteration factorial. This quickly would stack overflow without tail calls.
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Skipping by default due to execution time")]
         public void R7Rs_3_5_Tail_Recursion_Factorial()
         {
             var runtime = new LillispRuntime();

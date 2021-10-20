@@ -39,7 +39,8 @@ namespace Lillisp.Tests
         [InlineData("(boolean? '(1 2 3))", false)]
         [InlineData("(boolean? [1 2 3])", false)]
         [InlineData("(boolean? '())", false)]
-        [InlineData("(boolean? 'car)", false)]        
+        [InlineData("(boolean? 'car)", false)]
+        [InlineData("(boolean? #u8(1 2 3))", false)]
         [Theory]
         public void BooleanCheckTests(string input, bool expected)
         {
@@ -60,6 +61,7 @@ namespace Lillisp.Tests
         [InlineData("(char? [1 2 3])", false)]
         [InlineData("(char? '())", false)]
         [InlineData("(char? 'car)", false)]
+        [InlineData("(char? #u8(1 2 3))", false)]
         [Theory]
         public void CharCheckTests(string input, bool expected)
         {
@@ -80,6 +82,7 @@ namespace Lillisp.Tests
         [InlineData("(null? [1 2 3])", false)]
         [InlineData("(null? '())", true)]
         [InlineData("(null? 'car)", false)]
+        [InlineData("(null? #u8(1 2 3))", false)]
         [Theory]
         public void NullCheckTests(string input, bool expected)
         {
@@ -100,6 +103,7 @@ namespace Lillisp.Tests
         [InlineData("(number? [1 2 3])", false)]
         [InlineData("(number? '())", false)]
         [InlineData("(number? 'car)", false)]
+        [InlineData("(number? #u8(1 2 3))", false)]
         [Theory]
         public void NumberCheckTests(string input, bool expected)
         {
@@ -120,6 +124,7 @@ namespace Lillisp.Tests
         [InlineData("(string? [1 2 3])", false)]
         [InlineData("(string? '())", false)]
         [InlineData("(string? 'car)", false)]
+        [InlineData("(string? #u8(1 2 3))", false)]
         [Theory]
         public void StringCheckTests(string input, bool expected)
         {
@@ -140,6 +145,7 @@ namespace Lillisp.Tests
         [InlineData("(pair? [1 2 3])", false)]
         [InlineData("(pair? '())", false)]
         [InlineData("(pair? 'car)", false)]
+        [InlineData("(pair? #u8(1 2 3))", false)]
         [Theory]
         public void PairCheckTests(string input, bool expected)
         {
@@ -160,6 +166,7 @@ namespace Lillisp.Tests
         [InlineData("(procedure? [1 2 3])", false)]
         [InlineData("(procedure? '())", false)]
         [InlineData("(procedure? 'car)", false)]
+        [InlineData("(procedure? #u8(1 2 3))", false)]
         [Theory]
         public void ProcedureCheckTests(string input, bool expected)
         {
@@ -180,6 +187,7 @@ namespace Lillisp.Tests
         [InlineData("(symbol? [1 2 3])", false)]
         [InlineData("(symbol? '())", false)]
         [InlineData("(symbol? 'car)", true)]
+        [InlineData("(symbol? #u8(1 2 3))", false)]
         [Theory]
         public void SymbolCheckTests(string input, bool expected)
         {
@@ -200,8 +208,30 @@ namespace Lillisp.Tests
         [InlineData("(vector? [1 2 3])", true)]
         [InlineData("(vector? '())", false)]
         [InlineData("(vector? 'car)", false)]
+        [InlineData("(vector? #u8(1 2 3))", false)]
         [Theory]
         public void VectorCheckTests(string input, bool expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
+
+        [InlineData("(bytevector? #t)", false)]
+        [InlineData("(bytevector? #f)", false)]
+        [InlineData("(bytevector? 0)", false)]
+        [InlineData("(bytevector? #\\a)", false)]
+        [InlineData("(bytevector? \"cat\")", false)]
+        [InlineData("(bytevector? (lambda (x) x))", false)]
+        [InlineData("(bytevector? '(1 2 3))", false)]
+        [InlineData("(bytevector? [1 2 3])", false)]
+        [InlineData("(bytevector? '())", false)]
+        [InlineData("(bytevector? 'car)", false)]
+        [InlineData("(bytevector? #u8(1 2 3))", true)]
+        [Theory]
+        public void BytevectorCheckTests(string input, bool expected)
         {
             var runtime = new LillispRuntime();
 
@@ -261,6 +291,16 @@ namespace Lillisp.Tests
             var result = runtime.EvaluateProgram(input);
 
             Assert.Equal(expected, result);
+        }
+
+        [InlineData("(utf8->string #u8(65))", "A")]
+        [InlineData("(bytevector-length (string->utf8 \"λ\"))", 2)]
+        [InlineData("(bytevector-u8-ref (string->utf8 \"λ\") 0)", (byte)0xCE)]
+        [InlineData("(bytevector-u8-ref (string->utf8 \"λ\") 1)", (byte)0xBB)]
+        [Theory]
+        public void Utf8StringConversionTetss(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
         }
     }
 }

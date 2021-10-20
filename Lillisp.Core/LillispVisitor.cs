@@ -63,6 +63,45 @@ namespace Lillisp.Core
             return new Vector(nodes);
         }
 
+        public override Node VisitBytevector(LillispParser.BytevectorContext context)
+        {
+            var bv = new Bytevector();
+
+            foreach (var child in context.children)
+            {
+                var childNode = Visit(child);
+
+                if (childNode == null)
+                {
+                    continue;
+                }
+
+                if (childNode is Atom { AtomType: AtomType.Number, Value: >= 0 and <= 255 } atom)
+                {
+                    bv.Add((byte)(int)atom.Value);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Only integer literals between 0-255 are supported for bytevector literal values.");
+                }
+            }
+
+            return bv;
+        }
+
+        public override Node VisitInteger(LillispParser.IntegerContext context)
+        {
+            var integer = context.INTEGER();
+
+            if (integer != null)
+            {
+                var i = int.Parse(integer.GetText());
+                return new Atom(AtomType.Number, i);
+            }
+
+            throw new NotImplementedException("Unknown integer type");
+        }
+
         public override Node VisitAtom(LillispParser.AtomContext context)
         {
             var number = context.number();

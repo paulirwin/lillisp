@@ -253,5 +253,79 @@ namespace Lillisp.Core.Expressions
 
             return args[0].IsInteger();
         }
+
+        public static object? IsBytevector(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("bytevector? requires one argument");
+            }
+
+            return args[0] is Bytevector; // TODO: should we support byte[] here too?
+        }
+
+        public static object? Utf8ToString(object?[] args)
+        {
+            if (args.Length is 0 or > 3)
+            {
+                throw new ArgumentException("utf8->string requires one to three arguments");
+            }
+
+            if (args[0] is not Bytevector bv)
+            {
+                throw new ArgumentException("utf8->string's first argument must be a bytevector");
+            }
+
+            int start = 0, end = bv.Count;
+
+            if (args.Length > 1)
+            {
+                start = Convert.ToInt32(args[1]);
+            }
+
+            if (args.Length == 3)
+            {
+                end = Convert.ToInt32(args[2]);
+            }
+
+            var slice = bv[start..end];
+
+            // TODO: reduce extra allocations here
+            return Encoding.UTF8.GetString(slice.ToByteArray());
+        }
+
+        public static object? StringToUtf8(object?[] args)
+        {
+            if (args.Length is 0 or > 3)
+            {
+                throw new ArgumentException("string->utf8 requires one to three arguments");
+            }
+
+            if (args[0] is not string str)
+            {
+                if (args[0] is StringBuilder sb)
+                {
+                    str = sb.ToString();
+                }
+                else
+                {
+                    throw new ArgumentException("string->utf8's first argument must be a string");
+                }
+            }
+
+            int start = 0, end = str.Length;
+
+            if (args.Length > 1)
+            {
+                start = Convert.ToInt32(args[1]);
+            }
+
+            if (args.Length == 3)
+            {
+                end = Convert.ToInt32(args[2]);
+            }
+
+            return new Bytevector(Encoding.UTF8.GetBytes(str[start..end]));
+        }
     }
 }

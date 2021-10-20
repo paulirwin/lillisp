@@ -2,15 +2,19 @@ grammar Lillisp;
 
 prog: form * EOF;
 
-form: atom | list | vector | meta;
+form: atom | list | bytevector | vector | meta;
 
 atom: (number | STRING | SYMBOL | CHARACTER);
 
 list: '(' form* ')';
 
+bytevector: '#u8(' integer* ')';
+
 vector: '[' form* ']' | '#(' form* ')';
 
 meta: quote | quasiquote | unquote;
+
+integer: INTEGER;
 
 quote: '\'' form;
 

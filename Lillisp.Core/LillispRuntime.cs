@@ -59,7 +59,14 @@ namespace Lillisp.Core
             ["angle"] = ComplexExpressions.Angle,
             ["append"] = ListExpressions.Append,
             ["boolean?"] = TypeExpressions.IsBoolean,
-            //["bytevector?"] = TypeExpressions.IsByteVector, // TODO: bytevector support
+            ["bytevector?"] = TypeExpressions.IsBytevector,
+            ["bytevector"] = BytevectorExpressions.Bytevector,
+            ["bytevector-append"] = BytevectorExpressions.BytevectorAppend,
+            ["bytevector-copy"] = BytevectorExpressions.BytevectorCopy,
+            ["bytevector-copy!"] = BytevectorExpressions.BytevectorCopyTo,
+            ["bytevector-length"] = BytevectorExpressions.BytevectorLength,
+            ["bytevector-u8-ref"] = BytevectorExpressions.BytevectorU8Ref,
+            ["bytevector-u8-set!"] = BytevectorExpressions.BytevectorU8Set,
             ["car"] = ListExpressions.Car,
             ["cast"] = TypeExpressions.Cast,
             ["cdr"] = ListExpressions.Cdr,
@@ -102,6 +109,7 @@ namespace Lillisp.Core
             ["ln"] = MathExpressions.Ln,
             ["log"] = MathExpressions.Log,
             ["magnitude"] = ComplexExpressions.Magnitude,
+            ["make-bytevector"] = BytevectorExpressions.MakeBytevector,
             ["make-polar"] = ComplexExpressions.MakePolar,
             ["make-promise"] = DynamicExpressions.MakePromise,
             ["make-rectangular"] = ComplexExpressions.MakeRectangular,
@@ -153,9 +161,11 @@ namespace Lillisp.Core
             ["string-set!"] = StringExpressions.StringSet,
             ["string-upcase"] = StringExpressions.Upcase,
             ["string->list"] = TypeExpressions.StringToList,
+            ["string->utf8"] = TypeExpressions.StringToUtf8,
             ["substring"] = StringExpressions.Substring,
             ["symbol?"] = TypeExpressions.IsSymbol,
             ["typeof"] = TypeExpressions.TypeOf,
+            ["utf8->string"] = TypeExpressions.Utf8ToString,
             ["vector"] = VectorExpressions.Vector,
             ["vector-append"] = VectorExpressions.Append,
             ["vector-copy"] = VectorExpressions.VectorCopy,
@@ -232,6 +242,7 @@ namespace Lillisp.Core
             {
                 Program program => program.Children.Select(Quote).ToArray(),
                 Vector vector => vector, // TODO: is this correct?
+                Bytevector bv => bv, // TODO: is this correct?
                 Pair pair => pair.Select(Quote).ToArray(),
                 Symbol symbol => symbol.Value,
                 Atom atom => atom.Value,
@@ -246,6 +257,7 @@ namespace Lillisp.Core
             {
                 Program program => EvaluateProgram(scope, program),
                 Vector vector => EvaluateVector(scope, vector),
+                Bytevector bv => bv,
                 Pair pair => EvaluateExpression(scope, pair),
                 Symbol symbol => EvaluateSymbol(scope, symbol),
                 Atom atom => atom.Value,
@@ -267,6 +279,7 @@ namespace Lillisp.Core
             return node.Value switch
             {
                 Vector vector => new Vector(vector.Select(i => i is Node n ? Quote(n) : i)),
+                Bytevector bv => bv,
                 Pair pair => pair.Select(Quote).ToArray(),
                 Atom { Value: { } value } => value,
                 Symbol symbol => symbol,
