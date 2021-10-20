@@ -327,7 +327,7 @@ namespace Lillisp.Core.Macros
 
             foreach (var clause in clauses)
             {
-                var test = runtime.Evaluate(clause.Car);
+                var test = runtime.Evaluate(scope, clause.Car);
 
                 if (test.IsTruthy())
                 {
@@ -335,7 +335,7 @@ namespace Lillisp.Core.Macros
 
                     foreach (var expr in clause.Skip(1))
                     {
-                        result = runtime.Evaluate(expr);
+                        result = runtime.Evaluate(scope, expr);
                     }
 
                     return result;
@@ -348,7 +348,7 @@ namespace Lillisp.Core.Macros
 
                 foreach (var expr in elseClause.Skip(1))
                 {
-                    result = runtime.Evaluate(expr);
+                    result = runtime.Evaluate(scope, expr);
                 }
 
                 return result;

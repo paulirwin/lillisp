@@ -181,6 +181,7 @@ namespace Lillisp.Core
         };
 
         private readonly Scope _globalScope;
+        private readonly Scope _userScope;
 
         public LillispRuntime()
         {
@@ -192,6 +193,8 @@ namespace Lillisp.Core
             // TODO: don't load all libraries by default, support `import`
             EvaluateLibraryResource("Lillisp.Core.Library.base.lisp");
             EvaluateLibraryResource("Lillisp.Core.Library.cxr.lisp");
+
+            _userScope = _globalScope.CreateChildScope();
         }
 
         public void RegisterGlobal(string symbol, object? value)
@@ -199,21 +202,29 @@ namespace Lillisp.Core
             _globalScope.Define(symbol, value);
         }
 
-        public void RegisterFunction(string symbol, Expression func)
+        public void RegisterGlobalFunction(string symbol, Expression func)
         {
             _globalScope.Define(symbol, func);
         }
 
         public object? EvaluateProgram(string program)
         {
+            var prog = ParseProgramText(program);
+
+            return EvaluateProgram(prog);
+        }
+
+        private static Node ParseProgramText(string program)
+        {
             var lexer = new LillispLexer(new AntlrInputStream(program));
             var parser = new LillispParser(new CommonTokenStream(lexer));
             var visitor = new LillispVisitor();
 
             var prog = visitor.Visit(parser.prog());
-
-            return Evaluate(_globalScope, prog);
+            return prog;
         }
+
+        public object? EvaluateProgram(Node node) => Evaluate(_userScope, node);
 
         public object? Quote(Node node)
         {
@@ -228,8 +239,6 @@ namespace Lillisp.Core
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
-
-        public object? Evaluate(Node node) => Evaluate(_globalScope, node);
 
         public object? Evaluate(Scope scope, Node node)
         {
@@ -356,7 +365,9 @@ namespace Lillisp.Core
 
             string text = sr.ReadToEnd();
 
-            EvaluateProgram(text);
+            var prog = ParseProgramText(text);
+
+            Evaluate(_globalScope, prog);
         }
     }
 }
