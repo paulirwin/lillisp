@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -16,42 +18,20 @@ namespace Lillisp.Core
 
         public static string? Format(object? result, bool quote, bool nullAsString)
         {
-            if (result == null)
+            return result switch
             {
-                return nullAsString ? "null" : null;
-            }
-
-            if (result is Vector vector)
-            {
-                return $"[{string.Join(" ", vector.Select(i => Format(i, quote, nullAsString)))}]";
-            }
-
-            if (result is ICollection objArray)
-            {
-                return $"({string.Join(" ", objArray.Cast<object>().Select(i => Format(i, quote, nullAsString)))})";
-            }
-
-            if (result is Delegate expr)
-            {
-                return expr.Method.ToString();
-            }
-
-            if (result is string str)
-            {
-                return quote ? SymbolDisplay.FormatLiteral(str, true) : str;
-            }
-
-            if (result is StringBuilder sb)
-            {
-                return quote ? SymbolDisplay.FormatLiteral(sb.ToString(), true) : sb.ToString();
-            }
-
-            if (result is char ch)
-            {
-                return quote ? SymbolDisplay.FormatLiteral(ch, true) : ch.ToString();
-            }
-
-            return result.ToString();
+                null => nullAsString ? "null" : null,
+                Vector vector => $"[{string.Join(" ", vector.Select(i => Format(i, quote, nullAsString)))}]",
+                ICollection objArray => $"({string.Join(" ", objArray.Cast<object>().Select(i => Format(i, quote, nullAsString)))})",
+                Delegate expr => expr.Method.ToString(),
+                string str => quote ? SymbolDisplay.FormatLiteral(str, true) : str,
+                StringBuilder sb => quote ? SymbolDisplay.FormatLiteral(sb.ToString(), true) : sb.ToString(),
+                char ch => quote ? SymbolDisplay.FormatLiteral(ch, true) : ch.ToString(),
+                Complex { Imaginary: 0d } complex => complex.Real.ToString(CultureInfo.InvariantCulture),
+                Complex { Imaginary: < 0d } complex => $"{complex.Real.ToString(CultureInfo.InvariantCulture)}{complex.Imaginary.ToString(CultureInfo.InvariantCulture)}i",
+                Complex { Imaginary: > 0d } complex => $"{complex.Real.ToString(CultureInfo.InvariantCulture)}+{complex.Imaginary.ToString(CultureInfo.InvariantCulture)}i",
+                _ => result.ToString()
+            };
         }
     }
 }

@@ -85,7 +85,7 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("number? requires one argument");
             }
 
-            return args[0] is sbyte or byte or short or ushort or int or uint or long or ulong or float or double or decimal;
+            return args[0].IsNumber();
         }
 
         public static object? IsString(object?[] args)
@@ -212,6 +212,46 @@ namespace Lillisp.Core.Expressions
             }
 
             return args[0] is Lazy<object?> or Task<object?>;
+        }
+
+        public static object? IsComplex(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("complex? requires one argument");
+            }
+
+            return args[0].IsComplex();
+        }
+
+        public static object? IsReal(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("real? requires one argument");
+            }
+
+            return args[0].IsRealNumber();
+        }
+
+        public static object? IsRational(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("rational? requires one argument");
+            }
+
+            return args[0].IsRationalNumber();
+        }
+
+        public static object? IsInteger(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("number? requires one argument");
+            }
+
+            return args[0].IsInteger();
         }
     }
 }

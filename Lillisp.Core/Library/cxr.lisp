@@ -1,9 +1,4 @@
-﻿(define (caar x) (car (car x)))
-(define (cadr x) (car (cdr x)))
-(define (cdar x) (cdr (car x)))
-(define (cddr x) (cdr (cdr x)))
-
-(define (caaar x) (car (car (car x))))
+﻿(define (caaar x) (car (car (car x))))
 (define (caadr x) (car (car (cdr x))))
 (define (cadar x) (car (cdr (car x))))
 (define (caddr x) (car (cdr (cdr x))))

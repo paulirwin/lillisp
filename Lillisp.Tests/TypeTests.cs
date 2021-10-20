@@ -235,5 +235,32 @@ namespace Lillisp.Tests
 
             Assert.Equal(expected, result);
         }
+
+        // R7RS 6.2.6
+        // NOTE on commented-out tests: waiting on this to be fixed: https://github.com/xunit/visualstudio.xunit/issues/266
+        [InlineData("(complex? 3+4i)", true)]
+        [InlineData("(complex? 3)", true)]
+        [InlineData("(real? 3)", true)]
+        //[InlineData("(real? -2.5+0i)", true, Skip = "Would require either an exact complex type, or fail the test below by considering an imaginary part of 0 real")]
+        [InlineData("(real? -2.5+0.0i)", false)]
+        //[InlineData("(real? #e1e10)", true, Skip = "Exp notation not yet supported")]
+        //[InlineData("(real? +inf.0)", true, Skip = "Inf literals not yet supported")]
+        //[InlineData("(real? +nan.0)", true, Skip = "NaN literals not yet supported")]
+        //[InlineData("(rational? -inf.0)", false, Skip = "Inf literals not yet supported")]
+        //[InlineData("(rational? 3.5)", true, Skip = "Rationals (and therefore, their conversion to/from decimal) not yet supported")]
+        //[InlineData("(rational? 6/10)", true, Skip = "Rationals not yet supported")]
+        //[InlineData("(rational? 6/3)", true, Skip = "Rationals not yet supported")]
+        //[InlineData("(integer? 3+0i)", true, Skip = "Would require an exact complex type, or failing the '(real? -2.5+0.0i)' test above")]
+        //[InlineData("(integer? 3.0)", true, Skip = "Exact real literals not yet supported")]
+        //[InlineData("(integer? 8/4)", true, Skip = "Rationals not yet supported")]
+        [Theory]
+        public void NumberTypeCheckTests(string input, bool expected)
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram(input);
+
+            Assert.Equal(expected, result);
+        }
     }
 }

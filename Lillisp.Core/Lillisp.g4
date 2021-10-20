@@ -4,7 +4,7 @@ prog: form * EOF;
 
 form: atom | list | vector | meta;
 
-atom: (NUMBER | STRING | SYMBOL | CHARACTER);
+atom: (number | STRING | SYMBOL | CHARACTER);
 
 list: '(' form* ')';
 
@@ -18,7 +18,7 @@ quasiquote: '`' form;
 
 unquote: ',' form;
 
-CHARACTER: '#\\' ((LETTER | NUMBER | SYMBOL_CHAR)* | '(' | ')');
+CHARACTER: '#\\' ((LETTER | DIGIT | SYMBOL_CHAR)* | '(' | ')');
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 
@@ -28,15 +28,16 @@ OPERATOR: SYMBOL_CHAR+;
 
 IDENTIFIER: (LETTER | DOT | HASH) (
 		LETTER
-		| NUMBER
+		| DIGIT
 		| SYMBOL_CHAR
 	)*;
 
-NUMBER: INTEGER | FLOAT | RATIO;
+number: INTEGER | COMPLEX | FLOAT | RATIO;
 
 INTEGER: NEGATE? (DIGIT)+;
 FLOAT: NEGATE? (DIGIT | '.')+;
 RATIO: INTEGER '/' INTEGER;
+COMPLEX: NEGATE? (DIGIT | '.')+ ('+' | '-') (DIGIT | '.')+ 'i';
 
 LETTER: LOWER | UPPER;
 DIGIT: '0' ..'9';

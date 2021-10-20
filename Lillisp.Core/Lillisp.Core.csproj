@@ -6,11 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Library\core.lisp" />
+    <None Remove="Library\base.lisp" />
+    <None Remove="Library\cxr.lisp" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Library\core.lisp" />
+    <EmbeddedResource Include="Library\base.lisp" />
+    <EmbeddedResource Include="Library\cxr.lisp" />
   </ItemGroup>
 
   <ItemGroup>

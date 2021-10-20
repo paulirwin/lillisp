@@ -41,8 +41,8 @@ namespace Lillisp.Core
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
         {
-            ["+"] = MathExpressions.Plus,
-            ["-"] = MathExpressions.Minus,
+            ["+"] = MathExpressions.Add,
+            ["-"] = MathExpressions.Subtract,
             ["*"] = MathExpressions.Multiply,
             ["/"] = MathExpressions.Divide,
             ["%"] = MathExpressions.Modulo,
@@ -56,6 +56,7 @@ namespace Lillisp.Core
             [">>"] = MathExpressions.ShiftRight,
             ["<<"] = MathExpressions.ShiftLeft,
             ["abs"] = MathExpressions.Abs,
+            ["angle"] = ComplexExpressions.Angle,
             ["append"] = ListExpressions.Append,
             ["boolean?"] = TypeExpressions.IsBoolean,
             //["bytevector?"] = TypeExpressions.IsByteVector, // TODO: bytevector support
@@ -82,6 +83,7 @@ namespace Lillisp.Core
             ["char-downcase"] = CharacterExpressions.Downcase,
             ["char-foldcase"] = CharacterExpressions.Foldcase,
             ["char->integer"] = TypeExpressions.CharacterToInteger,
+            ["complex?"] = TypeExpressions.IsComplex,
             ["cons"] = ListExpressions.Cons,
             ["count"] = DynamicExpressions.Count,
             ["dec"] = MathExpressions.Decrement,
@@ -89,14 +91,19 @@ namespace Lillisp.Core
             //["eof-object?"] = TypeExpressions.IsEofObject, // TODO
             ["force"] = DynamicExpressions.Force,
             ["get"] = DynamicExpressions.Get,
+            ["imag-part"] = ComplexExpressions.ImaginaryPart,
             ["inc"] = MathExpressions.Increment,
+            ["integer?"] = TypeExpressions.IsInteger,
             ["integer->char"] = TypeExpressions.IntegerToCharacter,
             ["length"] = DynamicExpressions.Count,
             ["list"] = ListExpressions.List,
             ["list->string"] = TypeExpressions.ListToString,
             ["ln"] = MathExpressions.Ln,
             ["log"] = MathExpressions.Log,
+            ["magnitude"] = ComplexExpressions.Magnitude,
+            ["make-polar"] = ComplexExpressions.MakePolar,
             ["make-promise"] = DynamicExpressions.MakePromise,
+            ["make-rectangular"] = ComplexExpressions.MakeRectangular,
             ["make-string"] = StringExpressions.MakeString,
             ["make-vector"] = VectorExpressions.MakeVector,
             ["max"] = MathExpressions.Max,
@@ -114,6 +121,9 @@ namespace Lillisp.Core
             ["pr"] = StringExpressions.Pr,
             ["prn"] = StringExpressions.Prn,
             ["range"] = ListExpressions.Range,
+            ["rational?"] = TypeExpressions.IsRational,
+            ["real?"] = TypeExpressions.IsReal,
+            ["real-part"] = ComplexExpressions.RealPart,
             ["sqrt"] = MathExpressions.Sqrt,
             ["str"] = StringExpressions.Str,
             ["string"] = StringExpressions.String,
@@ -175,7 +185,9 @@ namespace Lillisp.Core
             _globalScope.AddAllFrom(_systemFunctions);
             _globalScope.AddAllFrom(_systemGlobals);
 
-            EvaluateLibraryResource("Lillisp.Core.Library.core.lisp");
+            // TODO: don't load all libraries by default, support `import`
+            EvaluateLibraryResource("Lillisp.Core.Library.base.lisp");
+            EvaluateLibraryResource("Lillisp.Core.Library.cxr.lisp");
         }
 
         public void RegisterGlobal(string symbol, object? value)

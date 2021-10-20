@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Lillisp.Core
 {
     public class LillispVisitor : LillispBaseVisitor<Node>
     {
+        private static readonly Regex _complexRegex = new("(?<real>\\-?[0-9]+(\\.[0-9]+)?)(?<imaginary>[\\-\\+][0-9]+(\\.[0-9]+)?)i", RegexOptions.Compiled);
+
         public override Node VisitProg(LillispParser.ProgContext context)
         {
             var node = new Program();
@@ -60,10 +64,17 @@ namespace Lillisp.Core
 
         public override Node VisitAtom(LillispParser.AtomContext context)
         {
-            var number = context.NUMBER();
+            var number = context.number();
 
             if (number != null)
             {
+                var complex = number.COMPLEX();
+
+                if (complex != null)
+                {
+                    return ParseComplex(complex.GetText());
+                }
+
                 double num = Convert.ToDouble(number.GetText());
                 return new Atom(AtomType.Number, num);
             }
@@ -121,6 +132,21 @@ namespace Lillisp.Core
             }
 
             throw new NotImplementedException("Unknown atom type");
+        }
+
+        private static Node ParseComplex(string text)
+        {
+            var match = _complexRegex.Match(text);
+
+            if (!match.Success)
+            {
+                throw new InvalidOperationException($"Unable to parse complex number: {text}");
+            }
+
+            var real = double.Parse(match.Groups["real"].Value);
+            var imaginary = double.Parse(match.Groups["imaginary"].Value);
+
+            return new Atom(AtomType.Number, new Complex(real, imaginary));
         }
 
         public override Node VisitMeta(LillispParser.MetaContext context)
