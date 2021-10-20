@@ -53,6 +53,7 @@ An incomplete list of features currently supported:
 * Conditional logic (`if`, `cond`, `when`)
 * Sequential logic with `begin`
 * Lambda expressions with `lambda`
+* Tail recursion (except for `and` and `or`, or any invoked .NET code)
 * Shorthand for defining a lambda variable (aka a named function) with `defun` (or `define` with a list as the first parameter)
 * Block-scoping variables with `let`
 * Rational number operations (`rationalize`, `numerator`/`denominator`, `simplify`)
@@ -60,7 +61,7 @@ An incomplete list of features currently supported:
 * Almost all of the Scheme `char`, `complex`, `CxR`, and `lazy` library functions
 
 Notable features not yet implemented from Scheme R7RS include:
-* Proper tail recursion
+* Tail context for `and` and `or`
 * Quasiquoting and unquoting
 * Macros
 * Dotted pairs
