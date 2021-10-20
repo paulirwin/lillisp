@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Rationals;
 
 // ReSharper disable IntVariableOverflowInUncheckedContext - allow for runtime exceptions in these cases
 
@@ -24,6 +25,7 @@ namespace Lillisp.Core.Expressions
                 {
                     Complex complex => complex.Real < 0 ? new Complex(-1 * complex.Real, complex.Imaginary) : complex, // TODO: I have no idea if this is correct
                     BigInteger bi => bi < 0 ? -1 * bi : bi,
+                    Rational r => r < 0 ? -1 * r : r,
                     sbyte sb => sb < 0 ? -1 * sb : sb,
                     short s => s < 0 ? -1 * s : s,
                     int i => i < 0 ? -1 * i : i,
@@ -131,6 +133,7 @@ namespace Lillisp.Core.Expressions
                 {
                     (Complex a, Complex b) => Complex.Pow(a, b),
                     (Complex a, _) => Complex.Pow(a, Convert.ToDouble(args[i])),
+                    (Rational a, _) => ObjectExtensions.IsInteger(args[i]) ? Rational.Pow(a, Convert.ToInt32(args[i])) : throw new NotImplementedException("Raising a rational to a non-integer is not yet supported"),
                     _ => Math.Pow(result, Convert.ToDouble(args[i]))
                 };
             }
@@ -154,6 +157,7 @@ namespace Lillisp.Core.Expressions
             {
                 Complex complex => Complex.Abs(complex),
                 BigInteger bi => BigInteger.Abs(bi),
+                Rational r => Rational.Abs(r),
                 decimal d => Math.Abs(d),
                 double d => Math.Abs(d),
                 float f => Math.Abs(f),
@@ -238,11 +242,29 @@ namespace Lillisp.Core.Expressions
 
             return args[0] switch
             {
-                // HACK: without the cast to object in one of the cases below, the type of the switch expression is Complex
-                double d => (object)Math.Sqrt(d),
+                double d => Math.Sqrt(d),
                 Complex complex => Complex.Sqrt(complex),
+                Rational r => RationalSqrt(r),
                 _ => Math.Sqrt(Convert.ToDouble(args[0]))
             };
+        }
+
+        private static Rational RationalSqrt(Rational rational)
+        {
+            if (rational.Numerator > long.MaxValue
+                || rational.Numerator < long.MinValue
+                || rational.Denominator > long.MaxValue
+                || rational.Denominator < long.MinValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rational), "Rational value has either a numerator or denominator that is too large to sqrt.");
+            }
+
+            var num = Math.Sqrt((double)rational.Numerator);
+            var den = Math.Sqrt((double)rational.Denominator);
+            
+            var result = num / den;
+
+            return Rational.Approximate(result);
         }
 
         public static object? ShiftRight(object?[] args)
@@ -291,6 +313,7 @@ namespace Lillisp.Core.Expressions
                 // HACK: without the cast to object, the type of the switch expression is Complex
                 double d => (object)Math.Log(d),
                 Complex complex => Complex.Log(complex),
+                Rational r => Rational.Log(r),
                 _ => Math.Log(Convert.ToDouble(args[0]))
             };
         }
@@ -309,6 +332,7 @@ namespace Lillisp.Core.Expressions
                     // HACK: without the cast to object, the type of the switch expression is Complex
                     double d => (object)Math.Log10(d),
                     Complex complex => Complex.Log10(complex),
+                    Rational r => Rational.Log10(r),
                     _ => Math.Log10(Convert.ToDouble(args[0]))
                 };
             }
@@ -319,6 +343,8 @@ namespace Lillisp.Core.Expressions
                 (double d, double b) => (object)Math.Log(d, b),
                 (Complex complex, double b) => Complex.Log(complex, b),
                 (Complex complex, _) => Complex.Log(complex, Convert.ToDouble(args[1])),
+                (Rational r, double b) => Rational.Log(r, b),
+                (Rational r, _) => Rational.Log(r, Convert.ToDouble(args[1])),
                 _ => Math.Log(Convert.ToDouble(args[0]), Convert.ToDouble(args[1]))
             };
         }

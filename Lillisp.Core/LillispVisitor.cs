@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using Rationals;
 
 namespace Lillisp.Core
 {
@@ -75,6 +76,13 @@ namespace Lillisp.Core
                     return ParseComplex(complex.GetText());
                 }
 
+                var ratio = number.RATIO();
+
+                if (ratio != null)
+                {
+                    return ParseRational(ratio.GetText());
+                }
+
                 double num = Convert.ToDouble(number.GetText());
                 return new Atom(AtomType.Number, num);
             }
@@ -132,6 +140,13 @@ namespace Lillisp.Core
             }
 
             throw new NotImplementedException("Unknown atom type");
+        }
+
+        private static Node ParseRational(string text)
+        {
+            var rational = Rational.Parse(text);
+
+            return new Atom(AtomType.Number, rational);
         }
 
         private static Node ParseComplex(string text)

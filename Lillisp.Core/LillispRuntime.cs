@@ -87,6 +87,7 @@ namespace Lillisp.Core
             ["cons"] = ListExpressions.Cons,
             ["count"] = DynamicExpressions.Count,
             ["dec"] = MathExpressions.Decrement,
+            ["denominator"] = RationalExpressions.Denominator,
             ["digit-value"] = CharacterExpressions.DigitValue,
             //["eof-object?"] = TypeExpressions.IsEofObject, // TODO
             ["force"] = DynamicExpressions.Force,
@@ -110,6 +111,7 @@ namespace Lillisp.Core
             ["min"] = MathExpressions.Min,
             ["not"] = BooleanExpressions.Not,
             ["null?"] = TypeExpressions.IsNull,
+            ["numerator"] = RationalExpressions.Numerator,
             ["number?"] = TypeExpressions.IsNumber,
             ["pair?"] = TypeExpressions.IsPair,
             //["port?"] = TypeExpressions.IsPort, // TODO
@@ -122,8 +124,10 @@ namespace Lillisp.Core
             ["prn"] = StringExpressions.Prn,
             ["range"] = ListExpressions.Range,
             ["rational?"] = TypeExpressions.IsRational,
+            ["rationalize"] = RationalExpressions.Rationalize,
             ["real?"] = TypeExpressions.IsReal,
             ["real-part"] = ComplexExpressions.RealPart,
+            ["simplify"] = RationalExpressions.Simplify,
             ["sqrt"] = MathExpressions.Sqrt,
             ["str"] = StringExpressions.Str,
             ["string"] = StringExpressions.String,

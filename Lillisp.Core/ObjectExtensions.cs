@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Rationals;
 
 namespace Lillisp.Core
 {
@@ -9,6 +10,7 @@ namespace Lillisp.Core
 
         public static bool IsNumber(this object? value) => value is Complex 
             or BigInteger
+            or Rational
             or decimal
             or double
             or float
@@ -28,6 +30,7 @@ namespace Lillisp.Core
         public static bool IsComplex(this object? value) => IsNumber(value);
 
         public static bool IsRealNumber(this object? value) => value is BigInteger
+            or Rational
             or decimal
             or double
             or float
@@ -41,7 +44,7 @@ namespace Lillisp.Core
             or sbyte;
 
         public static bool IsRationalNumber(this object? value) => value is BigInteger
-            // TODO: or Rational
+            or Rational
             or long
             or ulong
             or int

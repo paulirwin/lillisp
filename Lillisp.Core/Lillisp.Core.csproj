@@ -22,6 +22,7 @@
     </PackageReference>
     <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
+    <PackageReference Include="Rationals" Version="2.0.0" />
   </ItemGroup>
 
 </Project>

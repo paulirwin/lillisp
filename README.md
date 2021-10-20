@@ -42,6 +42,7 @@ Full docs coming at some point in the future. But it's basically a normal Lisp w
 
 An incomplete list of features currently supported:
 * Data types: list, pair (partial support), vector, number, boolean, character, string, symbol, nil, procedure
+* Number types: complex (rectangular `-3+2i` notation), real, rational (i.e. `3/8`), integer
 * Defining variables with `define` (aliased as `def`)
 * Mutating variables with `set!`
 * Most common math operations (`+`, `-`, `*`, `/`, `abs`, `log`, `sqrt`, etc. - others available in `System.Math`)
@@ -54,6 +55,7 @@ An incomplete list of features currently supported:
 * Lambda expressions with `lambda`
 * Shorthand for defining a lambda variable (aka a named function) with `defun` (or `define` with a list as the first parameter)
 * Block-scoping variables with `let`
+* Rational number operations (`rationalize`, `numerator`/`denominator`, `simplify`)
 * Almost all of the Scheme base library string- and vector-related functions
 * Almost all of the Scheme `char`, `complex`, `CxR`, and `lazy` library functions
 
@@ -62,6 +64,7 @@ Notable features not yet implemented from Scheme R7RS include:
 * Quasiquoting and unquoting
 * Macros
 * Dotted pairs
+* Inexact vs Exact number handling
 * Bytevectors
 * Exceptions
 * Pipes
@@ -208,7 +211,8 @@ Common Lillisp to .NET type mappings:
 | vector | `Lillisp.Core.Vector` (wraps a `System.Collections.Generic.List<System.Object?>`) |
 | boolean | `System.Boolean` |
 | real/integer numbers (i.e. `7` or `42.03`) | `System.Double` |
-| complex (i.e. `-4+7i`) | `System.Numerics.Complex` |
+| rational numbers (i.e. `3/8`) | [`Rationals.Rational`](https://github.com/tompazourek/Rationals) |
+| complex numbers (i.e. `-4+7i`) | `System.Numerics.Complex` |
 | character | `System.Char` |
 | constant string | `System.String` |
 | mutable string (i.e. with `(make-string)`) | `System.Text.StringBuilder` |
