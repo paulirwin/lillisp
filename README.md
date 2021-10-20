@@ -55,7 +55,7 @@ An incomplete list of features currently supported:
 * Shorthand for defining a lambda variable (aka a named function) with `defun` (or `define` with a list as the first parameter)
 * Block-scoping variables with `let`
 * Almost all of the Scheme base library string- and vector-related functions
-* Almost all of the Scheme `char`, `CxR`, and `lazy` library functions
+* Almost all of the Scheme `char`, `complex`, `CxR`, and `lazy` library functions
 
 Notable features not yet implemented from Scheme R7RS include:
 * Proper tail recursion
@@ -204,8 +204,11 @@ Lillisp> (typeof (cast 7 Int32))
 Common Lillisp to .NET type mappings:
 | Lillisp type | .NET type |
 | --- | --- |
-| boolean | System.Boolean |
-| number | System.Double |
-| character | System.Char |
-| constant string | System.String |
-| mutable string (i.e. with `(make-string)`) | System.Text.StringBuilder |
+| list | `System.Object?[]` |
+| vector | `System.Collections.Generic.List<System.Object?>` |
+| boolean | `System.Boolean` |
+| real/integer numbers (i.e. `7` or `42.03`) | `System.Double` |
+| complex (i.e. `-4+7i`) | `System.Numerics.Complex` |
+| character | `System.Char` |
+| constant string | `System.String` |
+| mutable string (i.e. with `(make-string)`) | `System.Text.StringBuilder` |
