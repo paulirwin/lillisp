@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Lillisp.Core
 {
-    public class Procedure
+    public class Procedure : IInvokable
     {
         public Procedure(string text, Node parameters, Node body)
         {
@@ -20,13 +20,15 @@ namespace Lillisp.Core
 
         public override string ToString() => Text;
 
-        public object? Invoke(LillispRuntime runtime, Scope scope, object?[] arguments, bool disableTailCalls = false)
+        public object? Invoke(LillispRuntime runtime, Scope scope, object?[] args) => Invoke(runtime, scope, args, false);
+
+        public object? Invoke(LillispRuntime runtime, Scope scope, object?[] args, bool disableTailCalls)
         {
             var childScope = scope.CreateChildScope();
 
             if (Parameters is Symbol pSymbol)
             {
-                childScope.Define(pSymbol.Value, arguments);
+                childScope.Define(pSymbol.Value, args);
             }
             else if (Parameters is Pair {IsList: true} parms)
             {
@@ -51,14 +53,14 @@ namespace Lillisp.Core
                             throw new ArgumentException("Variable must follow the dot in lambda parameters");
                         }
 
-                        childScope.Define(restSymbol.Value, arguments.Skip(i).ToArray());
+                        childScope.Define(restSymbol.Value, args.Skip(i).ToArray());
                         
                         break;
                     }
 
-                    if (arguments.Length > i)
+                    if (args.Length > i)
                     {
-                        var arg = arguments[i];
+                        var arg = args[i];
 
                         childScope.Define(symbol.Value, arg);
                     }

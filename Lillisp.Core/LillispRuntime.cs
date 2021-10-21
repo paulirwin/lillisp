@@ -30,9 +30,11 @@ namespace Lillisp.Core
             //["include-ci"] = CoreMacros.Include, // TODO
             ["lambda"] = CoreMacros.Lambda,
             ["let"] = CoreMacros.Let,
+            ["make-parameter"] = ParameterMacros.MakeParameter,
             ["map"] = CoreMacros.Map,
             ["new"] = InteropMacros.New,
             ["or"] = BooleanMacros.Or,
+            ["parameterize"] = ParameterMacros.Parameterize,
             ["quote"] = CoreMacros.Quote,
             ["raise-continuable"] = ExceptionMacros.RaiseContinuable,
             ["set!"] = CoreMacros.Set,
@@ -361,7 +363,7 @@ namespace Lillisp.Core
 
             return op switch
             {
-                Procedure proc => proc.Invoke(this, scope, args),
+                IInvokable invokable => invokable.Invoke(this, scope, args),
                 MethodInfo method => method.Invoke(null, args),
                 Expression expr => expr(args),
                 _ => throw new InvalidOperationException($"Invalid operation: {op}")

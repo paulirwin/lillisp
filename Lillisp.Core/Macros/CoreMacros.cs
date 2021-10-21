@@ -248,7 +248,7 @@ namespace Lillisp.Core.Macros
 
                     if (bindingValue is Pair { IsList: true } bindingValuePair)
                     {
-                        bindingValue = bindingValuePair.Car; // HACK: wtf? well this is going away soon anyways
+                        bindingValue = bindingValuePair.Car;
                     }
 
                     childScope.Define(listSymbol.Value, runtime.Evaluate(childScope, bindingValue));
