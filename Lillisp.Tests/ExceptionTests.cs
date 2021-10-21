@@ -58,7 +58,31 @@ namespace Lillisp.Tests
 
             Assert.Equal(1d, result);
         }
-        
+
+        [Fact]
+        public void WithExceptionHandler_BasicRaiseContinuableTest()
+        {
+            var runtime = new LillispRuntime();
+
+            var prog = "(def x 0)" +
+                       "(list " +
+                       "    (with-exception-handler " +
+                       "        (lambda (con) " +
+                       "            (begin " +
+                       "                (if (string? con) (set! x 1) (println \"a warning has been issued\"))" +
+                       "                42))" +
+                       "        (lambda () (+ (raise-continuable \"should be a number\") 23)))" +
+                       "    x)" +
+                       ")";
+
+            var result = runtime.EvaluateProgram(prog) as object[];
+
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Length);
+            Assert.Equal(65d, result[0]);
+            Assert.Equal(1d, result[1]);
+        }
+
         [Fact]
         public void WithExceptionHandler_BasicErrorTest()
         {

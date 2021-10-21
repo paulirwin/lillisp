@@ -21,6 +21,8 @@ namespace Lillisp.Core
 
         public ISet<string> InteropNamespaces { get; }
 
+        public Procedure? ExceptionHandler { get; set; }
+
         public IDictionary<string, object?> Env { get; } = new Dictionary<string, object?>();
 
         public object? this[string key] => Resolve(key);

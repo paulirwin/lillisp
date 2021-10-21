@@ -23,6 +23,9 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("with-exception-handler's second argument must be a function with no parameters");
             }
 
+            scope = scope.CreateChildScope();
+            scope.ExceptionHandler = handlerProc;
+            
             try
             {
                 return thunkProc.Invoke(runtime, scope, Array.Empty<object?>(), disableTailCalls: true);
@@ -47,6 +50,37 @@ namespace Lillisp.Core.Macros
             }
 
             return Nil.Value;
+        }
+
+        public static object? RaiseContinuable(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length > 1)
+            {
+                throw new ArgumentException("raise-continuable requires zero or one argument");
+            }
+
+            Scope? lastHandlerScope = scope;
+
+            while (lastHandlerScope is { ExceptionHandler: null })
+            {
+                lastHandlerScope = lastHandlerScope.Parent;
+            }
+
+            Procedure? handlerProc = lastHandlerScope?.ExceptionHandler;
+
+            object? arg = args.Length == 1 ? args[0] : null;
+
+            if (arg is Node node)
+            {
+                arg = runtime.Evaluate(scope, node);
+            }
+
+            if (handlerProc == null)
+            {
+                throw new RaisedException(arg);
+            }
+
+            return handlerProc.Invoke(runtime, scope, new[] { arg }, disableTailCalls: true);
         }
     }
 }

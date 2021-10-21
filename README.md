@@ -57,7 +57,7 @@ An incomplete list of features currently supported:
 * Shorthand for defining a lambda variable (aka a named function) with `defun` (or `define` with a list as the first parameter)
 * Block-scoping variables with `let`
 * Rational number operations (`rationalize`, `numerator`/`denominator`, `simplify`)
-* Exceptions (`with-exception-handler`, `raise`, `error`, etc., except for `raise-continuable`)
+* Exceptions (`with-exception-handler`, `raise`, `error`, `raise-continuable`, etc.)
 * Almost all of the Scheme base library string-, vector-, and bytevector-related functions
 * Almost all of the Scheme `char`, `complex`, `CxR`, and `lazy` library functions
 
@@ -68,7 +68,6 @@ Notable features not yet implemented from Scheme R7RS include:
 * Dotted pairs
 * Inexact vs Exact number handling
 * Pipes
-* `raise-continuable`
 * Libraries (as in, i.e. `import`)
 * Ports and I/O
 * System interface

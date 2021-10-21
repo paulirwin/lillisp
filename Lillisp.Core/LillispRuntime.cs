@@ -34,6 +34,7 @@ namespace Lillisp.Core
             ["new"] = InteropMacros.New,
             ["or"] = BooleanMacros.Or,
             ["quote"] = CoreMacros.Quote,
+            ["raise-continuable"] = ExceptionMacros.RaiseContinuable,
             ["set!"] = CoreMacros.Set,
             ["use"] = InteropMacros.Use,
             ["when"] = BooleanMacros.When,
