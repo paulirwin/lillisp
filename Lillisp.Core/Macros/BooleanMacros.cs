@@ -72,7 +72,7 @@ namespace Lillisp.Core.Macros
 
                 if (arg is Node node)
                 {
-                    result = (i == args.Length - 1 && node is Pair pair) ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, node);
+                    result = (i == args.Length - 1 && node is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, node);
                 }
             }
 

@@ -63,10 +63,10 @@ namespace Lillisp.Core.Macros
 
             if (result.IsTruthy())
             {
-                return consequence is Pair pair ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, consequence);
+                return consequence is Pair pair ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, consequence);
             }
 
-            return alt != null ? (alt is Pair altPair ? runtime.TailCall(scope, altPair) : runtime.Evaluate(scope, alt)) : Nil.Value;
+            return alt != null ? (alt is Pair altPair ? global::Lillisp.Core.LillispRuntime.TailCall(scope, altPair) : runtime.Evaluate(scope, alt)) : Nil.Value;
         }
 
         public static object? Begin(LillispRuntime runtime, Scope scope, object?[] args)
@@ -82,7 +82,7 @@ namespace Lillisp.Core.Macros
                     throw new ArgumentException("invalid node");
                 }
 
-                result = (i == args.Length - 1 && arg is Pair pair) ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, node);
+                result = (i == args.Length - 1 && arg is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, node);
             }
 
             return result;
@@ -266,7 +266,7 @@ namespace Lillisp.Core.Macros
             {
                 if (args[i] is Node node)
                 {
-                    result = (i == args.Length - 1 && node is Pair pair) ? runtime.TailCall(childScope, pair) : runtime.Evaluate(childScope, node);
+                    result = (i == args.Length - 1 && node is Pair pair) ? LillispRuntime.TailCall(childScope, pair) : runtime.Evaluate(childScope, node);
                 }
                 else
                 {
@@ -341,7 +341,7 @@ namespace Lillisp.Core.Macros
                     {
                         var expr = clauseForms[i];
 
-                        result = (i == clauseForms.Count - 1 && expr is Pair pair) ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
+                        result = (i == clauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
                     }
 
                     return result;
@@ -358,7 +358,7 @@ namespace Lillisp.Core.Macros
                 {
                     var expr = clauseForms[i];
 
-                    result = (i == clauseForms.Count - 1 && expr is Pair pair) ? runtime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
+                    result = (i == clauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
                 }
 
                 return result;

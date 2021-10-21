@@ -20,7 +20,7 @@ namespace Lillisp.Core
 
         public override string ToString() => Text;
 
-        public object? Invoke(LillispRuntime runtime, Scope scope, object?[] arguments)
+        public object? Invoke(LillispRuntime runtime, Scope scope, object?[] arguments, bool disableTailCalls = false)
         {
             var childScope = scope.CreateChildScope();
 
@@ -65,7 +65,7 @@ namespace Lillisp.Core
                 }
             }
 
-            return Body is Pair pair ? runtime.TailCall(childScope, pair) : runtime.Evaluate(childScope, Body);
+            return Body is Pair pair && !disableTailCalls ? LillispRuntime.TailCall(childScope, pair) : runtime.Evaluate(childScope, Body);
         }
     }
 }

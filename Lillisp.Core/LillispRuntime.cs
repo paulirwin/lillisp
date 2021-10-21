@@ -37,6 +37,7 @@ namespace Lillisp.Core
             ["set!"] = CoreMacros.Set,
             ["use"] = InteropMacros.Use,
             ["when"] = BooleanMacros.When,
+            ["with-exception-handler"] = ExceptionMacros.WithExceptionHandler,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
@@ -97,6 +98,10 @@ namespace Lillisp.Core
             ["denominator"] = RationalExpressions.Denominator,
             ["digit-value"] = CharacterExpressions.DigitValue,
             //["eof-object?"] = TypeExpressions.IsEofObject, // TODO
+            ["error"] = ExceptionExpressions.Error,
+            ["error-object?"] = ExceptionExpressions.ErrorObject,
+            ["error-object-irritants"] = ExceptionExpressions.ErrorObjectIrritants,
+            ["error-object-message"] = ExceptionExpressions.ErrorObjectMessage,
             ["force"] = DynamicExpressions.Force,
             ["get"] = DynamicExpressions.Get,
             ["imag-part"] = ComplexExpressions.ImaginaryPart,
@@ -130,6 +135,8 @@ namespace Lillisp.Core
             ["println"] = StringExpressions.PrintLn,
             ["pr"] = StringExpressions.Pr,
             ["prn"] = StringExpressions.Prn,
+            ["raise"] = ExceptionExpressions.Raise,
+            //["raise-continuable"] = ExceptionExpressions.RaiseContinuable, // TODO
             ["range"] = ListExpressions.Range,
             ["rational?"] = TypeExpressions.IsRational,
             ["rationalize"] = RationalExpressions.Rationalize,
@@ -323,7 +330,7 @@ namespace Lillisp.Core
             return result;
         }
 
-        internal TailCall TailCall(Scope scope, Pair pair)
+        internal static TailCall TailCall(Scope scope, Pair pair)
         {
             return new TailCall(scope, pair);
         }
