@@ -77,17 +77,10 @@ namespace Lillisp.Core.Expressions
             return args[0] switch
             {
                 null => null,
-                Rational r => SimplifyRational(r),
+                Rational r => r.CanonicalForm,
                 BigInteger or ulong or long or uint or int or ushort or short or byte or sbyte => args[0],
                 _ => $"Simplifying a {args[0]!.GetType()} is not supported. For inexact numbers, try rationalizing it first."
             };
-        }
-
-        private static Rational SimplifyRational(Rational rational)
-        {
-            var gcd = BigInteger.GreatestCommonDivisor(rational.Numerator, rational.Denominator);
-
-            return gcd == 1 ? rational : new Rational(rational.Numerator / gcd, rational.Denominator / gcd);
         }
     }
 }
