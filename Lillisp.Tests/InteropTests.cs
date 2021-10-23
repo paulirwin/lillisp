@@ -24,6 +24,7 @@ namespace Lillisp.Tests
         [InlineData("(begin (def x String/Empty) x)", "")]
         [InlineData("(String/IsNullOrEmpty null)", true)]
         [InlineData("(String/IsNullOrEmpty \"foo\")", false)]
+        [InlineData("(Int32/Parse \"123\")", 123)]
         [Theory]
         public void StaticMemberTests(string input, object expected)
         {

@@ -90,9 +90,11 @@ Lillisp> (String/IsNullOrWhiteSpace "foo")
 -> False
 Lillisp> (String/IsNullOrWhiteSpace " \t ")
 -> True
+Lillisp> (Int32/Parse "123")
+-> 123
+Lillisp> (Guid/NewGuid)
+-> 7bf62a3c-bcd1-4e38-aceb-50f13c4113d5
 ```
-
-Note: overload resolution does not currently work for static methods.
 
 ### Static Members
 

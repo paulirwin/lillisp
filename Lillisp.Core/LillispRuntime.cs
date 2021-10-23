@@ -365,11 +365,12 @@ namespace Lillisp.Core
             }
 
             var args = pair.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
-
+            
             return op switch
             {
                 IInvokable invokable => invokable.Invoke(this, scope, args),
                 MethodInfo method => method.Invoke(null, args),
+                InteropStaticOverloadSet overloadSet => overloadSet.Invoke(args),
                 Expression expr => expr(args),
                 _ => throw new InvalidOperationException($"Invalid operation: {op}")
             };

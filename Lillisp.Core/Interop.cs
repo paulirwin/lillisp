@@ -127,11 +127,13 @@ namespace Lillisp.Core
 
                     return memberInfo[0];
                 }
-                else if (memberInfo.Length > 1)
+
+                if (memberInfo.Length > 1)
                 {
-                    // HACK: right now we don't support overloading
-                    throw new AmbiguousMatchException($"More than one static member was found on .NET type {type} matching symbol {staticMember}.");
+                    return new InteropStaticOverloadSet(type, memberInfo[0].Name, memberInfo);
                 }
+
+                return null;
             }
 
             return type;
