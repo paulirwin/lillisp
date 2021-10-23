@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 
 namespace Lillisp.Core.Expressions
@@ -81,6 +82,16 @@ namespace Lillisp.Core.Expressions
             }
 
             return errorException.Irritants;
+        }
+
+        public static object? FileError(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("file-error? requires one argument");
+            }
+
+            return args[0] is Core.FileError or IOException;
         }
     }
 }

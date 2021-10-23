@@ -101,6 +101,7 @@ namespace Lillisp.Core
             ["current-jiffy"] = TimeExpressions.CurrentJiffy,
             ["current-second"] = TimeExpressions.CurrentSecond,
             ["dec"] = MathExpressions.Decrement,
+            ["delete-file"] = FileExpressions.DeleteFile,
             ["denominator"] = RationalExpressions.Denominator,
             ["digit-value"] = CharacterExpressions.DigitValue,
             //["eof-object?"] = TypeExpressions.IsEofObject, // TODO
@@ -109,6 +110,8 @@ namespace Lillisp.Core
             ["error-object?"] = ExceptionExpressions.ErrorObject,
             ["error-object-irritants"] = ExceptionExpressions.ErrorObjectIrritants,
             ["error-object-message"] = ExceptionExpressions.ErrorObjectMessage,
+            ["file-error?"] = ExceptionExpressions.FileError,
+            ["file-exists?"] = FileExpressions.FileExists,
             ["force"] = DynamicExpressions.Force,
             ["get"] = DynamicExpressions.Get,
             ["get-environment-variable"] = ProcessContextExpressions.GetEnvironmentVariable,
