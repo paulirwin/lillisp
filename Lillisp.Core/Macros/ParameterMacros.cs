@@ -67,7 +67,7 @@ namespace Lillisp.Core.Macros
                     throw new ArgumentException("Parameter bindings' first items must be a symbol");
                 }
 
-                Node bindingValue = binding.Cdr;
+                var bindingValue = binding.Cdr;
 
                 if (bindingValue is Pair { IsList: true } bindingValuePair)
                 {

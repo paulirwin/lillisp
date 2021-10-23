@@ -244,7 +244,7 @@ namespace Lillisp.Core.Macros
                         throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
                     }
 
-                    Node bindingValue = list.Cdr;
+                    var bindingValue = list.Cdr;
 
                     if (bindingValue is Pair { IsList: true } bindingValuePair)
                     {

@@ -248,9 +248,9 @@ namespace Lillisp.Core
             return prog;
         }
 
-        public object? EvaluateProgram(Node node) => Evaluate(_userScope, node);
+        public object? EvaluateProgram(object? node) => Evaluate(_userScope, node);
 
-        public object? Quote(Node node)
+        public object? Quote(object? node)
         {
             return node switch
             {
@@ -265,7 +265,7 @@ namespace Lillisp.Core
             };
         }
 
-        public object? Evaluate(Scope scope, Node node)
+        public object? Evaluate(Scope scope, object? node)
         {
             return node switch
             {

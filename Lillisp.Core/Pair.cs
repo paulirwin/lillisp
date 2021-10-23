@@ -6,22 +6,22 @@ using System.Text;
 
 namespace Lillisp.Core
 {
-    public class Pair : Node, IEnumerable<Node>
+    public class Pair : Node, IEnumerable<object?>
     {
         public Pair()
             : this(Nil.Value, Nil.Value)
         {
         }
 
-        public Pair(Node car, Node cdr)
+        public Pair(object? car, object? cdr)
         {
             Car = car;
             Cdr = cdr;
         }
 
-        public Node Car { get; set; }
+        public object? Car { get; set; }
 
-        public Node Cdr { get; set; }
+        public object? Cdr { get; set; }
 
         /// <summary>
         /// Determines if this pair is a proper list.
@@ -35,7 +35,7 @@ namespace Lillisp.Core
             get
             {
                 // TODO: can this be written in Lillisp instead?
-                Node next = Cdr;
+                var next = Cdr;
 
                 while (next is not Nil)
                 {
@@ -52,7 +52,7 @@ namespace Lillisp.Core
         }
 
         [DebuggerStepThrough]
-        public IEnumerator<Node> GetEnumerator()
+        public IEnumerator<object?> GetEnumerator()
         {
             return new PairEnumerator(this);
         }
@@ -73,7 +73,7 @@ namespace Lillisp.Core
             var sb = new StringBuilder("(");
             sb.Append(Car);
 
-            Node next = Cdr;
+            var next = Cdr;
 
             while (next is Pair p)
             {
@@ -93,11 +93,11 @@ namespace Lillisp.Core
             return GetEnumerator();
         }
 
-        private class PairEnumerator : IEnumerator<Node>
+        private class PairEnumerator : IEnumerator<object?>
         {
             private readonly Pair _startPair;
             private Pair? _current;
-            private Node? _currentNode;
+            private object? _currentNode;
             private bool _pairStop;
 
             public PairEnumerator(Pair pair)
@@ -144,7 +144,7 @@ namespace Lillisp.Core
                 _pairStop = false;
             }
 
-            public Node Current => _currentNode ?? throw new InvalidOperationException("Must call MoveNext first");
+            public object? Current => _currentNode ?? throw new InvalidOperationException("Must call MoveNext first");
 
             object IEnumerator.Current => Current;
 
