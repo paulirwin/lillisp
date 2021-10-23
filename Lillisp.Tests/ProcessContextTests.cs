@@ -17,5 +17,16 @@ namespace Lillisp.Tests
 
             Assert.Equal("bar", result);
         }
+
+        [Fact]
+        public void CommandLine_BasicTest()
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram("(command-line)") as Pair;
+
+            Assert.NotNull(result);
+            Assert.NotEmpty(result);
+        }
     }
 }

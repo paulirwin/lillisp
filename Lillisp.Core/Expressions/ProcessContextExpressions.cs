@@ -67,5 +67,10 @@ namespace Lillisp.Core.Expressions
 
             return List.FromNodes(list);
         }
+
+        public static object? CommandLine(object?[] args)
+        {
+            return List.FromNodes(Environment.GetCommandLineArgs());
+        }
     }
 }

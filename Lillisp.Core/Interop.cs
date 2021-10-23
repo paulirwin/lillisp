@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Lillisp.Core
 {
@@ -164,7 +162,7 @@ namespace Lillisp.Core
                     }
                 }
 
-                var assyMatches = scope.InteropNamespaces
+                var assyMatches = scope.AllInteropNamespaces()
                     .Select(i => FormatTypeName(name, i, arity))
                     .Select(i => assembly.GetType(i))
                     .Where(i => i != null)

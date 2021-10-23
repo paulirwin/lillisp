@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
-using Lillisp.Core;
 using Xunit;
 
 namespace Lillisp.Tests
@@ -10,17 +10,15 @@ namespace Lillisp.Tests
         [InlineData("(begin (use 'System.Text) (typeof (new StringBuilder)))", typeof(StringBuilder))]
         [InlineData("(typeof (new Uri \"https://www.google.com\"))", typeof(Uri))]
         [InlineData("(begin (def x (new DateTime)) (typeof x))", typeof(DateTime))]
+        [InlineData("(use 'System.Collections.Generic) (def x (new (List String))) (.Add x \"foo\") (get x 0)", "foo")]
         [Theory]
         public void NewAndUseTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("Math/PI", Math.PI)]
+        [InlineData("(typeof (Guid/NewGuid))", typeof(Guid))]
         [InlineData("(begin (def x String/Empty) x)", "")]
         [InlineData("(String/IsNullOrEmpty null)", true)]
         [InlineData("(String/IsNullOrEmpty \"foo\")", false)]
@@ -28,11 +26,7 @@ namespace Lillisp.Tests
         [Theory]
         public void StaticMemberTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
         
         [InlineData("(begin (def x (new Uri \"https://www.google.com\")) (.Scheme x))", "https")]
@@ -40,11 +34,17 @@ namespace Lillisp.Tests
         [Theory]
         public void InstanceMemberTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
+            TestHelper.DefaultTest(input, expected);
+        }
 
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+        [InlineData("(System.Collections.Generic.List String)", typeof(List<string>))]
+        [InlineData("(use 'System.Collections.Generic) (List String)", typeof(List<string>))]
+        [InlineData("(use 'System.Collections.Generic) (Dictionary String Int32)", typeof(Dictionary<string, int>))]
+        [InlineData("(use 'System.Collections.Generic) (Dictionary String (List Guid))", typeof(Dictionary<string, List<Guid>>))]
+        [Theory]
+        public void GenericTypeTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
         }
     }
 }

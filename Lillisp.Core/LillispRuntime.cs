@@ -94,6 +94,7 @@ namespace Lillisp.Core
             ["char-downcase"] = CharacterExpressions.Downcase,
             ["char-foldcase"] = CharacterExpressions.Foldcase,
             ["char->integer"] = TypeExpressions.CharacterToInteger,
+            ["command-line"] = ProcessContextExpressions.CommandLine,
             ["complex?"] = TypeExpressions.IsComplex,
             ["cons"] = ListExpressions.Cons,
             ["count"] = DynamicExpressions.Count,

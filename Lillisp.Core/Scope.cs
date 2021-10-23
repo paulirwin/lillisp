@@ -13,8 +13,7 @@ namespace Lillisp.Core
         public Scope(Scope parent)
         {
             Parent = parent;
-            // TODO: implement copy on write or parent traversal for namespaces
-            InteropNamespaces = new HashSet<string>(parent.InteropNamespaces);
+            InteropNamespaces = new HashSet<string>();
         }
 
         public Scope? Parent { get; }
@@ -26,6 +25,21 @@ namespace Lillisp.Core
         public IDictionary<string, object?> Env { get; } = new Dictionary<string, object?>();
 
         public object? this[string key] => Resolve(key);
+
+        public IEnumerable<string> AllInteropNamespaces()
+        {
+            var scope = this;
+
+            while (scope != null)
+            {
+                foreach (var ns in scope.InteropNamespaces)
+                {
+                    yield return ns;
+                }
+
+                scope = scope.Parent;
+            }
+        }
 
         public object? Resolve(string key)
         {
