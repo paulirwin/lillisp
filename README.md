@@ -77,7 +77,7 @@ Basically, give your existing Lisp code a try, and if a given feature doesn't wo
 
 ## .NET Interop
 
-Lillisp uses Clojure-like syntax for interop with .NET types. Any .NET object can be stored to a Lillisp variable. (Note: all values are boxed to `System.Object`.)
+Lillisp uses Clojure-inspired syntax for interop with .NET types. Any .NET object can be stored to a Lillisp variable. (Note: all values are boxed to `System.Object`.)
 
 .NET Interop is *extremely experimental* and *very fragile*.
 
@@ -177,9 +177,32 @@ Lillisp> (.AppendLine x "bar!")
 -> "*foobar!\r\n"
 ```
 
+### Generic Types
+
+Generic types can be used as if invoking the type as a function. In other languages, generic types are called "parameterized types", so Lillisp takes this literally, as if parameters to a function. Think of an "open" generic type as a function that takes type parameters and returns a "closed" generic type. For example, `List<String>` becomes `(List String)`.
+
+```lisp
+Lillisp> (use 'System.Collections.Generic)
+-> ()
+Lillisp> (List String)
+-> System.Collections.Generic.List`1[System.String]
+Lillisp> (Dictionary Int32 Guid)
+-> System.Collections.Generic.Dictionary`2[System.Int32,System.Guid]
+Lillisp> (def x (new (List String)))
+-> x
+Lillisp> (.Add x "foo")
+-> null
+Lillisp> (.Add x "bar")
+-> null
+Lillisp> x
+-> ("foo" "bar")
+```
+
+Note that generic methods are not yet supported.
+
 ### .NET Types
 
-All variables are boxed to `System.Object`. Also, generic types are not yet supported.
+All variables are boxed to `System.Object`.
 
 You can get the type of a variable with either `(.GetType var)` or `(typeof var)`. Notice how `typeof` operates more like JavaScript than C#. 
 There is no need to use a keyword to get a .NET `System.Type` reference: just use the type name directly. This enables convenient use of the `new` function. 

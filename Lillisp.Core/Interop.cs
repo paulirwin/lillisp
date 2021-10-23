@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Lillisp.Core
 {
@@ -91,7 +93,7 @@ namespace Lillisp.Core
             throw new NotImplementedException($"Unhandled member type {member.GetType()}");
         }
 
-        public static object? ResolveSymbol(Scope scope, string symbol)
+        public static object? ResolveSymbol(Scope scope, string symbol, int? arity)
         {
             string? staticMember = null;
 
@@ -102,16 +104,16 @@ namespace Lillisp.Core
                 staticMember = parts[1];
             }
 
-            var type = FindType(scope, symbol);
+            var type = FindType(scope, symbol, staticMember == null ? arity : null);
 
             if (type == null)
             {
                 return null;
             }
 
-            if (!string.IsNullOrEmpty(staticMember))
+            if (type is Type typeObj && !string.IsNullOrEmpty(staticMember))
             {
-                var memberInfo = type.GetMember(staticMember, BindingFlags.Public | BindingFlags.Static);
+                var memberInfo = typeObj.GetMember(staticMember, BindingFlags.Public | BindingFlags.Static);
 
                 if (memberInfo.Length == 1)
                 {
@@ -130,7 +132,7 @@ namespace Lillisp.Core
 
                 if (memberInfo.Length > 1)
                 {
-                    return new InteropStaticOverloadSet(type, memberInfo[0].Name, memberInfo);
+                    return new InteropStaticOverloadSet(typeObj, memberInfo[0].Name, memberInfo);
                 }
 
                 return null;
@@ -139,9 +141,9 @@ namespace Lillisp.Core
             return type;
         }
 
-        private static Type? FindType(Scope scope, string name)
+        private static object? FindType(Scope scope, string name, int? arity)
         {
-            var matches = new List<Type>();
+            var matches = new HashSet<Type>();
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -152,26 +154,41 @@ namespace Lillisp.Core
                     matches.Add(assyType);
                 }
 
+                if (arity != null)
+                {
+                    assyType = assembly.GetType($"{name}`{arity}");
+
+                    if (assyType != null)
+                    {
+                        matches.Add(assyType);
+                    }
+                }
+
                 var assyMatches = scope.InteropNamespaces
-                    .Select(i => $"{i}.{name}")
+                    .Select(i => FormatTypeName(name, i, arity))
                     .Select(i => assembly.GetType(i))
                     .Where(i => i != null)
                     .ToList();
 
-                matches.AddRange(assyMatches!);
+                matches.UnionWith(assyMatches!);
             }
-            
-            if (matches.Count >= 1)
+
+            if (matches.Count == 1)
             {
-                return matches[0];
+                return matches.First();
             }
-            
-            //if (matches.Count > 1)
-            //{
-            //    throw new AmbiguousMatchException($"More than one .NET type matched the symbol: {string.Join(", ", matches)}");
-            //}
+
+            if (matches.Count > 1)
+            {
+                return matches;
+            }
 
             return null;
+
+            static string FormatTypeName(string name, string ns, int? arity)
+            {
+                return arity == null ? $"{ns}.{name}" : $"{ns}.{name}`{arity}";
+            }
         }
 
     }

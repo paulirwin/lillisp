@@ -266,7 +266,9 @@ namespace Lillisp.Core
             };
         }
 
-        public object? Evaluate(Scope scope, object? node)
+        public object? Evaluate(Scope scope, object? node) => Evaluate(scope, node, null);
+
+        private object? Evaluate(Scope scope, object? node, int? arity)
         {
             return node switch
             {
@@ -274,7 +276,7 @@ namespace Lillisp.Core
                 Vector vector => EvaluateVector(scope, vector),
                 Bytevector bv => bv,
                 Pair pair => EvaluateExpression(scope, pair),
-                Symbol symbol => EvaluateSymbol(scope, symbol),
+                Symbol symbol => EvaluateSymbol(scope, symbol, arity),
                 Atom atom => atom.Value,
                 Quote quote => EvaluateQuote(quote),
                 Nil nil => nil,
@@ -303,7 +305,7 @@ namespace Lillisp.Core
             };
         }
 
-        private static object? EvaluateSymbol(Scope scope, Symbol node)
+        private static object? EvaluateSymbol(Scope scope, Symbol node, int? arity)
         {
             string? symbol = node.Value;
 
@@ -318,7 +320,7 @@ namespace Lillisp.Core
             if (value != null)
                 return value;
 
-            value = Interop.ResolveSymbol(scope, symbol);
+            value = Interop.ResolveSymbol(scope, symbol, arity);
 
             if (value != null)
                 return value;
@@ -357,7 +359,14 @@ namespace Lillisp.Core
                 return Interop.InvokeMember(this, scope, symbol.Value, memberArgs);
             }
 
-            var op = Evaluate(scope, pair.Car);
+            int? arity = null;
+
+            if (pair.Cdr is Pair { IsList: true } cdrList)
+            {
+                arity = cdrList.Count();
+            }
+
+            var op = Evaluate(scope, pair.Car, arity);
 
             if (op is MacroExpression macro)
             {
@@ -372,6 +381,7 @@ namespace Lillisp.Core
                 MethodInfo method => method.Invoke(null, args),
                 InteropStaticOverloadSet overloadSet => overloadSet.Invoke(args),
                 Expression expr => expr(args),
+                Type genericType => genericType.MakeGenericType(args.Cast<Type>().ToArray()),
                 _ => throw new InvalidOperationException($"Invalid operation: {op}")
             };
         }
