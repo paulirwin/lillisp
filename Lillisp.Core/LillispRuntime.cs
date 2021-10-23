@@ -11,6 +11,18 @@ namespace Lillisp.Core
 {
     public class LillispRuntime
     {
+        /// <summary>
+        /// The default collection of system "macros."
+        /// </summary>
+        /// <remarks>
+        /// Note that this use of the term "macro" is different than the Scheme/Lisp use of the term, and
+        /// they are not intended to mean the same thing. Here, macros are .NET functions that have access
+        /// to the runtime, the current environment, and the AST of the expression. Therefore, they have
+        /// the power to conditionally choose not to evaluate code, manipulate the environment (scope), or
+        /// otherwise cause mayhem. Regular expressions, on the other hand, can only operate with their
+        /// already- evaluated inputs. Ideally, most functions would be implemented as expressions rather
+        /// than macros, unless access to the runtime, AST, or environment is needed.
+        /// </remarks>
         private static readonly IReadOnlyDictionary<string, MacroExpression> _systemMacros = new Dictionary<string, MacroExpression>
         {
             ["++!"] = MathMacros.Increment,
@@ -25,6 +37,7 @@ namespace Lillisp.Core
             ["define"] = CoreMacros.Define,
             ["defun"] = CoreMacros.Defun,
             ["delay"] = CoreMacros.Delay,
+            ["display"] = PortMacros.Display,
             ["if"] = CoreMacros.If,
             //["include"] = CoreMacros.Include, // TODO
             //["include-ci"] = CoreMacros.Include, // TODO
@@ -33,6 +46,7 @@ namespace Lillisp.Core
             ["make-parameter"] = ParameterMacros.MakeParameter,
             ["map"] = CoreMacros.Map,
             ["new"] = InteropMacros.New,
+            ["newline"] = PortMacros.Newline,
             ["or"] = BooleanMacros.Or,
             ["parameterize"] = ParameterMacros.Parameterize,
             ["quote"] = CoreMacros.Quote,
@@ -116,6 +130,7 @@ namespace Lillisp.Core
             ["get"] = DynamicExpressions.Get,
             ["get-environment-variable"] = ProcessContextExpressions.GetEnvironmentVariable,
             ["get-environment-variables"] = ProcessContextExpressions.GetEnvironmentVariables,
+            ["get-output-string"] = PortExpressions.GetOutputString,
             ["imag-part"] = ComplexExpressions.ImaginaryPart,
             ["inc"] = MathExpressions.Increment,
             ["integer?"] = TypeExpressions.IsInteger,
@@ -139,8 +154,9 @@ namespace Lillisp.Core
             ["null?"] = TypeExpressions.IsNull,
             ["numerator"] = RationalExpressions.Numerator,
             ["number?"] = TypeExpressions.IsNumber,
+            ["open-output-string"] = PortExpressions.OpenOutputString,
             ["pair?"] = TypeExpressions.IsPair,
-            //["port?"] = TypeExpressions.IsPort, // TODO
+            ["port?"] = TypeExpressions.IsPort,
             ["pow"] = MathExpressions.Power,
             ["procedure?"] = TypeExpressions.IsProcedure,
             ["promise?"] = TypeExpressions.IsPromise,
@@ -149,7 +165,6 @@ namespace Lillisp.Core
             ["pr"] = StringExpressions.Pr,
             ["prn"] = StringExpressions.Prn,
             ["raise"] = ExceptionExpressions.Raise,
-            //["raise-continuable"] = ExceptionExpressions.RaiseContinuable, // TODO
             ["range"] = ListExpressions.Range,
             ["rational?"] = TypeExpressions.IsRational,
             ["rationalize"] = RationalExpressions.Rationalize,
@@ -204,10 +219,11 @@ namespace Lillisp.Core
             ["tau"] = Math.Tau,
             ["#t"] = true,
             ["#f"] = false,
-            ["#true"] = true,
-            ["#false"] = false,
             ["true"] = true,
             ["false"] = false,
+            ["current-input-port"] = new Parameter(Console.In),
+            ["current-output-port"] = new Parameter(Console.Out),
+            ["current-error-port"] = new Parameter(Console.Error),
         };
 
         private readonly Scope _globalScope;

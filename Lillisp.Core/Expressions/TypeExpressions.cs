@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -326,6 +327,16 @@ namespace Lillisp.Core.Expressions
             }
 
             return new Bytevector(Encoding.UTF8.GetBytes(str[start..end]));
+        }
+
+        public static object? IsPort(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("port? requires one argument");
+            }
+
+            return args[0] is Stream or TextReader or TextWriter;
         }
     }
 }
