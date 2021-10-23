@@ -99,6 +99,7 @@ namespace Lillisp.Core
             ["cons"] = ListExpressions.Cons,
             ["count"] = DynamicExpressions.Count,
             ["current-jiffy"] = TimeExpressions.CurrentJiffy,
+            ["current-second"] = TimeExpressions.CurrentSecond,
             ["dec"] = MathExpressions.Decrement,
             ["denominator"] = RationalExpressions.Denominator,
             ["digit-value"] = CharacterExpressions.DigitValue,
