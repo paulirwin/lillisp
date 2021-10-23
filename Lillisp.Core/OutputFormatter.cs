@@ -22,6 +22,7 @@ namespace Lillisp.Core
             {
                 null => nullAsString ? "null" : null,
                 Vector vector => $"[{string.Join(" ", vector.Select(i => Format(i, quote, nullAsString)))}]",
+                Pair pair => pair.ToString(i => Format(i, quote, nullAsString)),
                 ICollection objArray => $"({string.Join(" ", objArray.Cast<object>().Select(i => Format(i, quote, nullAsString)))})",
                 Delegate expr => expr.Method.ToString(),
                 string str => quote ? SymbolDisplay.FormatLiteral(str, true) : str,

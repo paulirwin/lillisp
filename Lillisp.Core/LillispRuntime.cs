@@ -110,6 +110,7 @@ namespace Lillisp.Core
             ["force"] = DynamicExpressions.Force,
             ["get"] = DynamicExpressions.Get,
             ["get-environment-variable"] = ProcessContextExpressions.GetEnvironmentVariable,
+            ["get-environment-variables"] = ProcessContextExpressions.GetEnvironmentVariables,
             ["imag-part"] = ComplexExpressions.ImaginaryPart,
             ["inc"] = MathExpressions.Increment,
             ["integer?"] = TypeExpressions.IsInteger,

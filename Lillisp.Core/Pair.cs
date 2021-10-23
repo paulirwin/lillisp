@@ -57,28 +57,29 @@ namespace Lillisp.Core
             return new PairEnumerator(this);
         }
 
-        public override string ToString()
+        public override string ToString() => ToString(i => i?.ToString());
+        
+        public string ToString(Func<object?, string?> formatter)
         {
-            // TODO: can this be written in Lillisp instead?
             if (Cdr is Nil)
             {
-                return $"({Car})";
+                return $"({formatter(Car)})";
             }
 
             if (!IsList)
             {
-                return $"({Car} . {Cdr})";
+                return $"({formatter(Car)} . {formatter(Cdr)})";
             }
 
             var sb = new StringBuilder("(");
-            sb.Append(Car);
+            sb.Append(formatter(Car));
 
             var next = Cdr;
 
             while (next is Pair p)
             {
                 sb.Append(' ');
-                sb.Append(p.Car);
+                sb.Append(formatter(p.Car));
                 next = p.Cdr;
             }
 

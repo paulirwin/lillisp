@@ -53,5 +53,19 @@ namespace Lillisp.Core.Expressions
 
             return null;
         }
+
+        public static object? GetEnvironmentVariables(object?[] args)
+        {
+            var list = new List<Pair>();
+
+            var enumerator = Environment.GetEnvironmentVariables().GetEnumerator();
+
+            while (enumerator.MoveNext())
+            {
+                list.Add(new Pair(enumerator.Key, enumerator.Value));
+            }
+
+            return List.FromNodes(list);
+        }
     }
 }
