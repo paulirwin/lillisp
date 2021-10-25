@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -205,6 +206,96 @@ namespace Lillisp.Core.Macros
             }
 
             return (byte)value;
+        }
+
+        public static object? ReadBytevector(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length > 1)
+            {
+                throw new ArgumentException("read-bytevector requires one or two arguments");
+            }
+
+            int k = Convert.ToInt32(runtime.Evaluate(scope, args[0]));
+
+            if (k == 0)
+            {
+                return new Bytevector();
+            }
+
+            object? port = GetInputPort(runtime, scope, args.Length == 2 ? args[1] : null);
+
+            if (port is not Stream stream)
+            {
+                throw new ArgumentException("Specified port is not a binary input port");
+            }
+
+            var buffer = new byte[k];
+
+            int count = stream.Read(buffer, 0, k);
+
+            if (count == 0)
+            {
+                return -1;
+            }
+
+            return new Bytevector(buffer);
+        }
+
+        public static object? ReadBytevectorMutate(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length is 0 or > 4)
+            {
+                throw new ArgumentException("read-bytevector! requires one to four arguments");
+            }
+
+            var bv = runtime.Evaluate(scope, args[0]) as Bytevector;
+
+            if (bv == null)
+            {
+                throw new ArgumentException("read-bytevector!'s first argument must be a bytevector");
+            }
+
+            object? port = GetInputPort(runtime, scope, args.Length > 1 ? args[1] : null);
+
+            if (port is not Stream stream)
+            {
+                throw new ArgumentException("Specified port is not a binary input port");
+            }
+
+            int start = 0, end = bv.Count;
+
+            if (args.Length > 2)
+            {
+                start = Convert.ToInt32(runtime.Evaluate(scope, args[2]));
+            }
+
+            if (args.Length == 4)
+            {
+                end = Convert.ToInt32(runtime.Evaluate(scope, args[3]));
+            }
+
+            int count = end - start;
+
+            if (count <= 0)
+            {
+                return -1;
+            }
+
+            var data = new byte[count];
+
+            int countRead = stream.Read(data, 0, count);
+
+            if (countRead <= 0)
+            {
+                return -1;
+            }
+
+            for (int i = 0, j = start; i < countRead && j < end; i++, j++)
+            {
+                bv[j] = data[i];
+            }
+
+            return countRead;
         }
     }
 }

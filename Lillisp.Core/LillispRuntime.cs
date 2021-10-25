@@ -52,6 +52,8 @@ namespace Lillisp.Core
             ["peek-char"] = PortMacros.PeekChar,
             ["quote"] = CoreMacros.Quote,
             ["raise-continuable"] = ExceptionMacros.RaiseContinuable,
+            ["read-bytevector"] = PortMacros.ReadBytevector,
+            ["read-bytevector!"] = PortMacros.ReadBytevectorMutate,
             ["read-char"] = PortMacros.ReadChar,
             ["read-string"] = PortMacros.ReadString,
             ["read-u8"] = PortMacros.ReadU8,
