@@ -135,12 +135,23 @@ namespace Lillisp.Core
                 return new Atom(AtomType.String, unescapedStr);
             }
 
-            var symbol = context.SYMBOL();
+            var symbol = context.symbol();
 
             if (symbol != null)
             {
-                var symbolText = symbol.GetText();
-                return new Symbol(symbolText);
+                var escapedSymbol = symbol.ESCAPED_IDENTIFIER();
+
+                if (escapedSymbol != null)
+                {
+                    var escapedText = symbol.GetText()[1..^1]; // exclude start and end bars
+                    var unescapedText = UnescapeString(escapedText);
+                    return new Symbol(unescapedText, escaped: true);
+                }
+                else
+                {
+                    var symbolText = symbol.GetText();
+                    return new Symbol(symbolText);
+                }
             }
 
             var character = context.CHARACTER();

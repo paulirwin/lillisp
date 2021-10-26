@@ -8,11 +8,21 @@ namespace Lillisp.Tests
 {
     public class R7RSTests
     {
+        [InlineData("(begin (def |H\\x65;llo| 42) Hello)", 42d)]
+        [InlineData("(begin (def |two words| 42) |two\\x20;words|)", 42d)]
+        [InlineData("(== '|\\x3BB;| '|λ|)", true)]
+        [InlineData("(== '|\\x9;\\x9;| '|\t\t|)", true)]
+        [Theory]
+        public void R7RS_2_1_Identifiers(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
         /// <summary>
         /// Tests tail recursion with a 10,000 iteration factorial. This quickly would stack overflow without tail calls.
         /// </summary>
         [Fact(Skip = "Skipping by default due to execution time")]
-        public void R7Rs_3_5_Tail_Recursion_Factorial()
+        public void R7RS_3_5_Tail_Recursion_Factorial()
         {
             var runtime = new LillispRuntime();
 

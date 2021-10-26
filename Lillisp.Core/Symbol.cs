@@ -1,15 +1,20 @@
-﻿namespace Lillisp.Core
+﻿using Microsoft.CodeAnalysis.CSharp;
+
+namespace Lillisp.Core
 {
     public class Symbol : Node
     {
-        public Symbol(string value)
+        public Symbol(string value, bool escaped = false)
         {
             Value = value;
+            Escaped = escaped;
         }
 
         public string Value { get; }
 
-        public override string ToString() => Value;
+        public bool Escaped { get; }
+
+        public override string ToString() => Escaped ? $"|{SymbolDisplay.FormatLiteral(Value, false)}|" : Value;
 
         protected bool Equals(Symbol other)
         {

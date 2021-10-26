@@ -370,7 +370,7 @@ namespace Lillisp.Core
             if (value != null)
                 return value;
 
-            throw new ArgumentException($"Unable to resolve symbol {symbol}");
+            throw new ArgumentException($"Unable to resolve symbol {node}");
         }
 
         private object? EvaluateExpression(Scope scope, Pair pair)

@@ -4,7 +4,7 @@ prog: form * EOF;
 
 form: atom | list | bytevector | vector | meta;
 
-atom: (number | STRING | SYMBOL | CHARACTER);
+atom: (number | STRING | symbol | CHARACTER);
 
 list: '(' form* ')';
 
@@ -22,13 +22,15 @@ quasiquote: '`' form;
 
 unquote: ',' form;
 
+symbol: OPERATOR | IDENTIFIER | ESCAPED_IDENTIFIER;
+
 CHARACTER: '#\\' ((LETTER | DIGIT | SYMBOL_CHAR)* | '(' | ')');
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 
-SYMBOL: OPERATOR | IDENTIFIER;
-
 OPERATOR: SYMBOL_CHAR+;
+
+ESCAPED_IDENTIFIER: '|' ( ~'|' | '\\' '|' )* '|';
 
 IDENTIFIER: (LETTER | DOT | HASH) (
 		LETTER
