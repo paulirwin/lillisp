@@ -249,6 +249,13 @@ namespace Lillisp.Core
                 return new Unquote(node);
             }
 
+            var commentDatum = context.comment_datum();
+
+            if (commentDatum != null)
+            {
+                return null!;
+            }
+
             throw new NotImplementedException("Unknown macro type");
         }
 

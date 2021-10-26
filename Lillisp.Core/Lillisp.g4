@@ -12,7 +12,7 @@ bytevector: '#u8(' integer* ')';
 
 vector: '[' form* ']' | '#(' form* ')';
 
-meta: quote | quasiquote | unquote;
+meta: quote | quasiquote | unquote | comment_datum;
 
 integer: INTEGER;
 
@@ -21,6 +21,8 @@ quote: '\'' form;
 quasiquote: '`' form;
 
 unquote: ',' form;
+
+comment_datum: '#;' form;
 
 symbol: OPERATOR | IDENTIFIER | ESCAPED_IDENTIFIER;
 

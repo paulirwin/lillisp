@@ -18,6 +18,13 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
+        [InlineData("(+ 2 #;(* 3 6) 4)", 6d)]
+        [Theory]
+        public void R7RS_2_2_Datum_Comments(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
         /// <summary>
         /// Tests tail recursion with a 10,000 iteration factorial. This quickly would stack overflow without tail calls.
         /// </summary>
