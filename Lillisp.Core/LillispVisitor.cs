@@ -150,7 +150,13 @@ namespace Lillisp.Core
                 else
                 {
                     var symbolText = symbol.GetText();
-                    return new Symbol(symbolText);
+
+                    return symbolText switch
+                    {
+                        "#t" or "true" => new Atom(AtomType.Boolean, true),
+                        "#f" or "false" => new Atom(AtomType.Boolean, false),
+                        _ => new Symbol(symbolText)
+                    };
                 }
             }
 
