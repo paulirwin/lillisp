@@ -153,8 +153,8 @@ namespace Lillisp.Core
 
                     return symbolText switch
                     {
-                        "#t" or "true" => new Atom(AtomType.Boolean, true),
-                        "#f" or "false" => new Atom(AtomType.Boolean, false),
+                        "#t" or "#true" or "true" => new Atom(AtomType.Boolean, true),
+                        "#f" or "#false" or "false" => new Atom(AtomType.Boolean, false),
                         _ => new Symbol(symbolText)
                     };
                 }
