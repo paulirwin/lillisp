@@ -33,6 +33,7 @@ namespace Lillisp.Tests
         [InlineData("(boolean? 'car)", false)]
         [InlineData("(boolean? #u8(1 2 3))", false)]
         [InlineData("(boolean? (eof-object))", false)]
+        [InlineData("(boolean? (current-output-port))", false)]
         [Theory]
         public void BooleanCheckTests(string input, bool expected)
         {
@@ -51,6 +52,7 @@ namespace Lillisp.Tests
         [InlineData("(char? 'car)", false)]
         [InlineData("(char? #u8(1 2 3))", false)]
         [InlineData("(char? (eof-object))", false)]
+        [InlineData("(char? (current-output-port))", false)]
         [Theory]
         public void CharCheckTests(string input, bool expected)
         {
@@ -69,6 +71,7 @@ namespace Lillisp.Tests
         [InlineData("(null? 'car)", false)]
         [InlineData("(null? #u8(1 2 3))", false)]
         [InlineData("(null? (eof-object))", false)]
+        [InlineData("(null? (current-output-port))", false)]
         [Theory]
         public void NullCheckTests(string input, bool expected)
         {
@@ -87,6 +90,7 @@ namespace Lillisp.Tests
         [InlineData("(number? 'car)", false)]
         [InlineData("(number? #u8(1 2 3))", false)]
         [InlineData("(number? (eof-object))", false)]
+        [InlineData("(number? (current-output-port))", false)]
         [Theory]
         public void NumberCheckTests(string input, bool expected)
         {
@@ -105,6 +109,7 @@ namespace Lillisp.Tests
         [InlineData("(string? 'car)", false)]
         [InlineData("(string? #u8(1 2 3))", false)]
         [InlineData("(string? (eof-object))", false)]
+        [InlineData("(string? (current-output-port))", false)]
         [Theory]
         public void StringCheckTests(string input, bool expected)
         {
@@ -123,6 +128,7 @@ namespace Lillisp.Tests
         [InlineData("(pair? 'car)", false)]
         [InlineData("(pair? #u8(1 2 3))", false)]
         [InlineData("(pair? (eof-object))", false)]
+        [InlineData("(pair? (current-output-port))", false)]
         [Theory]
         public void PairCheckTests(string input, bool expected)
         {
@@ -141,6 +147,7 @@ namespace Lillisp.Tests
         [InlineData("(procedure? 'car)", false)]
         [InlineData("(procedure? #u8(1 2 3))", false)]
         [InlineData("(procedure? (eof-object))", false)]
+        [InlineData("(procedure? (current-output-port))", false)]
         [Theory]
         public void ProcedureCheckTests(string input, bool expected)
         {
@@ -159,6 +166,7 @@ namespace Lillisp.Tests
         [InlineData("(symbol? 'car)", true)]
         [InlineData("(symbol? #u8(1 2 3))", false)]
         [InlineData("(symbol? (eof-object))", false)]
+        [InlineData("(symbol? (current-output-port))", false)]
         [Theory]
         public void SymbolCheckTests(string input, bool expected)
         {
@@ -177,6 +185,7 @@ namespace Lillisp.Tests
         [InlineData("(vector? 'car)", false)]
         [InlineData("(vector? #u8(1 2 3))", false)]
         [InlineData("(vector? (eof-object))", false)]
+        [InlineData("(vector? (current-output-port))", false)]
         [Theory]
         public void VectorCheckTests(string input, bool expected)
         {
@@ -195,6 +204,7 @@ namespace Lillisp.Tests
         [InlineData("(bytevector? 'car)", false)]
         [InlineData("(bytevector? #u8(1 2 3))", true)]
         [InlineData("(bytevector? (eof-object))", false)]
+        [InlineData("(bytevector? (current-output-port))", false)]
         [Theory]
         public void BytevectorCheckTests(string input, bool expected)
         {
@@ -213,8 +223,28 @@ namespace Lillisp.Tests
         [InlineData("(eof-object? 'car)", false)]
         [InlineData("(eof-object? #u8(1 2 3))", false)]
         [InlineData("(eof-object? (eof-object))", true)]
+        [InlineData("(eof-object? (current-output-port))", false)]
         [Theory]
         public void EofObjectCheckTests(string input, bool expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(port? #t)", false)]
+        [InlineData("(port? #f)", false)]
+        [InlineData("(port? 0)", false)]
+        [InlineData("(port? #\\a)", false)]
+        [InlineData("(port? \"cat\")", false)]
+        [InlineData("(port? (lambda (x) x))", false)]
+        [InlineData("(port? '(1 2 3))", false)]
+        [InlineData("(port? [1 2 3])", false)]
+        [InlineData("(port? '())", false)]
+        [InlineData("(port? 'car)", false)]
+        [InlineData("(port? #u8(1 2 3))", false)]
+        [InlineData("(port? (eof-object))", false)]
+        [InlineData("(port? (current-output-port))", true)]
+        [Theory]
+        public void PortCheckTests(string input, bool expected)
         {
             TestHelper.DefaultTest(input, expected);
         }
