@@ -27,8 +27,6 @@ namespace Lillisp.Core
         {
             ["++!"] = MathMacros.Increment,
             ["--!"] = MathMacros.Decrement,
-            ["&&"] = BooleanMacros.And,
-            ["||"] = BooleanMacros.Or,
             ["and"] = BooleanMacros.And,
             ["apply"] = CoreMacros.Apply,
             ["begin"] = CoreMacros.Begin,

@@ -8,7 +8,7 @@ namespace Lillisp.Core.Macros
         {
             if (args.Length < 2)
             {
-                throw new ArgumentException("and/&& requires at least two arguments");
+                throw new ArgumentException("and requires at least two arguments");
             }
             
             foreach (var arg in args)
@@ -26,7 +26,7 @@ namespace Lillisp.Core.Macros
         {
             if (args.Length < 2)
             {
-                throw new ArgumentException("or/|| requires at least two arguments");
+                throw new ArgumentException("or requires at least two arguments");
             }
 
             foreach (var arg in args)
