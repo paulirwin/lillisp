@@ -85,4 +85,8 @@ ATSIGN: '@';
 DOT: '.';
 HASH: '#';
 
+BLOCK_COMMENT: '#|' .*? '|#' -> skip;
+
+LINE_COMMENT: ';' ~[\r\n]* -> skip;
+
 WHITESPACE: [ \r\n\t]+ -> channel(HIDDEN);

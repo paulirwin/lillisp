@@ -19,8 +19,11 @@ namespace Lillisp.Tests
         }
 
         [InlineData("(+ 2 #;(* 3 6) 4)", 6d)]
+        [InlineData("(* 2 6) ; look at me now", 12d)]
+        [InlineData("(begin (def x \"goodbye; hello\") x) ; this is a demo", "goodbye; hello")]
+        [InlineData("#|\nThis is a block comment\n|#\n(+ 2 6)", 8d)]
         [Theory]
-        public void R7RS_2_2_Datum_Comments(string input, object expected)
+        public void R7RS_2_2_Comments(string input, object expected)
         {
             TestHelper.DefaultTest(input, expected);
         }
