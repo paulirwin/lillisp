@@ -22,4 +22,10 @@
 		<ProjectReference Include="..\Lillisp.Core\Lillisp.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="include\add7.lisp">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>

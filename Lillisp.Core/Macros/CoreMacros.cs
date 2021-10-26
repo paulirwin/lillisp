@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Lillisp.Core.Macros
@@ -365,6 +366,27 @@ namespace Lillisp.Core.Macros
             }
 
             return new Lazy<object?>(() => runtime.Evaluate(scope, node));
+        }
+
+        public static object? Include(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            object? result = Nil.Value;
+
+            foreach (var arg in args)
+            {
+                var fileName = arg?.ToString();
+
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    throw new ArgumentException("File name given to include cannot be null or empty");
+                }
+
+                var fileText = File.ReadAllText(fileName);
+
+                result = runtime.EvaluateProgram(scope, fileText);
+            }
+
+            return result;
         }
     }
 }

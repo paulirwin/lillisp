@@ -39,7 +39,7 @@ namespace Lillisp.Core
             ["delay"] = CoreMacros.Delay,
             ["display"] = PortMacros.Display,
             ["if"] = CoreMacros.If,
-            //["include"] = CoreMacros.Include, // TODO
+            ["include"] = CoreMacros.Include,
             //["include-ci"] = CoreMacros.Include, // TODO
             ["lambda"] = CoreMacros.Lambda,
             ["let"] = CoreMacros.Let,
@@ -273,11 +273,13 @@ namespace Lillisp.Core
             _globalScope.Define(symbol, func);
         }
 
-        public object? EvaluateProgram(string program)
+        public object? EvaluateProgram(string program) => EvaluateProgram(_userScope, program);
+
+        public object? EvaluateProgram(Scope scope, string program)
         {
             var prog = ParseProgramText(program);
 
-            return EvaluateProgram(prog);
+            return Evaluate(scope, prog);
         }
 
         private static Node ParseProgramText(string program)
