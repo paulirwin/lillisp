@@ -128,7 +128,7 @@ namespace Lillisp.Core
             ["delete-file"] = FileExpressions.DeleteFile,
             ["denominator"] = RationalExpressions.Denominator,
             ["digit-value"] = CharacterExpressions.DigitValue,
-            ["eof-object"] = PortExpressions.EofObject,
+            ["eof-object"] = PortExpressions.GetEofObject,
             ["eof-object?"] = PortExpressions.IsEofObject,
             ["emergency-exit"] = ProcessContextExpressions.EmergencyExit,
             ["error"] = ExceptionExpressions.Error,

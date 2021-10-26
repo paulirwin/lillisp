@@ -280,12 +280,12 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("eof-object? requires one argument");
             }
 
-            return args[0] is int i && i == -1;
+            return args[0] is EofObject;
         }
 
-        public static object? EofObject(object?[] args)
+        public static object? GetEofObject(object?[] args)
         {
-            return -1;
+            return EofObject.Instance;
         }
     }
 }

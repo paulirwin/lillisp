@@ -1,5 +1,4 @@
 ﻿using System;
-using Lillisp.Core;
 using Xunit;
 
 namespace Lillisp.Tests
@@ -11,11 +10,7 @@ namespace Lillisp.Tests
         [Theory]
         public void TypeofTests(string input, Type expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(typeof (cast 1 Int32))", typeof(int))]
@@ -23,11 +18,7 @@ namespace Lillisp.Tests
         [Theory]
         public void CastTests(string input, Type expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(boolean? #t)", true)]
@@ -41,14 +32,11 @@ namespace Lillisp.Tests
         [InlineData("(boolean? '())", false)]
         [InlineData("(boolean? 'car)", false)]
         [InlineData("(boolean? #u8(1 2 3))", false)]
+        [InlineData("(boolean? (eof-object))", false)]
         [Theory]
         public void BooleanCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(char? #t)", false)]
@@ -62,14 +50,11 @@ namespace Lillisp.Tests
         [InlineData("(char? '())", false)]
         [InlineData("(char? 'car)", false)]
         [InlineData("(char? #u8(1 2 3))", false)]
+        [InlineData("(char? (eof-object))", false)]
         [Theory]
         public void CharCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(null? #t)", false)]
@@ -83,14 +68,11 @@ namespace Lillisp.Tests
         [InlineData("(null? '())", true)]
         [InlineData("(null? 'car)", false)]
         [InlineData("(null? #u8(1 2 3))", false)]
+        [InlineData("(null? (eof-object))", false)]
         [Theory]
         public void NullCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(number? #t)", false)]
@@ -104,14 +86,11 @@ namespace Lillisp.Tests
         [InlineData("(number? '())", false)]
         [InlineData("(number? 'car)", false)]
         [InlineData("(number? #u8(1 2 3))", false)]
+        [InlineData("(number? (eof-object))", false)]
         [Theory]
         public void NumberCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(string? #t)", false)]
@@ -125,14 +104,11 @@ namespace Lillisp.Tests
         [InlineData("(string? '())", false)]
         [InlineData("(string? 'car)", false)]
         [InlineData("(string? #u8(1 2 3))", false)]
+        [InlineData("(string? (eof-object))", false)]
         [Theory]
         public void StringCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(pair? #t)", false)]
@@ -146,14 +122,11 @@ namespace Lillisp.Tests
         [InlineData("(pair? '())", false)]
         [InlineData("(pair? 'car)", false)]
         [InlineData("(pair? #u8(1 2 3))", false)]
+        [InlineData("(pair? (eof-object))", false)]
         [Theory]
         public void PairCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(procedure? #t)", false)]
@@ -167,14 +140,11 @@ namespace Lillisp.Tests
         [InlineData("(procedure? '())", false)]
         [InlineData("(procedure? 'car)", false)]
         [InlineData("(procedure? #u8(1 2 3))", false)]
+        [InlineData("(procedure? (eof-object))", false)]
         [Theory]
         public void ProcedureCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(symbol? #t)", false)]
@@ -188,14 +158,11 @@ namespace Lillisp.Tests
         [InlineData("(symbol? '())", false)]
         [InlineData("(symbol? 'car)", true)]
         [InlineData("(symbol? #u8(1 2 3))", false)]
+        [InlineData("(symbol? (eof-object))", false)]
         [Theory]
         public void SymbolCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(vector? #t)", false)]
@@ -209,14 +176,11 @@ namespace Lillisp.Tests
         [InlineData("(vector? '())", false)]
         [InlineData("(vector? 'car)", false)]
         [InlineData("(vector? #u8(1 2 3))", false)]
+        [InlineData("(vector? (eof-object))", false)]
         [Theory]
         public void VectorCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(bytevector? #t)", false)]
@@ -230,14 +194,29 @@ namespace Lillisp.Tests
         [InlineData("(bytevector? '())", false)]
         [InlineData("(bytevector? 'car)", false)]
         [InlineData("(bytevector? #u8(1 2 3))", true)]
+        [InlineData("(bytevector? (eof-object))", false)]
         [Theory]
         public void BytevectorCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
+            TestHelper.DefaultTest(input, expected);
+        }
 
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+        [InlineData("(eof-object? #t)", false)]
+        [InlineData("(eof-object? #f)", false)]
+        [InlineData("(eof-object? 0)", false)]
+        [InlineData("(eof-object? #\\a)", false)]
+        [InlineData("(eof-object? \"cat\")", false)]
+        [InlineData("(eof-object? (lambda (x) x))", false)]
+        [InlineData("(eof-object? '(1 2 3))", false)]
+        [InlineData("(eof-object? [1 2 3])", false)]
+        [InlineData("(eof-object? '())", false)]
+        [InlineData("(eof-object? 'car)", false)]
+        [InlineData("(eof-object? #u8(1 2 3))", false)]
+        [InlineData("(eof-object? (eof-object))", true)]
+        [Theory]
+        public void EofObjectCheckTests(string input, bool expected)
+        {
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(promise? (delay 3))", true)]
@@ -245,11 +224,7 @@ namespace Lillisp.Tests
         [Theory]
         public void PromiseCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(char->integer #\\=)", 61)]
@@ -259,11 +234,7 @@ namespace Lillisp.Tests
         [Theory]
         public void TypeConversionTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         // R7RS 6.2.6
@@ -286,11 +257,7 @@ namespace Lillisp.Tests
         [Theory]
         public void NumberTypeCheckTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(utf8->string #u8(65))", "A")]

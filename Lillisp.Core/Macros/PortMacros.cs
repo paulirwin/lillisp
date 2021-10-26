@@ -121,7 +121,7 @@ namespace Lillisp.Core.Macros
 
             if (value == -1)
             {
-                return value;
+                return EofObject.Instance;
             }
 
             return (char)value;
@@ -145,7 +145,7 @@ namespace Lillisp.Core.Macros
 
             if (value == -1)
             {
-                return value;
+                return EofObject.Instance;
             }
 
             return (char)value;
@@ -178,7 +178,7 @@ namespace Lillisp.Core.Macros
 
             if (count == 0)
             {
-                return -1;
+                return EofObject.Instance;
             }
 
             return new string(buffer, 0, count);
@@ -202,7 +202,7 @@ namespace Lillisp.Core.Macros
 
             if (value == -1)
             {
-                return value;
+                return EofObject.Instance;
             }
 
             return (byte)value;
@@ -235,7 +235,7 @@ namespace Lillisp.Core.Macros
 
             if (count == 0)
             {
-                return -1;
+                return EofObject.Instance;
             }
 
             return new Bytevector(buffer);
@@ -278,7 +278,7 @@ namespace Lillisp.Core.Macros
 
             if (count <= 0)
             {
-                return -1;
+                return EofObject.Instance;
             }
 
             var data = new byte[count];
@@ -287,7 +287,7 @@ namespace Lillisp.Core.Macros
 
             if (countRead <= 0)
             {
-                return -1;
+                return EofObject.Instance;
             }
 
             for (int i = 0, j = start; i < countRead && j < end; i++, j++)
