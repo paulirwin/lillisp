@@ -156,36 +156,31 @@ namespace Lillisp.Core.Macros
 
         public static object? Lambda(LillispRuntime runtime, Scope scope, object?[] args)
         {
-            if (args.Length != 2)
+            if (args.Length < 2)
             {
-                throw new ArgumentException("lambda requires two arguments");
+                throw new ArgumentException("lambda requires at least two arguments");
             }
             
             if (args[0] is not Node parameters)
             {
                 throw new ArgumentException("lambda's first argument must be a list of symbols");
             }
-
-            if (args[1] is not Node body)
-            {
-                throw new ArgumentException("lambda's second argument must be a node");
-            }
-
-            return CreateProcedure(parameters, body);
+            
+            return CreateProcedure(parameters, args.Skip(1).Cast<Node>().ToArray());
         }
 
-        private static Procedure CreateProcedure(Node parameters, Node body)
+        private static Procedure CreateProcedure(Node parameters, Node[] body)
         {
-            string text = $"(lambda {parameters} {body})"; // TODO: get access to actual AST node here
+            string text = $"(lambda {parameters} {string.Join(' ', body.Select(OutputFormatter.FormatPr))})";
             
             return new Procedure(text, parameters, body);
         }
 
         public static object? Defun(LillispRuntime runtime, Scope scope, object?[] args)
         {
-            if (args.Length != 3)
+            if (args.Length < 3)
             {
-                throw new ArgumentException("defun requires three arguments");
+                throw new ArgumentException("defun requires at least three arguments");
             }
 
             if (args[0] is not Symbol symbol)
@@ -197,13 +192,8 @@ namespace Lillisp.Core.Macros
             {
                 throw new ArgumentException("defun's first argument must be a list of symbols");
             }
-
-            if (args[2] is not Node body)
-            {
-                throw new ArgumentException("defun's second argument must be a node");
-            }
-
-            var procedure = CreateProcedure(parameters, body);
+            
+            var procedure = CreateProcedure(parameters, args.Skip(2).Cast<Node>().ToArray());
 
             scope.Define(symbol.Value, procedure);
             

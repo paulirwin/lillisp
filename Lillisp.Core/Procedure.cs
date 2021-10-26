@@ -5,7 +5,7 @@ namespace Lillisp.Core
 {
     public class Procedure : IInvokable
     {
-        public Procedure(string text, Node parameters, Node body)
+        public Procedure(string text, Node parameters, Node[] body)
         {
             Text = text;
             Parameters = parameters;
@@ -16,7 +16,7 @@ namespace Lillisp.Core
 
         public Node Parameters { get; }
 
-        public Node Body { get; }
+        public Node[] Body { get; }
 
         public override string ToString() => Text;
 
@@ -67,7 +67,23 @@ namespace Lillisp.Core
                 }
             }
 
-            return Body is Pair pair && !disableTailCalls ? LillispRuntime.TailCall(childScope, pair) : runtime.Evaluate(childScope, Body);
+            object? result = Nil.Value;
+
+            for (int i = 0; i < Body.Length; i++)
+            {
+                var bodyNode = Body[i];
+
+                if (i < Body.Length - 1)
+                {
+                    result = runtime.Evaluate(childScope, bodyNode);
+                }
+                else
+                {
+                    result = bodyNode is Pair pair && !disableTailCalls ? LillispRuntime.TailCall(childScope, pair) : runtime.Evaluate(childScope, bodyNode);
+                }
+            }
+
+            return result;
         }
     }
 }
