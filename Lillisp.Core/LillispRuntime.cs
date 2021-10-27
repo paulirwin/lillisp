@@ -298,10 +298,11 @@ namespace Lillisp.Core
                 Program program => program.Children.Select(Quote).ToArray(),
                 Vector vector => vector, // TODO: is this correct?
                 Bytevector bv => bv, // TODO: is this correct?
-                Pair pair => pair.Select(Quote).ToArray(),
-                Symbol symbol => symbol.Value,
+                Pair pair => new Pair(Quote(pair.Car), Quote(pair.Cdr)),
+                Symbol symbol => symbol,
                 Atom atom => atom.Value,
-                Quote quote => quote.Value,
+                Quote quote => Quote(quote.Value),
+                Nil nil => nil,
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
@@ -318,7 +319,7 @@ namespace Lillisp.Core
                 Pair pair => EvaluateExpression(scope, pair),
                 Symbol symbol => EvaluateSymbol(scope, symbol, arity),
                 Atom atom => atom.Value,
-                Quote quote => EvaluateQuote(quote),
+                Quote quote => Quote(quote),
                 Nil nil => nil,
                 _ => throw new ArgumentOutOfRangeException()
             };
@@ -330,21 +331,7 @@ namespace Lillisp.Core
 
             return new Vector(items);
         }
-
-        private object? EvaluateQuote(Quote node)
-        {
-            return node.Value switch
-            {
-                Vector vector => new Vector(vector.Select(i => i is Node n ? Quote(n) : i)),
-                Bytevector bv => bv,
-                Pair pair => pair.Select(Quote).ToArray(),
-                Atom { Value: { } value } => value,
-                Symbol symbol => symbol,
-                Nil nil => nil,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
-
+        
         private static object? EvaluateSymbol(Scope scope, Symbol node, int? arity)
         {
             string? symbol = node.Value;

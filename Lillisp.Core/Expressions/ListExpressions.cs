@@ -8,44 +8,54 @@ namespace Lillisp.Core.Expressions
     {
         public static object? Car(object?[] args)
         {
-            if (args.Length == 0 || args[0] is not IList<object> objects)
+            if (args.Length == 0)
             {
                 throw new ArgumentException("car requires an argument");
             }
 
-            if (objects.Count == 0)
+            if (args[0] is Nil)
             {
                 throw new ArgumentException("Attempt to apply car on nil");
             }
 
-            return objects[0];
+            if (args[0] is not Pair pair)
+            {
+                throw new ArgumentException("car requires a pair argument");
+            }
+
+            return pair.Car;
         }
 
         public static object? Cdr(object?[] args)
         {
-            if (args.Length == 0 || args[0] is not IList<object> objects)
+            if (args.Length == 0)
             {
                 throw new ArgumentException("cdr requires a list argument");
             }
 
-            if (objects.Count == 0)
+            if (args[0] is Nil)
             {
                 throw new ArgumentException("Attempt to apply cdr on nil");
             }
 
-            return objects.Skip(1).ToArray();
+            if (args[0] is not Pair pair)
+            {
+                throw new ArgumentException("cdr requires a pair argument");
+            }
+
+            return pair.Cdr;
         }
 
         public static object? Cons(object?[] args)
         {
-            if (args.Length != 2 || args[1] is not IEnumerable<object> objects)
+            if (args.Length != 2)
             {
                 throw new ArgumentException("cons requires two arguments");
             }
 
             var first = args[0];
-
-            return new[] { first }.Concat(objects).ToArray();
+            
+            return args[1] is IEnumerable<object> objects ? Core.List.FromNodes(new[] { first }.Concat(objects).ToArray()) : new Pair(first, args[1]);
         }
 
         public static object? Append(object?[] args)
@@ -75,7 +85,7 @@ namespace Lillisp.Core.Expressions
                 }
             }
 
-            return result.ToArray();
+            return Core.List.FromNodes(result.ToArray());
         }
 
         public static object? Range(object?[] args)
@@ -110,7 +120,7 @@ namespace Lillisp.Core.Expressions
                 step = Convert.ToDouble(args[2]);
             }
 
-            return RangeGenerator(start, end, step).ToArray();
+            return Core.List.FromNodes(RangeGenerator(start, end, step).ToArray());
         }
 
         private static IEnumerable<object> RangeGenerator(double start, double end, double step)
@@ -128,7 +138,7 @@ namespace Lillisp.Core.Expressions
                 return Nil.Value;
             }
 
-            return args.ToArray();
+            return Core.List.FromNodes(args.ToArray());
         }
     }
 }

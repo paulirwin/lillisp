@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Lillisp.Core;
 using Xunit;
 
@@ -75,7 +76,7 @@ namespace Lillisp.Tests
                        "    x)" +
                        ")";
 
-            var result = runtime.EvaluateProgram(prog) as object[];
+            var result = (runtime.EvaluateProgram(prog) as Pair)?.ToArray();
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Length);

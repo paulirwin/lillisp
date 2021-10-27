@@ -4,6 +4,8 @@ namespace Lillisp.Core
 {
     public static class List
     {
+        public static Node FromNodes(params object?[] nodes) => FromNodes((IEnumerable<object?>)nodes);
+
         public static Node FromNodes(IEnumerable<object?> nodes)
         {
             Pair? first = null, current = null;

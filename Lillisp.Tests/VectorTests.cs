@@ -1,4 +1,5 @@
-﻿using Lillisp.Core;
+﻿using System.Linq;
+using Lillisp.Core;
 using Xunit;
 
 namespace Lillisp.Tests
@@ -109,7 +110,7 @@ namespace Lillisp.Tests
             Assert.Equal(3, vector.Count);
             Assert.Equal(0d, vector[0]);
 
-            var list = vector[1] as object[];
+            var list = (vector[1] as Pair)?.ToList();
 
             Assert.NotNull(list);
             Assert.Equal("Sue", list[0]);
