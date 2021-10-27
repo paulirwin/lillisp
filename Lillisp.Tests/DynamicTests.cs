@@ -19,7 +19,7 @@ namespace Lillisp.Tests
             Assert.Equal(expected, result);
         }
 
-        [InlineData("(get '(1 2 3) 0)", 1d)]
+        [InlineData("(get '(1 2 3) 0)", 1)]
         [InlineData("(get (range 0 10 2) 2)", 4d)]
         [InlineData("(get \"foo bar\" 5)", 'a')]
         [Theory]
@@ -33,9 +33,9 @@ namespace Lillisp.Tests
         }
 
         [InlineData("(promise? (make-promise 7))", true)]
-        [InlineData("(force (make-promise 7))", 7d)]
+        [InlineData("(force (make-promise 7))", 7)]
         [InlineData("(promise? (make-promise (delay 7)))", true)]
-        [InlineData("(force (make-promise (delay 7)))", 7d)]
+        [InlineData("(force (make-promise (delay 7)))", 7)]
         [Theory]
         public void MakePromiseTests(string input, object expected)
         {

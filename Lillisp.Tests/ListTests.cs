@@ -66,7 +66,7 @@ namespace Lillisp.Tests
         [InlineData("(car '(2 3))", 2)]
         [InlineData("(car '(2 3 4 5 6))", 2)]
         [Theory]
-        public void CarTests(string input, double expected)
+        public void CarTests(string input, object expected)
         {
             var runtime = new LillispRuntime();
 
@@ -75,8 +75,8 @@ namespace Lillisp.Tests
             Assert.Equal(expected, result);
         }
 
-        [InlineData("(cdr '(2 3))", new object[] {3d})]
-        [InlineData("(cdr '(2 3 4 5 6))", new object[] {3d, 4d, 5d, 6d})]
+        [InlineData("(cdr '(2 3))", new object[] {3})]
+        [InlineData("(cdr '(2 3 4 5 6))", new object[] {3, 4, 5, 6})]
         [Theory]
         public void CdrTests(string input, object[] expected)
         {
@@ -87,8 +87,8 @@ namespace Lillisp.Tests
             Assert.Equal(expected, (IEnumerable<object>) result);
         }
 
-        [InlineData("(cons 1 (list 2 3))", new object[] {1d, 2d, 3d})]
-        [InlineData("(cons 1 (cons 2 (cons 3 nil)))", new object[] {1d, 2d, 3d})]
+        [InlineData("(cons 1 (list 2 3))", new object[] {1, 2, 3})]
+        [InlineData("(cons 1 (cons 2 (cons 3 nil)))", new object[] {1, 2, 3})]
         [Theory]
         public void ConsTests(string input, object[] expected)
         {

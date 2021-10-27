@@ -143,8 +143,23 @@ namespace Lillisp.Core
                     return new Atom(AtomType.Number, double.NaN);
                 }
 
-                double num = Convert.ToDouble(number.GetText());
-                return new Atom(AtomType.Number, num);
+                var floatingPoint = number.FLOAT();
+
+                if (floatingPoint != null)
+                {
+                    double num = Convert.ToDouble(number.GetText());
+                    return new Atom(AtomType.Number, num);
+                }
+
+                var integer = number.INTEGER();
+
+                if (integer != null)
+                {
+                    int num = Convert.ToInt32(integer.GetText());
+                    return new Atom(AtomType.Number, num);
+                }
+
+                throw new NotImplementedException("Unknown number type");
             }
 
             var str = context.STRING();

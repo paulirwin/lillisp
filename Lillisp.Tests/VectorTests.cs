@@ -24,7 +24,7 @@ namespace Lillisp.Tests
         {
             var runtime = new LillispRuntime();
 
-            var result = runtime.EvaluateProgram("(make-vector 3 42)");
+            var result = runtime.EvaluateProgram("(make-vector 3 42.)");
 
             var vector = result as Vector;
 
@@ -65,9 +65,9 @@ namespace Lillisp.Tests
 
             Assert.NotNull(vector);
             Assert.Equal(3, vector.Count);
-            Assert.Equal(1d, vector[0]);
-            Assert.Equal(2d, vector[1]);
-            Assert.Equal(3d, vector[2]);
+            Assert.Equal(1, vector[0]);
+            Assert.Equal(2, vector[1]);
+            Assert.Equal(3, vector[2]);
         }
 
         [InlineData("(vector-length (vector))", 0)]
@@ -84,8 +84,8 @@ namespace Lillisp.Tests
             Assert.Equal(expected, result);
         }
 
-        [InlineData("(vector-ref (vector 1) 0)", 1d)]
-        [InlineData("(vector-ref [1 2 3] 1)", 2d)]
+        [InlineData("(vector-ref (vector 1) 0)", 1)]
+        [InlineData("(vector-ref [1 2 3] 1)", 2)]
         [Theory]
         public void VectorRefTests(string input, object expected)
         {
@@ -108,7 +108,7 @@ namespace Lillisp.Tests
 
             Assert.NotNull(vector);
             Assert.Equal(3, vector.Count);
-            Assert.Equal(0d, vector[0]);
+            Assert.Equal(0, vector[0]);
 
             var list = (vector[1] as Pair)?.ToList();
 
@@ -120,11 +120,11 @@ namespace Lillisp.Tests
         }
 
         // R7RS 6.8
-        [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (vector-ref b 0))", 3d)]
-        [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (vector-ref b 1))", 8d)]
+        [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (vector-ref b 0))", 3)]
+        [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (vector-ref b 1))", 8)]
         [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (vector-length b))", 4)]
-        [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (def c (vector-copy b 1 3)) (vector-ref c 0))", 8d)]
-        [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (def c (vector-copy b 1 3)) (vector-ref c 1))", 2d)]
+        [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (def c (vector-copy b 1 3)) (vector-ref c 0))", 8)]
+        [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (def c (vector-copy b 1 3)) (vector-ref c 1))", 2)]
         [InlineData("(begin (def a [1 8 2 8]) (def b (vector-copy a)) (vector-set! b 0 3) (def c (vector-copy b 1 3)) (vector-length c))", 2)]
         [Theory]
         public void VectorCopyTests(string input, object expected)
@@ -150,16 +150,16 @@ namespace Lillisp.Tests
 
             Assert.NotNull(vector);
             Assert.Equal(5, vector.Count);
-            Assert.Equal(10d, vector[0]);
-            Assert.Equal(1d, vector[1]);
-            Assert.Equal(2d, vector[2]);
-            Assert.Equal(40d, vector[3]); 
-            Assert.Equal(50d, vector[4]);
+            Assert.Equal(10, vector[0]);
+            Assert.Equal(1, vector[1]);
+            Assert.Equal(2, vector[2]);
+            Assert.Equal(40, vector[3]); 
+            Assert.Equal(50, vector[4]);
         }
 
         [InlineData("(begin (def x (vector-append [0 1 2] [3 4 5])) (vector-length x))", 6)]
-        [InlineData("(begin (def x (vector-append [0 1 2] [3 4 5])) (vector-ref x 0))", 0d)]
-        [InlineData("(begin (def x (vector-append [0 1 2] [3 4 5])) (vector-ref x 3))", 3d)]
+        [InlineData("(begin (def x (vector-append [0 1 2] [3 4 5])) (vector-ref x 0))", 0)]
+        [InlineData("(begin (def x (vector-append [0 1 2] [3 4 5])) (vector-ref x 3))", 3)]
         [Theory]
         public void VectorAppendTests(string input, object expected)
         {
@@ -184,11 +184,11 @@ namespace Lillisp.Tests
 
             Assert.NotNull(vector);
             Assert.Equal(5, vector.Count);
-            Assert.Equal(1d, vector[0]);
-            Assert.Equal(2d, vector[1]);
+            Assert.Equal(1, vector[0]);
+            Assert.Equal(2, vector[1]);
             Assert.Equal("smash", vector[2]);
             Assert.Equal("smash", vector[3]);
-            Assert.Equal(5d, vector[4]);
+            Assert.Equal(5, vector[4]);
         }
     }
 }

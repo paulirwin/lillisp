@@ -8,8 +8,8 @@ namespace Lillisp.Tests
 {
     public class R7RSTests
     {
-        [InlineData("(begin (def |H\\x65;llo| 42) Hello)", 42d)]
-        [InlineData("(begin (def |two words| 42) |two\\x20;words|)", 42d)]
+        [InlineData("(begin (def |H\\x65;llo| 42) Hello)", 42)]
+        [InlineData("(begin (def |two words| 42) |two\\x20;words|)", 42)]
         [InlineData("(eqv? '|\\x3BB;| '|λ|)", true)]
         [InlineData("(eqv? '|\\x9;\\x9;| '|\t\t|)", true)]
         [Theory]
@@ -18,10 +18,10 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
-        [InlineData("(+ 2 #;(* 3 6) 4)", 6d)]
-        [InlineData("(* 2 6) ; look at me now", 12d)]
+        [InlineData("(+ 2 #;(* 3 6) 4)", 6)]
+        [InlineData("(* 2 6) ; look at me now", 12)]
         [InlineData("(begin (def x \"goodbye; hello\") x) ; this is a demo", "goodbye; hello")]
-        [InlineData("#|\nThis is a block comment\n|#\n(+ 2 6)", 8d)]
+        [InlineData("#|\nThis is a block comment\n|#\n(+ 2 6)", 8)]
         [Theory]
         public void R7RS_2_2_Comments(string input, object expected)
         {
@@ -53,7 +53,7 @@ namespace Lillisp.Tests
 
             var result = runtime.EvaluateProgram(prog);
 
-            Assert.Equal(8d, result);
+            Assert.Equal(8, result);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Lillisp.Tests
 
             var result = runtime.EvaluateProgram(prog);
 
-            Assert.Equal(3d, result);
+            Assert.Equal(3, result);
         }
 
         [Fact(Skip = "let does not return a binding scope that outlives its execution; or should define be lazy?")]
@@ -79,7 +79,7 @@ namespace Lillisp.Tests
 
             var result = runtime.EvaluateProgram(prog);
 
-            Assert.Equal(10d, result);
+            Assert.Equal(10, result);
         }
 
         [Fact]
@@ -96,10 +96,10 @@ namespace Lillisp.Tests
             var list = (result as IEnumerable<object>)!.ToList();
 
             Assert.Equal(4, list.Count);
-            Assert.Equal(3d, list[0]);
-            Assert.Equal(4d, list[1]);
-            Assert.Equal(5d, list[2]);
-            Assert.Equal(6d, list[3]);
+            Assert.Equal(3, list[0]);
+            Assert.Equal(4, list[1]);
+            Assert.Equal(5, list[2]);
+            Assert.Equal(6, list[3]);
         }
 
         [Fact]
@@ -116,15 +116,15 @@ namespace Lillisp.Tests
             var list = (result as IEnumerable<object>)!.ToList();
 
             Assert.Equal(2, list.Count);
-            Assert.Equal(5d, list[0]);
-            Assert.Equal(6d, list[1]);
+            Assert.Equal(5, list[0]);
+            Assert.Equal(6, list[1]);
         }
 
         // HACK: the actual examples use quoted symbols, but those aren't 100% correct yet here.
         // The point of the example is more about the conditionals, so using strings instead for now.
         [InlineData("(if (> 3 2) \"yes\" \"no\")", "yes")]
         [InlineData("(if (> 2 3) \"yes\" \"no\")", "no")]
-        [InlineData("(if (> 3 2) (- 3 2) (+ 3 2))", 1d)]
+        [InlineData("(if (> 3 2) (- 3 2) (+ 3 2))", 1)]
         [Theory]
         public void R7RS_4_1_5_Conditional_Examples(string input, object expected)
         {
@@ -146,7 +146,7 @@ namespace Lillisp.Tests
 
             var result = runtime.EvaluateProgram(prog.ToString());
 
-            Assert.Equal(3d, result);
+            Assert.Equal(3, result);
 
             prog.Clear();
 
@@ -155,7 +155,7 @@ namespace Lillisp.Tests
 
             result = runtime.EvaluateProgram(prog.ToString());
 
-            Assert.Equal(5d, result);
+            Assert.Equal(5, result);
         }
 
         [InlineData("(cond ((> 3 2) \"greater\") ((< 3 2) \"less\"))", "greater")]

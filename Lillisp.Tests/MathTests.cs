@@ -6,12 +6,12 @@ namespace Lillisp.Tests
     public class MathTests
     {
         [InlineData("(+ 2 4)", 6)]
-        [InlineData("(+ 2.5 3.5)", 6)]
+        [InlineData("(+ 2.5 3.5)", 6.0)]
         [InlineData("(+ -1 3)", 2)]
         [InlineData("(+ 4 -1.5)", 2.5)]
         [InlineData("(+ 2 4 6)", 12)]
         [Theory]
-        public void AddTests(string input, double expected)
+        public void AddTests(string input, object expected)
         {
             var runtime = new LillispRuntime();
 

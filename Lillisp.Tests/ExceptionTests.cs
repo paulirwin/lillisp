@@ -39,7 +39,7 @@ namespace Lillisp.Tests
 
             Assert.Equal("something went wrong", ex.Message);
             Assert.Equal(2, ex.Irritants.Count);
-            Assert.Equal(1d, ex.Irritants[0]);
+            Assert.Equal(1, ex.Irritants[0]);
             Assert.Equal("foo", ex.Irritants[1]);
         }
 
@@ -57,7 +57,7 @@ namespace Lillisp.Tests
 
             var result = runtime.EvaluateProgram(prog);
 
-            Assert.Equal(1d, result);
+            Assert.Equal(1, result);
         }
 
         [Fact]
@@ -80,8 +80,8 @@ namespace Lillisp.Tests
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Length);
-            Assert.Equal(65d, result[0]);
-            Assert.Equal(1d, result[1]);
+            Assert.Equal(65, result[0]);
+            Assert.Equal(1, result[1]);
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Lillisp.Tests
 
             var result = runtime.EvaluateProgram(prog);
 
-            Assert.Equal(1d, result);
+            Assert.Equal(1, result);
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Lillisp.Tests
 
             var result = runtime.EvaluateProgram(prog);
 
-            Assert.Equal(1d, result);
+            Assert.Equal(1, result);
         }
 
         [Fact]
@@ -147,9 +147,9 @@ namespace Lillisp.Tests
 
             Assert.NotNull(result);
             Assert.Equal(3, result.Count);
-            Assert.Equal(1d, result[0]);
+            Assert.Equal(1, result[0]);
             Assert.Equal("foo", result[1]);
-            Assert.Equal(3d, result[2]);
+            Assert.Equal(3, result[2]);
         }
     }
 }
