@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lillisp.Core.Expressions
 {
@@ -122,7 +124,7 @@ namespace Lillisp.Core.Expressions
             return !args[0].IsTruthy() ? true : Nil.Value;
         }
 
-        public static object? Eq(object?[] args)
+        public static object? ReferencesEqual(object?[] args)
         {
             if (args.Length < 2)
             {
@@ -148,6 +150,41 @@ namespace Lillisp.Core.Expressions
             }
 
             return true;
+        }
+
+        public static object? Equal(object?[] args)
+        {
+            if (args.Length < 2)
+            {
+                throw new ArgumentException("eq? needs at least 2 arguments");
+            }
+
+            var first = args[0];
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                if (!EqualEqualityComparer.Instance.Equals(first, args[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private class EqualEqualityComparer : IEqualityComparer<object?>
+        {
+            public static readonly EqualEqualityComparer Instance = new();
+
+            public new bool Equals(object? x, object? y)
+            {
+                return object.Equals(x, y) || (x is IEnumerable<object?> firstEnumerable && y is IEnumerable<object?> secondEnumerable && firstEnumerable.SequenceEqual(secondEnumerable, Instance));
+            }
+
+            public int GetHashCode(object? obj)
+            {
+                return obj?.GetHashCode() ?? 0;
+            }
         }
     }
 }

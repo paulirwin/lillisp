@@ -51,5 +51,19 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        // R7RS 6.1
+        [InlineData("(equal? 'a 'a)", true)]
+        [InlineData("(equal? '(a) '(a))", true)]
+        [InlineData("(equal? '(a (b) c) '(a (b) c))", true)]
+        [InlineData("(equal? \"abc\" \"abc\")", true)]
+        [InlineData("(equal? 2 2)", true)]
+        [InlineData("(equal? (make-vector 5 'a) (make-vector 5 'a))", true)]
+        // [InlineData("(equal? '#1=(a b . #1#) '#2=(a b a b . #2#))", true)] // TODO: datum labels and circular lists
+        [Theory]
+        public void EqualTests(string input, bool expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }
