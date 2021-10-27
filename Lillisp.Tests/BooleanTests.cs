@@ -27,7 +27,7 @@ namespace Lillisp.Tests
         [InlineData("(eqv? 2 2)", true)]
         // [InlineData("(eqv? 2 2.0)", false)] // TODO: inexact numbers
         [InlineData("(eqv? 100000000 100000000)", true)]
-        // [InlineData("(eqv? 0 +nan.0)", false)] // TODO: nan literals
+        [InlineData("(eqv? 0 +nan.0)", false)]
         [InlineData("(eqv? (cons 1 2) (cons 1 2))", false)]
         [InlineData("(eqv? (lambda () 1) (lambda () 2))", false)]
         [InlineData("(let ((p (lambda (x) x))) (eqv? p p))", true)]

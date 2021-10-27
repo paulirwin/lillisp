@@ -122,6 +122,27 @@ namespace Lillisp.Core
                     return ParseRational(ratio.GetText());
                 }
 
+                var posInfinity = number.POS_INFINITY();
+
+                if (posInfinity != null)
+                {
+                    return new Atom(AtomType.Number, double.PositiveInfinity);
+                }
+
+                var negInfinity = number.NEG_INFINITY();
+
+                if (negInfinity != null)
+                {
+                    return new Atom(AtomType.Number, double.NegativeInfinity);
+                }
+
+                var nan = number.NAN();
+
+                if (nan != null)
+                {
+                    return new Atom(AtomType.Number, double.NaN);
+                }
+
                 double num = Convert.ToDouble(number.GetText());
                 return new Atom(AtomType.Number, num);
             }
