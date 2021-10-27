@@ -92,11 +92,11 @@ namespace Lillisp.Core.Expressions
             return true;
         }
 
-        public static object? Equal(object?[] args)
+        public static object? Equivalent(object?[] args)
         {
             if (args.Length < 2)
             {
-                throw new ArgumentException("= needs at least 2 arguments");
+                throw new ArgumentException("eqv? needs at least 2 arguments");
             }
 
             var first = args[0];

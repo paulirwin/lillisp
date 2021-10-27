@@ -10,8 +10,8 @@ namespace Lillisp.Tests
     {
         [InlineData("(begin (def |H\\x65;llo| 42) Hello)", 42d)]
         [InlineData("(begin (def |two words| 42) |two\\x20;words|)", 42d)]
-        [InlineData("(== '|\\x3BB;| '|λ|)", true)]
-        [InlineData("(== '|\\x9;\\x9;| '|\t\t|)", true)]
+        [InlineData("(eqv? '|\\x3BB;| '|λ|)", true)]
+        [InlineData("(eqv? '|\\x9;\\x9;| '|\t\t|)", true)]
         [Theory]
         public void R7RS_2_1_Identifiers(string input, object expected)
         {

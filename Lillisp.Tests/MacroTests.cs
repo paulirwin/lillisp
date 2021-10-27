@@ -100,7 +100,7 @@ namespace Lillisp.Tests
 
         [InlineData("((lambda (x) (pow x 2)) 4)", 16d)]
         [InlineData("(begin (define square (lambda (x) (pow x 2))) (square 4))", 16d)]
-        [InlineData("(begin (define fact (lambda (n) (if (= n 0) 1 (* n (fact (- n 1)))))) (fact 10))", 3628800d)]
+        [InlineData("(begin (define fact (lambda (n) (if (eqv? n 0) 1 (* n (fact (- n 1)))))) (fact 10))", 3628800d)]
         [Theory]
         public void LambdaTests(string input, object expected)
         {

@@ -1,6 +1,4 @@
-﻿using System;
-using Lillisp.Core;
-using Xunit;
+﻿using Xunit;
 
 namespace Lillisp.Tests
 {
@@ -11,13 +9,25 @@ namespace Lillisp.Tests
         [InlineData("(not (> 3 2))", false)]
         [InlineData("(not (< 3 2))", true)]
         [Theory]
-        public void NotTests(string input, object expected)
+        public void NotTests(string input, bool expected)
         {
-            var runtime = new LillispRuntime();
+            TestHelper.DefaultTest(input, expected);
+        }
 
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, (bool)result);
+        [InlineData("(eqv? #t #t)", true)]
+        [InlineData("(eqv? 'a 'a)", true)]
+        [InlineData("(eqv? 42 42)", true)]
+        [InlineData("(eqv? #\\a #\\a)", true)]
+        [InlineData("(eqv? '() '())", true)]
+        [InlineData("(eqv? #t #f)", false)]
+        [InlineData("(eqv? 'a 'b)", false)]
+        [InlineData("(eqv? 42 43)", false)]
+        [InlineData("(eqv? #\\a #\\b)", false)]
+        [InlineData("(eqv? '() '(1 2 3))", false)]
+        [Theory]
+        public void EqvTests(string input, bool expected)
+        {
+            TestHelper.DefaultTest(input, expected);
         }
     }
 }
