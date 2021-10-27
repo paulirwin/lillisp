@@ -6,7 +6,7 @@ namespace Lillisp.Core
     {
         public Symbol(string value, bool escaped = false)
         {
-            Value = value;
+            Value = string.Intern(value);
             Escaped = escaped;
         }
 

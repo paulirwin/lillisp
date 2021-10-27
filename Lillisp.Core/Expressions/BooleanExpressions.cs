@@ -121,5 +121,33 @@ namespace Lillisp.Core.Expressions
 
             return !args[0].IsTruthy() ? true : Nil.Value;
         }
+
+        public static object? Eq(object?[] args)
+        {
+            if (args.Length < 2)
+            {
+                throw new ArgumentException("eq? needs at least 2 arguments");
+            }
+
+            var first = args[0];
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                // HACK: Symbols are currently different objects, even though the value is interned. Should they be part of some global symbol cache?
+                if (first is Symbol firstSym && args[i] is Symbol secondSym)
+                {
+                    if (!ReferenceEquals(firstSym.Value, secondSym.Value))
+                    {
+                        return false;
+                    }
+                }
+                else if (!ReferenceEquals(first, args[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

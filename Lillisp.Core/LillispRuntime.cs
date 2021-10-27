@@ -127,6 +127,7 @@ namespace Lillisp.Core
             ["eof-object"] = PortExpressions.GetEofObject,
             ["eof-object?"] = PortExpressions.IsEofObject,
             ["emergency-exit"] = ProcessContextExpressions.EmergencyExit,
+            ["eq?"] = BooleanExpressions.Eq,
             ["eqv?"] = BooleanExpressions.Equivalent,
             ["error"] = ExceptionExpressions.Error,
             ["error-object?"] = ExceptionExpressions.ErrorObject,

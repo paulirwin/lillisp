@@ -14,6 +14,7 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
+        // R7RS 6.1
         [InlineData("(eqv? #t #t)", true)]
         [InlineData("(eqv? 'a 'a)", true)]
         [InlineData("(eqv? #\\a #\\a)", true)]
@@ -33,6 +34,20 @@ namespace Lillisp.Tests
         [InlineData("(eqv? #f 'nil)", false)]
         [Theory]
         public void EqvTests(string input, bool expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        // R7RS 6.1
+        [InlineData("(eq? 'a 'a)", true)]
+        [InlineData("(eq? (list 'a) (list 'a))", false)]
+        [InlineData("(eq? '() '())", true)]
+        [InlineData("(eq? car car)", true)]
+        [InlineData("(let ((x '(a))) (eq? x x))", true)]
+        [InlineData("(let ((x '#())) (eq? x x))", true)]
+        [InlineData("(let ((p (lambda (x) x))) (eq? p p))", true)]
+        [Theory]
+        public void EqTests(string input, bool expected)
         {
             TestHelper.DefaultTest(input, expected);
         }
