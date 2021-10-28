@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.31613.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lillisp.Core", "Lillisp.Core\Lillisp.Core.csproj", "{A38E88C9-1C1C-4675-BA11-3DDD7E96382F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lillisp.Repl", "Lillisp.Repl\Lillisp.Repl.csproj", "{D1461F98-50FE-417D-9828-B43DC5B1DE1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lillisp", "Lillisp\Lillisp.csproj", "{D1461F98-50FE-417D-9828-B43DC5B1DE1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lillisp.Tests", "Lillisp.Tests\Lillisp.Tests.csproj", "{7B7F5418-221A-4DFB-BF0E-5ECE2D92E5EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lillisp.Tests", "Lillisp.Tests\Lillisp.Tests.csproj", "{7B7F5418-221A-4DFB-BF0E-5ECE2D92E5EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

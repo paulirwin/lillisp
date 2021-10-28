@@ -24,7 +24,7 @@ Lillisp started as a C# implementation of Peter Norvig's lis.py from the blog po
 
 ## Using the REPL
 
-Build and run the Lillisp.Repl project in Visual Studio 2019 or later, or via the `dotnet` CLI.
+Build and run the Lillisp project in Visual Studio 2019 or later, or via the `dotnet` CLI.
 
 Input commands and hit enter. Note that multi-line input is not yet supported.
 
