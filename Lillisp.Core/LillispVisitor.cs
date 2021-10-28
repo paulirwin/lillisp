@@ -10,7 +10,7 @@ namespace Lillisp.Core
 {
     public class LillispVisitor : LillispBaseVisitor<Node>
     {
-        private static readonly Regex _complexRegex = new("(?<real>\\-?[0-9]+(\\.[0-9]+)?)(?<imaginary>[\\-\\+][0-9]+(\\.[0-9]+)?)i", RegexOptions.Compiled);
+        private static readonly Regex _complexRegex = new("(?<real>((\\-?[0-9]+(\\.[0-9]*)?)|[\\-\\+]inf\\.0|[\\-\\+]nan\\.0))(?<imaginary>[\\-\\+](([0-9]+(\\.[0-9]*)?)|inf\\.0|nan\\.0))i", RegexOptions.Compiled);
 
         public override Node VisitProg(LillispParser.ProgContext context)
         {
@@ -250,8 +250,22 @@ namespace Lillisp.Core
                 throw new InvalidOperationException($"Unable to parse complex number: {text}");
             }
 
-            var real = double.Parse(match.Groups["real"].Value);
-            var imaginary = double.Parse(match.Groups["imaginary"].Value);
+            var real = match.Groups["real"].Value switch
+            {
+                "-inf.0" => double.NegativeInfinity,
+                "+inf.0" => double.PositiveInfinity,
+                "-nan.0" or "+nan.0" => double.NaN,
+                { } other => double.Parse(other)
+            };
+
+            var imaginary = match.Groups["imaginary"].Value switch
+            {
+                "-inf.0" => double.NegativeInfinity,
+                "+inf.0" => double.PositiveInfinity,
+                "-nan.0" or "+nan.0" => double.NaN,
+                { }
+                other => double.Parse(other)
+            };
 
             return new Atom(AtomType.Number, new Complex(real, imaginary));
         }

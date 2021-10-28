@@ -28,11 +28,34 @@ namespace Lillisp.Core
                 string str => quote ? SymbolDisplay.FormatLiteral(str, true) : str,
                 StringBuilder sb => quote ? SymbolDisplay.FormatLiteral(sb.ToString(), true) : sb.ToString(),
                 char ch => quote ? SymbolDisplay.FormatLiteral(ch, true) : ch.ToString(),
-                Complex { Imaginary: 0d } complex => complex.Real.ToString(CultureInfo.InvariantCulture),
-                Complex { Imaginary: < 0d } complex => $"{complex.Real.ToString(CultureInfo.InvariantCulture)}{complex.Imaginary.ToString(CultureInfo.InvariantCulture)}i",
-                Complex { Imaginary: > 0d } complex => $"{complex.Real.ToString(CultureInfo.InvariantCulture)}+{complex.Imaginary.ToString(CultureInfo.InvariantCulture)}i",
+                Complex complex => FormatComplex(complex),
+                double.PositiveInfinity => "+inf.0",
+                double.NegativeInfinity => "-inf.0",
+                double.NaN => "+nan.0",
                 _ => result.ToString()
             };
+        }
+
+        private static string FormatComplex(Complex complex)
+        {
+            string real = complex.Real switch
+            {
+                double.PositiveInfinity => "+inf.0",
+                double.NegativeInfinity => "-inf.0",
+                double.NaN => "+nan.0",
+                _ => complex.Real.ToString(CultureInfo.InvariantCulture)
+            };
+
+            string imaginary = complex.Imaginary switch
+            {
+                double.PositiveInfinity => "+inf.0i",
+                double.NegativeInfinity => "-inf.0i",
+                double.NaN => "+nan.0i",
+                >= 0 => $"+{complex.Imaginary.ToString(CultureInfo.InvariantCulture)}i",
+                _ => $"{complex.Imaginary.ToString(CultureInfo.InvariantCulture)}i"
+            };
+
+            return real + imaginary;
         }
     }
 }

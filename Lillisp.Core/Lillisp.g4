@@ -43,9 +43,9 @@ IDENTIFIER: (LETTER | DOT | HASH) (
 number: INTEGER | COMPLEX | FLOAT | RATIO | POS_INFINITY | NEG_INFINITY | NAN;
 
 INTEGER: NEGATE? (DIGIT)+;
-FLOAT: NEGATE? (DIGIT | '.')+;
-RATIO: NEGATE? INTEGER '/' INTEGER;
-COMPLEX: NEGATE? (DIGIT | '.')+ ('+' | '-') (DIGIT | '.')+ 'i';
+FLOAT: NEGATE? (DIGIT | '.')+ ('e' '-'? (DIGIT | '.')+)?;
+RATIO: NEGATE? DIGIT+ '/' DIGIT+;
+COMPLEX: ((NEGATE? (DIGIT | '.')+) | POS_INFINITY | NEG_INFINITY | NAN) ('+' | '-') ((DIGIT | '.')+ | 'inf.0' | 'nan.0') 'i';
 POS_INFINITY: '+inf.0';
 NEG_INFINITY: '-inf.0';
 NAN: '+nan.0' | '-nan.0';
