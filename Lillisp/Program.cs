@@ -1,13 +1,44 @@
 ﻿using System;
+using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.IO;
 using System.Reflection;
 using Antlr4.Runtime;
 using Lillisp.Core;
 
-namespace Lillisp.Repl
+namespace Lillisp
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
+        {
+            var rootCommand = new RootCommand("A prototype Lisp-based language in .NET.")
+            {
+                new Option<FileInfo>("--file", "A Lillisp file to execute."),
+            };
+
+            rootCommand.Handler = CommandHandler.Create<FileInfo?>(FileHandler);
+
+            return rootCommand.Invoke(args);
+        }
+
+        private static void FileHandler(FileInfo? file)
+        {
+            if (file == null)
+            {
+                RunRepl();
+            }
+            else
+            {
+                string text = File.ReadAllText(file.FullName);
+
+                var runtime = new LillispRuntime();
+
+                runtime.EvaluateProgram(text);
+            }
+        }
+
+        private static void RunRepl()
         {
             var options = new ReplOptions();
 

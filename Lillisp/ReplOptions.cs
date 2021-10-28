@@ -1,4 +1,4 @@
-﻿namespace Lillisp.Repl
+﻿namespace Lillisp
 {
     public class ReplOptions
     {
