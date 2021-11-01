@@ -338,5 +338,20 @@ namespace Lillisp.Core.Expressions
 
             return args[0] is Stream or TextReader or TextWriter;
         }
+
+        public static object? StringToSymbol(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("string->symbol requires one string argument");
+            }
+
+            return args[0] switch
+            {
+                string s => new Symbol(s),
+                StringBuilder sb => new Symbol(sb.ToString()),
+                _ => throw new ArgumentException("string->symbol requires one string argument")
+            };
+        }
     }
 }

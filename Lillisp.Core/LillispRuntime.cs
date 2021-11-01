@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,6 +37,7 @@ namespace Lillisp.Core
             ["defun"] = CoreMacros.Defun,
             ["delay"] = CoreMacros.Delay,
             ["display"] = PortMacros.Display,
+            ["eval"] = CoreMacros.Eval,
             ["if"] = CoreMacros.If,
             ["include"] = CoreMacros.Include,
             //["include-ci"] = CoreMacros.Include, // TODO
@@ -218,6 +220,7 @@ namespace Lillisp.Core
             ["string-set!"] = StringExpressions.StringSet,
             ["string-upcase"] = StringExpressions.Upcase,
             ["string->list"] = TypeExpressions.StringToList,
+            ["string->symbol"] = TypeExpressions.StringToSymbol,
             ["string->utf8"] = TypeExpressions.StringToUtf8,
             ["substring"] = StringExpressions.Substring,
             ["symbol?"] = TypeExpressions.IsSymbol,
@@ -293,20 +296,65 @@ namespace Lillisp.Core
 
         public object? EvaluateProgram(object? node) => Evaluate(_userScope, node);
 
-        public object? Quote(object? node)
+        private object? Quote(Scope scope, object? node)
         {
             return node switch
             {
-                Program program => program.Children.Select(Quote).ToArray(),
+                Program program => program.Children.Select(i => Quote(scope, i)).ToArray(),
                 Vector vector => vector, // TODO: is this correct?
                 Bytevector bv => bv, // TODO: is this correct?
-                Pair pair => new Pair(Quote(pair.Car), Quote(pair.Cdr)),
+                Pair pair => QuotePair(Quote(scope, pair.Car), Quote(scope, pair.Cdr)),
                 Symbol symbol => symbol,
                 Atom atom => atom.Value,
-                Quote quote => Quote(quote.Value),
+                Quote quote => Quote(scope, quote.Value),
+                Quasiquote quote => Quote(scope, quote.Value),
+                Unquote { Splicing: false } unquote => Evaluate(scope, unquote.Value),
+                Unquote { Splicing: true } unquote => EvaluateUnquoteSplicing(scope, unquote.Value),
                 Nil nil => nil,
                 _ => throw new ArgumentOutOfRangeException()
             };
+        }
+
+        private static Node QuotePair(object? car, object? cdr)
+        {
+            if (car is not Splice && cdr is not Splice)
+            {
+                return new Pair(car, cdr);
+            }
+
+            var values = new List<object?>();
+
+            if (car is Splice carSplice)
+            {
+                values.AddRange(carSplice.Values);
+            }
+            else
+            {
+                values.Add(car);
+            }
+
+            if (cdr is Splice cdrSplice)
+            {
+                values.AddRange(cdrSplice.Values);
+            }
+            else if (cdr is not Nil)
+            {
+                values.Add(cdr);
+            }
+
+            return List.FromNodes(values);
+        }
+
+        private Splice EvaluateUnquoteSplicing(Scope scope, Node unquoteValue)
+        {
+            var result = Evaluate(scope, unquoteValue);
+
+            if (result is not IEnumerable enumerable)
+            {
+                throw new InvalidOperationException("Result of unquote-splicing operation is not enumerable");
+            }
+
+            return new Splice(enumerable.Cast<object?>());
         }
 
         public object? Evaluate(Scope scope, object? node) => Evaluate(scope, node, null);
@@ -321,13 +369,14 @@ namespace Lillisp.Core
                 Pair pair => EvaluateExpression(scope, pair),
                 Symbol symbol => EvaluateSymbol(scope, symbol, arity),
                 Atom atom => atom.Value,
-                Quote quote => Quote(quote),
+                Quote quote => Quote(scope, quote),
+                Quasiquote quote => Quote(scope, quote),
                 Nil nil => nil,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => node
             };
         }
 
-        private object? EvaluateVector(Scope scope, Vector vector)
+        private Vector EvaluateVector(Scope scope, Vector vector)
         {
             var items = vector.Select(i => i is Node node ? Evaluate(scope, node) : i);
 

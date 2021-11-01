@@ -49,6 +49,7 @@ An incomplete list of features currently supported:
 * Boolean expressions (`<`, `>`, `<=`, `==`, `and`, `or`, etc)
 * List operations (`list`, `car`, `cdr`, `cons`, etc)
 * Quoting expressions (i.e. `'(1 2 3)` or `(quote (1 2 3))`)
+* Quasiquoting, unquoting, and splicing (i.e. ``(eval `(+ ,@(range 0 10)))``)
 * Higher-order list functions (`apply`, `map`)
 * Conditional logic (`if`, `cond`, `when`)
 * Sequential logic with `begin`
@@ -58,19 +59,16 @@ An incomplete list of features currently supported:
 * Block-scoping variables with `let`
 * Rational number operations (`rationalize`, `numerator`/`denominator`, `simplify`)
 * Exceptions (`with-exception-handler`, `raise`, `error`, `raise-continuable`, etc.)
-* Almost all of the Scheme base library string-, vector-, and bytevector-related functions
+* Almost all of the Scheme base library string-, vector-, port-, and bytevector-related functions
 * Almost all of the Scheme `char`, `complex`, `CxR`, and `lazy` library functions
 
 Notable features not yet implemented from Scheme R7RS include:
 * Tail context for `and` and `or`
-* Quasiquoting and unquoting
 * Macros
 * Dotted pairs
-* Inexact vs Exact number handling
+* Inexact vs Exact number handling (limited to exact integer and inexact real (`System.Double`) literals currently)
 * Pipes
 * Libraries (as in, i.e. `import`)
-* Ports and I/O
-* System interface
 * Many base library methods, and other libraries
 
 Basically, give your existing Lisp code a try, and if a given feature doesn't work, file an issue.
@@ -133,13 +131,11 @@ Lillisp> (.Next rnd)
 -> 1055373556
 Lillisp> (.Next rnd)
 -> 938800480
-Lillisp> (.Next rnd (cast 100 Int32))
+Lillisp> (.Next rnd 100)
 -> 73
-Lillisp> (.Next rnd (cast 100 Int32))
+Lillisp> (.Next rnd 100)
 -> 55
 ```
-
-Note that the `cast` above is currently required since all numbers in Lillisp are of type `System.Double`, and there is no overload of `System.Random.Next` that takes a `System.Double`.
 
 ### Instance Members
 
@@ -232,15 +228,15 @@ Lillisp> (typeof (cast 7 Int32))
 Common Lillisp to .NET type mappings:
 | Lillisp type | .NET type |
 | --- | --- |
-| list | `System.Object?[]`** |
+| list/pair | `Lillisp.Core.Pair` |
 | vector | `Lillisp.Core.Vector` (wraps a `System.Collections.Generic.List<System.Object?>`) |
 | bytevector | `Lillisp.Core.Bytevector` (wraps a `System.Collections.Generic.List<System.Byte>`) |
-| boolean | `System.Boolean` |
-| real/integer numbers (i.e. `7` or `42.03`) | `System.Double` |
+| boolean (i.e. `true` or `#t`) | `System.Boolean` |
+| integer numbers (i.e. `7`) | `System.Int32` |
+| real numbers (i.e. `42.03` or `1.1e-10`) | `System.Double` |
 | rational numbers (i.e. `3/8`) | [`Rationals.Rational`](https://github.com/tompazourek/Rationals) |
 | complex numbers (i.e. `-4+7i`) | `System.Numerics.Complex` |
 | character | `System.Char` |
 | constant string | `System.String` |
 | mutable string (i.e. with `(make-string)`) | `System.Text.StringBuilder` |
 
-** Note: lists are currently implemented as a singly-linked list of `Lillisp.Core.Pair` objects once parsed, until they are evaluated or returned from functions (such as `list`), at which point they are from then on `object?[]`. The plan is to change this to use the `Pair` linked list top to bottom, from syntax parsing all the way through execution.

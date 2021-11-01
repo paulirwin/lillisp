@@ -294,6 +294,17 @@ namespace Lillisp.Core
                 return new Quasiquote(node);
             }
 
+            var unquoteSplicing = context.unquote_splicing();
+
+            if (unquoteSplicing != null)
+            {
+                var child = unquoteSplicing.children[1];
+
+                var node = Visit(child);
+
+                return new Unquote(node, true);
+            }
+
             var unquote = context.unquote();
 
             if (unquote != null)
@@ -302,7 +313,7 @@ namespace Lillisp.Core
 
                 var node = Visit(child);
 
-                return new Unquote(node);
+                return new Unquote(node, false);
             }
 
             var commentDatum = context.comment_datum();

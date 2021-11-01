@@ -40,6 +40,8 @@ namespace Lillisp
 
         private static void RunRepl()
         {
+            PrintSystemInfo();
+
             var options = new ReplOptions();
 
             var runtime = CreateRuntime(options);
@@ -114,6 +116,15 @@ namespace Lillisp
                     Console.WriteLine(ex.Message);
                 }
             }
+        }
+
+        private static void PrintSystemInfo()
+        {
+            Console.WriteLine($"Lillisp v{typeof(Program).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Unknown"}");
+
+            Console.WriteLine($".NET {Environment.Version}, {Environment.OSVersion}");
+            
+            Console.WriteLine();
         }
 
         private static LillispRuntime CreateRuntime(ReplOptions options)

@@ -14,7 +14,7 @@ namespace Lillisp.Core.Macros
                 throw new InvalidOperationException("quote requires an argument");
             }
 
-            return runtime.Quote(node);
+            return runtime.Evaluate(scope, new Quote(node));
         }
 
         public static object? Apply(LillispRuntime runtime, Scope scope, object?[] args)
@@ -96,14 +96,9 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("define requires two arguments");
             }
             
-            if (args[1] is not Node node)
-            {
-                throw new ArgumentException("define's second argument must be a node");
-            }
-
             if (args[0] is Symbol symbol)
             {
-                object? value = runtime.Evaluate(scope, node);
+                object? value = runtime.Evaluate(scope, args[1]);
 
                 scope.Define(symbol.Value, value);
 
@@ -121,7 +116,7 @@ namespace Lillisp.Core.Macros
                     ? cdrp
                     : List.FromNodes(new [] { pair.Cdr });
 
-                var lambda = Lambda(runtime, scope, new object?[] { lambdaArgs, node });
+                var lambda = Lambda(runtime, scope, new object?[] { lambdaArgs, args[1] });
 
                 scope.Define(ps.Value, lambda);
 
@@ -387,6 +382,16 @@ namespace Lillisp.Core.Macros
             }
 
             return result;
+        }
+
+        public static object? Eval(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("eval requires one argument");
+            }
+
+            return runtime.Evaluate(scope, runtime.Evaluate(scope, args[0]));
         }
     }
 }

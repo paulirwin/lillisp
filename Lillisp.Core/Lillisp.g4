@@ -12,13 +12,15 @@ bytevector: '#u8(' integer* ')';
 
 vector: '[' form* ']' | '#(' form* ')';
 
-meta: quote | quasiquote | unquote | comment_datum;
+meta: quote | quasiquote | unquote_splicing | unquote | comment_datum;
 
 integer: INTEGER;
 
 quote: '\'' form;
 
 quasiquote: '`' form;
+
+unquote_splicing: ',@' form;
 
 unquote: ',' form;
 
