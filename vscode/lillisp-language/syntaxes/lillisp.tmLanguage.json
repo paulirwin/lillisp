@@ -1,0 +1,70 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Lillisp",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#numbers"
+		},
+		{
+			"include": "#characters"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.lillisp",
+				"match": "\\b(define|let|set!|lambda|begin|include)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.lillisp",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.lillisp",
+					"match": "\\\\."
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line",
+					"match": ";.*$"
+				},
+				{
+					"name": "comment.block",
+					"begin": "#\\|",
+					"end": "\\|#"
+				}
+			]
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric",
+					"match": "[\\-\\+]?([0-9\\.e]+|nan\\.0|inf\\.0)([\\-\\+]([0-9\\.e]+|nan\\.0|inf\\.0)i)?"
+				}
+			]
+		},
+		"characters": {
+			"patterns": [
+				{
+					"name": "constant.character",
+					"match": "#\\\\(.{1}|[a-zA-Z0-9]+)"
+				}
+			]
+		}
+	},
+	"scopeName": "source.llsp"
+}

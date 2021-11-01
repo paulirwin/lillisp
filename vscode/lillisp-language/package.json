@@ -1,0 +1,25 @@
+{
+    "name": "lillisp-language",
+    "displayName": "Lillisp Language",
+    "description": "VS Code syntax highlighting support for the Lillisp Lisp-based programming language.",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.61.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "lillisp",
+            "aliases": ["Lillisp", "lillisp"],
+            "extensions": [".llsp"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "lillisp",
+            "scopeName": "source.llsp",
+            "path": "./syntaxes/lillisp.tmLanguage.json"
+        }]
+    }
+}
