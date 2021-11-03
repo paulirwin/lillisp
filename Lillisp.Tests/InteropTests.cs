@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Lillisp.Core;
 using Xunit;
 
 namespace Lillisp.Tests
@@ -45,6 +46,18 @@ namespace Lillisp.Tests
         public void GenericTypeTests(string input, object expected)
         {
             TestHelper.DefaultTest(input, expected);
+        }
+
+        [Fact]
+        public void ExtensionMethodTest()
+        {
+            var runtime = new LillispRuntime();
+
+            var program = "(use 'System.Collections.Generic) (use 'System.Linq) (define mylist (new (List String))) (.Any mylist)";
+
+            var result = runtime.EvaluateProgram(program) as bool?;
+
+            Assert.False(result);
         }
     }
 }

@@ -38,6 +38,7 @@ namespace Lillisp.Core
             ["delay"] = CoreMacros.Delay,
             ["display"] = PortMacros.Display,
             ["eval"] = CoreMacros.Eval,
+            ["from"] = LispINQMacros.From,
             ["if"] = CoreMacros.If,
             ["include"] = CoreMacros.Include,
             //["include-ci"] = CoreMacros.Include, // TODO

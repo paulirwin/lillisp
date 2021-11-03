@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Lillisp.Core
 {
@@ -20,52 +21,49 @@ namespace Lillisp.Core
             {
                 throw new ArgumentException("First parameter must be an object instance");
             }
-            
+
             symbol = symbol.TrimStart('.');
 
-            var type = args[0].GetType();
+            var type = args[0]!.GetType();
 
             object?[]? restArgs = args.Length > 1 ? args.Skip(1).ToArray() : null;
 
             if (symbol == "[]")
             {
-                // indexer syntax
-                var indexers = type.GetProperties().Where(i => i.GetIndexParameters().Length > 0).ToList();
-
-                if (indexers.Count == 0)
-                {
-                    throw new ArgumentException($"Type {type} does not have an indexer property");
-                }
-                
-                if (indexers.Count > 1)
-                {
-                    throw new NotImplementedException("Support for multiple indexer properties is not implemented");
-                }
-
-                if (restArgs == null)
-                {
-                    throw new ArgumentException("Indexer access must have at least one index parameter");
-                }
-
-                var indexes = restArgs.Zip(indexers[0].GetIndexParameters())
-                    .Select(i => Convert.ChangeType(i.First, i.Second.ParameterType))
-                    .ToArray();
-
-                return indexers[0].GetValue(args[0], indexes);
+                return InvokeIndexer(args, type, restArgs);
             }
 
             var members = type.GetMember(symbol, BindingFlags.Public | BindingFlags.Instance);
+
+            members = members.Concat(GetExtensionMethods(scope, type, symbol, restArgs)).ToArray();
 
             if (members.Length == 0)
             {
                 throw new ArgumentException($"Could not find member {symbol} on type {type}");
             }
-            
+
             var member = members[0];
 
-            if (member is MethodInfo)
+            if (member is MethodInfo { IsStatic: false })
             {
                 return type.InvokeMember(symbol, BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance, null, args[0], restArgs);
+            }
+            
+            if (member is MethodInfo { IsStatic: true } extensionMethod)
+            {
+                var extArgs = new List<object?> { args[0] };
+
+                if (restArgs != null)
+                {
+                    extArgs.AddRange(restArgs);
+                }
+
+                if (extensionMethod.IsGenericMethodDefinition)
+                {
+                    extensionMethod = CloseGenericExtensionMethod(extensionMethod, extArgs);
+                }
+
+                return extensionMethod.Invoke(null, extArgs.ToArray());
             }
 
             if (member is PropertyInfo prop)
@@ -89,6 +87,121 @@ namespace Lillisp.Core
             }
 
             throw new NotImplementedException($"Unhandled member type {member.GetType()}");
+        }
+
+        private static object? InvokeIndexer(object?[] args, Type type, object?[]? restArgs)
+        {
+            // indexer syntax
+            var indexers = type.GetProperties().Where(i => i.GetIndexParameters().Length > 0).ToList();
+
+            if (indexers.Count == 0)
+            {
+                throw new ArgumentException($"Type {type} does not have an indexer property");
+            }
+
+            if (indexers.Count > 1)
+            {
+                throw new NotImplementedException("Support for multiple indexer properties is not implemented");
+            }
+
+            if (restArgs == null)
+            {
+                throw new ArgumentException("Indexer access must have at least one index parameter");
+            }
+
+            var indexes = restArgs.Zip(indexers[0].GetIndexParameters())
+                .Select(i => Convert.ChangeType(i.First, i.Second.ParameterType))
+                .ToArray();
+
+            return indexers[0].GetValue(args[0], indexes);
+        }
+
+        private static MethodInfo CloseGenericExtensionMethod(MethodInfo extensionMethod, IReadOnlyList<object?> extArgs)
+        {
+            var typeParameters = new List<Type>();
+            var extParameters = extensionMethod.GetParameters();
+
+            foreach (var argument in extensionMethod.GetGenericArguments())
+            {
+                for (int i = 0; i < extParameters.Length; i++)
+                {
+                    var extParameter = extParameters[i];
+                    var argType = extArgs[i]?.GetType();
+
+                    if (!extParameter.ParameterType.IsGenericType || argType == null)
+                        continue;
+
+                    var extParameterTypeArgs = extParameter.ParameterType.GetGenericArguments();
+
+                    for (int j = 0; j < extParameterTypeArgs.Length; j++)
+                    {
+                        var extParameterTypeArg = extParameterTypeArgs[j];
+
+                        if (extParameterTypeArg != argument)
+                        {
+                            continue;
+                        }
+
+                        var extGenericTypeDef = extParameter.ParameterType.GetGenericTypeDefinition();
+
+                        var typeHierarchy = GetTypeHierarchy(argType);
+                        var matchingType = typeHierarchy.FirstOrDefault(t => t.IsConstructedGenericType && t.GetGenericTypeDefinition() == extGenericTypeDef);
+
+                        if (matchingType != null)
+                        {
+                            var matchingTypeParams = matchingType.GetGenericArguments();
+
+                            typeParameters.Add(matchingTypeParams[j]);
+                        }
+                    }
+                }
+            }
+
+            extensionMethod = extensionMethod.MakeGenericMethod(typeParameters.ToArray());
+            return extensionMethod;
+        }
+
+        private static IEnumerable<MemberInfo> GetExtensionMethods(Scope scope, Type type, string symbol, object?[]? restArgs)
+        {
+            int argCount = 1 + (restArgs?.Length ?? 0);
+            var typeHierarchy = GetTypeHierarchy(type);
+
+            var namespaces = scope.AllInteropNamespaces().ToHashSet();
+
+            var methods = from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                          from t in assembly.GetTypes()
+                          where t.Namespace != null
+                                && namespaces.Contains(t.Namespace)
+                                && t.GetCustomAttribute<ExtensionAttribute>() != null
+                          from m in t.GetMethods()
+                          where m.GetCustomAttribute<ExtensionAttribute>() != null
+                                && m.Name.Equals(symbol)
+                          let parameters = m.GetParameters()
+                          where parameters.Length == argCount
+                                && (typeHierarchy.Contains(parameters[0].ParameterType)
+                                    || (parameters[0].ParameterType.IsConstructedGenericType && typeHierarchy.Contains(parameters[0].ParameterType.GetGenericTypeDefinition())))
+                          select m;
+
+            return methods;
+        }
+
+        private static HashSet<Type> GetTypeHierarchy(Type type)
+        {
+            var interfaces = type.GetInterfaces();
+
+            var typeHierarchy = new HashSet<Type> { type };
+            typeHierarchy.UnionWith(interfaces);
+            typeHierarchy.UnionWith(interfaces.Where(i => i.IsConstructedGenericType).Select(i => i.GetGenericTypeDefinition()));
+
+            var currentType = type;
+
+            while (currentType.BaseType != null)
+            {
+                typeHierarchy.Add(currentType.BaseType);
+                currentType = currentType.BaseType;
+            }
+
+            return typeHierarchy;
         }
 
         public static object? ResolveSymbol(Scope scope, string symbol, int? arity)
@@ -119,7 +232,7 @@ namespace Lillisp.Core
                     {
                         return field.GetValue(null);
                     }
-                    
+
                     if (memberInfo[0] is PropertyInfo { CanWrite: false } roProp)
                     {
                         return roProp.GetValue(null);
@@ -188,6 +301,5 @@ namespace Lillisp.Core
                 return arity == null ? $"{ns}.{name}" : $"{ns}.{name}`{arity}";
             }
         }
-
     }
 }

@@ -36,7 +36,7 @@ namespace Lillisp.Tests
         {
             var runtime = new LillispRuntime();
 
-            var prog = "(define (fact x) (begin (define (fact-tail x accum) (if (= x 0) accum (fact-tail (- x 1) (* x accum)))) (fact-tail x 1)))";
+            var prog = "(define (fact x) (begin (define (fact-tail x accum) (if (eqv? x 0) accum (fact-tail (- x 1) (* x accum)))) (fact-tail x 1)))";
             prog += "(fact 10000)";
 
             var result = runtime.EvaluateProgram(prog);
