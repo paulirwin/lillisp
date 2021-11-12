@@ -20,7 +20,7 @@ Lillisp started as a C# implementation of Peter Norvig's lis.py from the blog po
 
 ![image](https://user-images.githubusercontent.com/1874103/137605342-15623f3f-9ca0-429c-b655-e02176ba6b9a.png)
 
-(Using the open-source [Windows Terminal](https://github.com/microsoft/terminal), [Powershell 7](https://github.com/PowerShell/PowerShell), and [Cascadia Code](https://github.com/microsoft/cascadia-code) font, running on .NET 5.)
+(Using the open-source [Windows Terminal](https://github.com/microsoft/terminal), [Powershell 7](https://github.com/PowerShell/PowerShell), and [Cascadia Code](https://github.com/microsoft/cascadia-code) font, running on .NET 6.)
 
 ## Using the REPL
 
@@ -154,7 +154,7 @@ Lillisp> (.PathAndQuery u)
 
 ### Importing Namespaces
 
-Currently, only the .NET 5 Base Class Library is available. Any namespaces can be "imported" (like the `using` statement in C#) into the current environment with the `use` keyword and a quoted symbol of the namespace name. Examples:
+Currently, only the .NET 6 Base Class Library is available. Any namespaces can be "imported" (like the `using` statement in C#) into the current environment with the `use` keyword and a quoted symbol of the namespace name. Examples:
 
 ```
 Lillisp> (new StringBuilder)
