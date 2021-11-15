@@ -8,7 +8,7 @@ This repo contains the Lillisp core runtime (which includes the standard library
 
 Lillisp (prounounced "lill-isp", like "lilly") is a prototype Lisp-based language that is written in C# (with some library functions written in Lillisp itself) and runs on [.NET](https://dotnet.microsoft.com/). 
 
-Currently, Lillisp can call some .NET code, but is not yet callable *from* .NET code. Also, Lillisp is currently only interpreted as a REPL. The short term plan is to allow for interpretation of Lillisp files too, and the long term plan is to support compilation of Lillisp code into a .NET assembly.
+Currently, Lillisp can call some .NET code, but anything defined in it is not yet easily callable *from* .NET code. Lillisp can be used as a REPL, or you can specify a file to interpret. Compilation is on the roadmap but not yet supported.
 
 Lillisp is a Scheme-based Lisp, and ultimately aims to be as [R7RS-small](https://small.r7rs.org/) compliant as possible. Being a Scheme, Lillisp is a [Lisp-1](https://andersmurphy.com/2019/03/08/lisp-1-vs-lisp-2.html), meaning functions and variables/parameters cannot share the same name, and functions do not need to be quoted to be passed as values.
 
@@ -24,7 +24,7 @@ Lillisp started as a C# implementation of Peter Norvig's lis.py from the blog po
 
 ## Using the REPL
 
-Build and run the Lillisp project in Visual Studio 2019 or later, or via the `dotnet` CLI.
+Build and run the Lillisp project in Visual Studio 2022 or later, or via the `dotnet` CLI.
 
 Input commands and hit enter. Note that multi-line input is not yet supported.
 
@@ -35,6 +35,18 @@ Certain REPL commands may be entered, without parentheses. These include:
 | `clear` or `cls` | Clears the console buffer/window and starts a new input line at the top of the buffer. |
 | `exit` or `quit` or <kbd>Ctrl</kbd>+<kbd>C</kbd> | Exits the Lillisp REPL. |
 | `reset` | Resets the current Lillisp runtime environment, starting fresh. All data in memory will be lost. |
+
+## Lillisp CLI
+
+Running the Lillisp project executable will launch the REPL if no command-line arguments are provided.
+
+The following command-line arguments are supported:
+
+| Argument | Description |
+| --- | --- |
+| `--file <path>` | Run the Lillisp interpreter on the specified file. |
+| `--version` | Display the Lillisp version. |
+| `--help` | Display help information on the available command-line arguments. |
 
 ## The Lillisp Language
 
