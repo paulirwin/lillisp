@@ -29,7 +29,7 @@ namespace Lillisp.Tests
             Assert.Equal("fizz", result[1]);
         }
 
-        [Fact(Skip = "Where not yet supported")]
+        [Fact]
         public void BasicWhereTest()
         {
             var runtime = new LillispRuntime();
@@ -37,6 +37,7 @@ namespace Lillisp.Tests
             var prog = new StringBuilder();
 
             prog.AppendLine("(use 'System.Collections.Generic)");
+            prog.AppendLine("(use 'System.Linq)");
             prog.AppendLine("(define mylist (new (List String)))");
             prog.AppendLine("(.Add mylist \"foo\")");
             prog.AppendLine("(.Add mylist \"bar\")");
@@ -45,13 +46,38 @@ namespace Lillisp.Tests
             prog.AppendLine("(.Add mylist \"buzz\")");
             prog.AppendLine("(.ToArray (from i in mylist where (.StartsWith i \"f\") select i))");
 
-            var result = runtime.EvaluateProgram(prog.ToString()) as string[];
+            var result = runtime.EvaluateProgram(prog.ToString());
 
-            Assert.NotNull(result);
+            var resultArray = result as object[];
+            Assert.NotNull(resultArray);
 
-            Assert.Equal(2, result.Length);
-            Assert.Equal("foo", result[0]);
-            Assert.Equal("fizz", result[1]);
+            Assert.Equal(2, resultArray.Length);
+            Assert.Equal("foo", resultArray[0]);
+            Assert.Equal("fizz", resultArray[1]);
+        }
+
+        [Fact]
+        public void SelectProjectionTest()
+        {
+            var runtime = new LillispRuntime();
+
+            var prog = new StringBuilder();
+
+            prog.AppendLine("(use 'System.Collections.Generic)");
+            prog.AppendLine("(use 'System.Linq)");
+            prog.AppendLine("(define mylist (new (List String)))");
+            prog.AppendLine("(.Add mylist \"foo\")");
+            prog.AppendLine("(.Add mylist \"bar\")");
+            prog.AppendLine("(.ToArray (from i in mylist select (.ToUpper i)))");
+
+            var result = runtime.EvaluateProgram(prog.ToString());
+
+            var resultArray = result as object[];
+            Assert.NotNull(resultArray);
+
+            Assert.Equal(2, resultArray.Length);
+            Assert.Equal("FOO", resultArray[0]);
+            Assert.Equal("BAR", resultArray[1]);
         }
     }
 }

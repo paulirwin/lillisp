@@ -74,6 +74,11 @@ namespace Lillisp.Core
             Env[key] = value;
         }
 
+        public void DefineOrSet(string key, object? value)
+        {
+            Env[key] = value;
+        }
+
         public void Set(string key, object? value)
         {
             var scope = this;

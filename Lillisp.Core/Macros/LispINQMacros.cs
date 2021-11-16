@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace Lillisp.Core.Macros
 {
@@ -17,7 +17,7 @@ namespace Lillisp.Core.Macros
             var alias = aliasSymbol.Value;
             var source = runtime.Evaluate(childScope, args[2]);
 
-            if (source is not IEnumerable enumerable)
+            if (source is not IEnumerable<object?> enumerable)
             {
                 throw new InvalidOperationException("Source must be enumerable");
             }
@@ -37,8 +37,14 @@ namespace Lillisp.Core.Macros
                     }
                     else
                     {
-                        throw new NotImplementedException("Projections are not yet supported");
+                        enumerable = Select(runtime, scope, enumerable, alias, projection);
                     }
+                }
+                else if (next is Symbol { Value: "where" })
+                {
+                    var condition = args[++i];
+
+                    enumerable = Where(runtime, scope, enumerable, alias, condition);
                 }
                 else
                 {
@@ -47,6 +53,37 @@ namespace Lillisp.Core.Macros
             }
 
             return enumerable;
+        }
+
+        private static IEnumerable<object?> Select(LillispRuntime runtime, 
+            Scope scope, IEnumerable<object?> enumerable, string alias, object? projection)
+        {
+            var childScope = scope.CreateChildScope();
+
+            foreach (var item in enumerable)
+            {
+                childScope.DefineOrSet(alias, item);
+
+                yield return runtime.Evaluate(childScope, projection);
+            }
+        }
+
+        private static IEnumerable<object?> Where(LillispRuntime runtime, 
+            Scope scope, IEnumerable<object?> enumerable, string alias, object? condition)
+        {
+            var childScope = scope.CreateChildScope();
+            
+            foreach (var item in enumerable)
+            {
+                childScope.DefineOrSet(alias, item);
+
+                var conditionResult = runtime.Evaluate(childScope, condition);
+
+                if (conditionResult.IsTruthy())
+                {
+                    yield return item;
+                }
+            }
         }
     }
 }
