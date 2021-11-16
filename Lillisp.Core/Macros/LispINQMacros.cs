@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lillisp.Core.Macros
 {
@@ -46,6 +47,37 @@ namespace Lillisp.Core.Macros
 
                     enumerable = Where(runtime, scope, enumerable, alias, condition);
                 }
+                else if (next is Symbol { Value: "orderby" })
+                {
+                    var selector = args[++i];
+                    bool desc = false;
+                    
+                    if (args.Length > i + 2 && args[i + 1] is Symbol { Value: "desc" })
+                    {
+                        desc = true;
+                        i++;
+                    }
+
+                    enumerable = OrderBy(runtime, scope, enumerable, alias, selector, desc);
+                }
+                else if (next is Symbol { Value: "thenby" })
+                {
+                    var selector = args[++i];
+                    bool desc = false;
+
+                    if (args.Length > i + 2 && args[i + 1] is Symbol { Value: "desc" })
+                    {
+                        desc = true;
+                        i++;
+                    }
+
+                    if (enumerable is not IOrderedEnumerable<object?> orderedEnumerable)
+                    {
+                        throw new InvalidOperationException("thenby must be used on an (IOrderedEnumerable Object). Did you forget to call 'orderby'?");
+                    }
+
+                    enumerable = ThenBy(runtime, scope, orderedEnumerable, alias, selector, desc);
+                }
                 else
                 {
                     throw new NotImplementedException("LispINQ operator not yet implemented");
@@ -53,6 +85,56 @@ namespace Lillisp.Core.Macros
             }
 
             return enumerable;
+        }
+
+        private static IEnumerable<object?> OrderBy(LillispRuntime runtime, 
+            Scope scope, IEnumerable<object?> enumerable, string alias, object? selector, bool desc)
+        {
+            var childScope = scope.CreateChildScope();
+
+            if (!desc)
+            {
+                return enumerable
+                    .OrderBy(i =>
+                    {
+                        childScope.DefineOrSet(alias, i);
+                        return runtime.Evaluate(childScope, selector);
+                    });
+            }
+            else
+            {
+                return enumerable
+                    .OrderByDescending(i =>
+                    {
+                        childScope.DefineOrSet(alias, i);
+                        return runtime.Evaluate(childScope, selector);
+                    });
+            }
+        }
+
+        private static IEnumerable<object?> ThenBy(LillispRuntime runtime,
+            Scope scope, IOrderedEnumerable<object?> enumerable, string alias, object? selector, bool desc)
+        {
+            var childScope = scope.CreateChildScope();
+
+            if (!desc)
+            {
+                return enumerable
+                    .ThenBy(i =>
+                    {
+                        childScope.DefineOrSet(alias, i);
+                        return runtime.Evaluate(childScope, selector);
+                    });
+            }
+            else
+            {
+                return enumerable
+                    .ThenByDescending(i =>
+                    {
+                        childScope.DefineOrSet(alias, i);
+                        return runtime.Evaluate(childScope, selector);
+                    });
+            }
         }
 
         private static IEnumerable<object?> Select(LillispRuntime runtime, 
