@@ -3,6 +3,7 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using Antlr4.Runtime;
 using Lillisp.Core;
 
@@ -54,7 +55,30 @@ namespace Lillisp
                 Console.Write("Lillisp> ");
                 Console.ForegroundColor = ConsoleColor.White;
 
-                string? input = Console.ReadLine();
+                var sb = new StringBuilder();
+
+                while (true)
+                {
+                    var key = Console.ReadKey();
+
+                    if (key.Modifiers.HasFlag(ConsoleModifiers.Shift) && key.Key == ConsoleKey.Enter)
+                    {
+                        sb.Append(Environment.NewLine);
+                        Console.WriteLine();
+                        Console.Write(".......> ");
+                    }
+                    else if (key.Key == ConsoleKey.Enter)
+                    {
+                        Console.WriteLine();
+                        break;
+                    }
+                    else
+                    {
+                        sb.Append(key.KeyChar);
+                    }
+                }
+
+                string? input = sb.ToString();
 
                 if (input == null)
                 {
