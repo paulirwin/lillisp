@@ -11,6 +11,11 @@ namespace Lillisp.Core.Macros
 {
     public static class EmitMacros
     {
+        private static MethodInfo appendString = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(string) })!;
+        private static MethodInfo appendChar = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(char) })!;
+        private static MethodInfo appendObject = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(object) })!;
+        private static MethodInfo objectToString = typeof(object).GetMethod(nameof(object.ToString), Type.EmptyTypes)!;
+
         public static object? DefineRecord(LillispRuntime runtime, Scope scope, object?[] args)
         {
             if (args.Length == 0)
@@ -41,12 +46,11 @@ namespace Lillisp.Core.Macros
 
             GenerateConstructor(type, props);
 
-            //var equalityContract = GenerateEqualityContractProperty(type);
+            var equalityContract = GenerateEqualityContractProperty(type);
 
-            var appendString = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(string) })!;
-            var appendChar = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(char) })!;
+            var printMembers = GeneratePrintMembersMethod(type, props);
             
-            GenerateToStringMethod(recordName, type, appendString, appendChar);
+            GenerateToStringMethod(recordName, type, printMembers);
 
             var newType = type.CreateType();
 
@@ -55,7 +59,62 @@ namespace Lillisp.Core.Macros
             return newType;
         }
 
-        private static void GenerateToStringMethod(Symbol recordName, TypeBuilder type, MethodInfo appendString, MethodInfo appendChar)
+        private static MethodBuilder GeneratePrintMembersMethod(TypeBuilder type, IList<DynamicPropertyInfo> props)
+        {
+            var printMembers = type.DefineMethod("PrintMembers", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot, CallingConventions.HasThis, typeof(bool), new[] { typeof(StringBuilder) });
+            printMembers.DefineParameter(1, ParameterAttributes.None, "builder");
+
+            var gen = printMembers.GetILGenerator();
+            
+            var valueTypes = props.Select(i => i.PropertyType).Where(i => i.IsValueType).ToList();
+
+            foreach (var valueType in valueTypes)
+            {
+                gen.DeclareLocal(valueType);
+            }
+
+            gen.Emit(OpCodes.Call, typeof(RuntimeHelpers).GetMethod(nameof(RuntimeHelpers.EnsureSufficientExecutionStack), Type.EmptyTypes)!);
+
+            bool isFirst = true;
+
+            foreach (var prop in props)
+            {
+                gen.Emit(OpCodes.Ldarg_1); // builder
+                gen.Emit(OpCodes.Ldstr, $"{(isFirst ? "" : ", ")}{prop.Name} = ");
+                gen.Emit(OpCodes.Callvirt, appendString);
+                gen.Emit(OpCodes.Pop);
+
+                gen.Emit(OpCodes.Ldarg_1); // builder
+                gen.Emit(OpCodes.Ldarg_0); // this
+                gen.Emit(OpCodes.Call, prop.Getter);
+
+                int valueTypeIndex = valueTypes.IndexOf(prop.PropertyType);
+
+                if (valueTypeIndex >= 0)
+                {
+                    gen.Emit(OpCodes.Stloc_S, valueTypeIndex); // store value type to local
+                    gen.Emit(OpCodes.Ldloca_S, valueTypeIndex); // load address as managed pointer to local
+                    gen.Emit(OpCodes.Constrained, prop.PropertyType); // constrain value type to virtual call site type, or box
+                    gen.Emit(OpCodes.Callvirt, objectToString); // call Object.ToString() on constrained/boxed value
+                    gen.Emit(OpCodes.Callvirt, appendString);
+                }
+                else
+                {
+                    gen.Emit(OpCodes.Callvirt, appendObject); // reference type, no need to constrain/box, can just call the Object overload
+                }
+
+                gen.Emit(OpCodes.Pop);
+
+                isFirst = false;
+            }
+
+            gen.Emit(OpCodes.Ldc_I4_1);
+            gen.Emit(OpCodes.Ret);
+
+            return printMembers;
+        }
+
+        private static void GenerateToStringMethod(Symbol recordName, TypeBuilder type, MethodInfo printMembers)
         {
             var toString = type.DefineMethod(nameof(object.ToString), MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual, CallingConventions.HasThis, typeof(string), Type.EmptyTypes);
             var gen = toString.GetILGenerator();
@@ -72,27 +131,26 @@ namespace Lillisp.Core.Macros
             gen.Emit(OpCodes.Ldstr, " { ");
             gen.Emit(OpCodes.Callvirt, appendString);
             gen.Emit(OpCodes.Pop);
-            
-            // TODO: implement PrintMembers method
-            //gen.Emit(OpCodes.Ldarg_0); // this
-            //gen.Emit(OpCodes.Ldloc_0); // sb
-            //gen.Emit(OpCodes.Callvirt, printMembers);
 
-            //var falseLabel = gen.DefineLabel();
+            gen.Emit(OpCodes.Ldarg_0); // this
+            gen.Emit(OpCodes.Ldloc_0); // sb
+            gen.Emit(OpCodes.Callvirt, printMembers);
 
-            //gen.Emit(OpCodes.Brfalse_S, falseLabel);
-            //gen.Emit(OpCodes.Ldloc_0); // sb
-            //gen.Emit(OpCodes.Ldc_I4_S, 32); // 0x20, ' '
-            //gen.Emit(OpCodes.Callvirt, appendChar);
-            //gen.Emit(OpCodes.Pop);
+            var falseLabel = gen.DefineLabel();
 
-            //gen.MarkLabel(falseLabel);
+            gen.Emit(OpCodes.Brfalse_S, falseLabel);
+            gen.Emit(OpCodes.Ldloc_0); // sb
+            gen.Emit(OpCodes.Ldc_I4_S, 32); // 0x20, ' '
+            gen.Emit(OpCodes.Callvirt, appendChar);
+            gen.Emit(OpCodes.Pop);
+
+            gen.MarkLabel(falseLabel);
             gen.Emit(OpCodes.Ldloc_0); // sb
             gen.Emit(OpCodes.Ldc_I4_S, 125); // 0x7d, '}'
             gen.Emit(OpCodes.Callvirt, appendChar);
             gen.Emit(OpCodes.Pop);
             gen.Emit(OpCodes.Ldloc_0); // sb
-            gen.Emit(OpCodes.Callvirt, typeof(object).GetMethod(nameof(object.ToString), Type.EmptyTypes)!);
+            gen.Emit(OpCodes.Callvirt, objectToString);
             gen.Emit(OpCodes.Ret);
         }
 
@@ -113,7 +171,7 @@ namespace Lillisp.Core.Macros
 
             setter = type.DefineMethod($"set_{name}", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName, CallingConventions.HasThis, null, new[] { propertyType });
             setter.SetCustomAttribute(new CustomAttributeBuilder(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes)!, new object?[0]));
-            setter.DefineParameter(0, ParameterAttributes.None, "value");
+            setter.DefineParameter(1, ParameterAttributes.None, "value");
 
             gen = setter.GetILGenerator();
 
@@ -176,7 +234,7 @@ namespace Lillisp.Core.Macros
 
             for (int i = 0; i < props.Count; i++)
             {
-                ctor.DefineParameter(i, ParameterAttributes.None, props[i].Name);
+                ctor.DefineParameter(i + 1, ParameterAttributes.None, props[i].Name);
             }
 
             var ctorGenerator = ctor.GetILGenerator();
