@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +21,12 @@ namespace Lillisp.Core.Macros
 
             if (source is not IEnumerable<object?> enumerable)
             {
-                throw new InvalidOperationException("Source must be enumerable");
+                if (source is not IEnumerable nonGenericEnumerable)
+                {
+                    throw new InvalidOperationException("Source must be enumerable");
+                }
+
+                enumerable = nonGenericEnumerable.Cast<object?>();
             }
 
             for (int i = 3; i < args.Length; i++)

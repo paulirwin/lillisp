@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 
 namespace Lillisp.Core
 {
@@ -21,6 +22,8 @@ namespace Lillisp.Core
         public ISet<string> InteropNamespaces { get; }
 
         public Procedure? ExceptionHandler { get; set; }
+
+        public AssemblyBuilder? AssemblyBuilder { get; set; }
 
         public IDictionary<string, object?> Env { get; } = new Dictionary<string, object?>();
 

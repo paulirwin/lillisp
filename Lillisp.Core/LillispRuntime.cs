@@ -34,6 +34,7 @@ namespace Lillisp.Core
             ["cond"] = CoreMacros.Cond,
             ["def"] = CoreMacros.Define,
             ["define"] = CoreMacros.Define,
+            ["defrecord"] = EmitMacros.DefineRecord,
             ["defun"] = CoreMacros.Defun,
             ["delay"] = CoreMacros.Delay,
             ["display"] = PortMacros.Display,
