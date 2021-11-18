@@ -66,7 +66,7 @@ namespace Lillisp.Core.Macros
 
             var gen = printMembers.GetILGenerator();
             
-            var valueTypes = props.Select(i => i.PropertyType).Where(i => i.IsValueType).ToList();
+            var valueTypes = props.Select(i => i.PropertyType).Where(i => i.IsValueType).Distinct().ToList();
 
             foreach (var valueType in valueTypes)
             {
