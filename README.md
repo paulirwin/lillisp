@@ -252,3 +252,73 @@ Common Lillisp to .NET type mappings:
 | constant string | `System.String` |
 | mutable string (i.e. with `(make-string)`) | `System.Text.StringBuilder` |
 
+## Creating Types
+
+C#-like "record" types can be defined with the `defrecord` function. 
+Note that these are true .NET class types, and are not to be confused with Scheme records.
+
+The `defrecord` form is: `(defrecord TypeName *properties)`
+
+`*properties` is one or more property definitions. A property definition is either of the form `Name` (for an `object`-typed property) or `(Name Type)` where `Type` is a .NET type name.
+
+Example: `(defrecord Customer (Id Int32) (Name String))`
+
+Each property is generated on the new record type with a private backing field, and a constructor parameter in the order specified. 
+Properties without a type specified will be of type `System.Object`.
+
+In addition, a `ToString` implementation is generated, along with equality members. Two records with the same values will not be `eq?` (aka reference equals)
+but will be `eqv?` (aka value-wise equivalent).
+
+Records are IL-emitted at runtime, when the type is defined. This means they are real .NET types, and so you can create a `(List Customer)` that is strongly-generic-typed to the newly-created `Customer` type.
+
+```lisp
+Lillisp> (defrecord Customer (Id Int32) (Name String) (Balance Double))
+-> Customer
+Lillisp> (new Customer 123 "Foo Bar" 2021.11)
+-> Customer { Id = 123, Name = Foo Bar, Balance = 2021.11 }
+Lillisp> (def c (new Customer 234 "Fizz Buzz" 123.45))
+-> c
+Lillisp> (.Id c)
+-> 234
+Lillisp> (.Name c)
+-> "Fizz Buzz"
+Lillisp> (def c2 (new Customer 234 "Fizz Buzz" 123.45))
+-> c2
+Lillisp> (eq? c c2)
+-> False
+Lillisp> (eqv? c c2)
+-> True
+```
+
+## LispINQ
+
+Work has started on adding a LINQ-like syntax to Lillisp, called LispINQ. Currently `from`, `where`, `orderby`, `thenby`, and `select` are supported to some degree.
+
+This is probably best expressed with an example:
+
+```lisp
+Lillisp> (defrecord Customer (Id Int32) (Name String))
+-> Customer
+Lillisp> (use 'System.Linq)
+-> ()
+Lillisp> (use 'System.Collections.Generic)
+-> ()
+Lillisp> (def mylist (new (List Customer)))
+-> mylist
+Lillisp> (.Add mylist (new Customer 123 "Foo Bar"))
+-> null
+Lillisp> (.Add mylist (new Customer 234 "Fizz Buzz"))
+-> null
+Lillisp> (.Add mylist (new Customer 345 "Buzz Lightyear"))
+-> null
+Lillisp> (.ToArray (from i in mylist where (.StartsWith (.Name i) "F") orderby (.Id i) desc select (.Id i)))
+-> (234 123)
+Lillisp> (.ToArray (from i in mylist where (eqv? (% (.Id i) 2) 1) orderby (.Id i) desc select (.Id i)))
+-> (345 123)
+```
+
+Note that the example above also makes use of dynamic dispatch of extension methods, with the `.ToArray` call. 
+And as you can see in the last line, you can mix and match Lillisp expressions with .NET interop in LispINQ expressions.
+
+Unlike C#, to add an additional `orderby` clause, you'll add a `thenby` for any subsequent ordering expressions.
+e.g.: `(from i in mylist orderby (.Name i) thenby (.Id i) desc select i)`. Also note that LispINQ uses `desc` to indicate descending, while C# uses `descending`.
