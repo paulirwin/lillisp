@@ -297,6 +297,27 @@ namespace Lillisp.Core.Expressions
             return Encoding.UTF8.GetString(slice.ToByteArray());
         }
 
+        public static object? IsFinite(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("finite? requires one argument");
+            }
+
+            if (args[0].IsInteger() || args[0] is decimal or Rational)
+            {
+                return true;
+            }
+
+            return args[0] switch
+            {
+                Complex complex => complex.Real.IsFinite() && complex.Imaginary.IsFinite(),
+                float f => f.IsFinite(),
+                double d => d.IsFinite(),
+                _ => throw new InvalidOperationException("Not sure how to determine if this is finite")
+            };
+        }
+
         public static object? IsExactInteger(object?[] args)
         {
             if (args.Length != 1)
@@ -305,6 +326,27 @@ namespace Lillisp.Core.Expressions
             }
 
             return args[0] is int or uint or long or ulong or short or ushort or byte or sbyte or BigInteger;
+        }
+
+        public static object? IsInfinite(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("infinite? requires one argument");
+            }
+
+            if (args[0].IsInteger() || args[0] is decimal or Rational)
+            {
+                return false;
+            }
+
+            return args[0] switch
+            {
+                Complex complex => complex.Real.IsInfinite() || complex.Imaginary.IsInfinite(),
+                float f => f.IsInfinite(),
+                double d => d.IsInfinite(),
+                _ => throw new InvalidOperationException("Not sure how to determine if this is infinite")
+            };
         }
 
         public static object? IsExact(object?[] args)

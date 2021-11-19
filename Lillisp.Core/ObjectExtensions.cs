@@ -72,5 +72,13 @@ namespace Lillisp.Core
         || (value is decimal de && Math.Truncate(de) == de);
 
         public static bool IsUnsignedNumber(this object? value) => value is ulong or uint or ushort or byte;
+
+        public static bool IsFinite(this float value) => value != float.PositiveInfinity && value != float.NegativeInfinity;
+
+        public static bool IsFinite(this double value) => value != double.PositiveInfinity && value != double.NegativeInfinity;
+
+        public static bool IsInfinite(this float value) => value is float.PositiveInfinity or float.NegativeInfinity;
+
+        public static bool IsInfinite(this double value) => value is double.PositiveInfinity or double.NegativeInfinity;
     }
 }
