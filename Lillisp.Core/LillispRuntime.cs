@@ -33,6 +33,7 @@ namespace Lillisp.Core
             ["begin"] = CoreMacros.Begin,
             ["cond"] = CoreMacros.Cond,
             ["def"] = CoreMacros.Define,
+            ["defenum"] = EmitMacros.DefineEnum,
             ["define"] = CoreMacros.Define,
             ["defrecord"] = EmitMacros.DefineRecord,
             ["defun"] = CoreMacros.Defun,

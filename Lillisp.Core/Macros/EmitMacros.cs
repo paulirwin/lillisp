@@ -28,11 +28,7 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("defrecord's first argument must be the record name");
             }
 
-            var assy = scope.AssemblyBuilder ?? AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("Lillisp.User"), AssemblyBuilderAccess.RunAndCollect);
-
-            var module = assy.DefineDynamicModule(Guid.NewGuid().ToString("N"));
-
-            var type = module.DefineType(recordName.Value, TypeAttributes.Public | TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AutoLayout | TypeAttributes.AnsiClass);
+            var type = CreateTypeBuilder(scope, recordName.Value, TypeAttributes.Public | TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AutoLayout | TypeAttributes.AnsiClass);
 
             var equatable = typeof(IEquatable<>).MakeGenericType(type);
             type.AddInterfaceImplementation(equatable);
@@ -57,12 +53,61 @@ namespace Lillisp.Core.Macros
             GenerateInequalityOperator(type, opEquality);
 
             var printMembers = GeneratePrintMembersMethod(type, props);
-            
+
             GenerateToStringMethod(recordName, type, printMembers);
-            
+
             var newType = type.CreateType();
 
             scope.Define(recordName.Value, newType);
+
+            return newType;
+        }
+
+        private static TypeBuilder CreateTypeBuilder(Scope scope, string typeName, TypeAttributes attributes, Type? parent = null)
+        {
+            var module = CreateModuleBuilder(scope);
+
+            return module.DefineType(typeName, attributes, parent);
+        }
+
+        private static ModuleBuilder CreateModuleBuilder(Scope scope)
+        {
+            var assy = scope.AssemblyBuilder ?? AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("Lillisp.User"), AssemblyBuilderAccess.RunAndCollect);
+
+            return assy.DefineDynamicModule(Guid.NewGuid().ToString("N"));
+        }
+
+        public static object? DefineEnum(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                throw new ArgumentException("defenum requires at least one argument");
+            }
+
+            if (args[0] is not Symbol enumName)
+            {
+                throw new ArgumentException("defenum's first argument must be the record name");
+            }
+
+            var module = CreateModuleBuilder(scope);
+
+            var type = module.DefineEnum(enumName.Value, TypeAttributes.Public, typeof(int));
+
+            int value = 0;
+
+            foreach (var arg in args.Skip(1))
+            {
+                if (arg is not Symbol argSymbol)
+                {
+                    throw new InvalidOperationException("Field definitions must be a symbol");
+                }
+
+                type.DefineLiteral(argSymbol.Value, value++);
+            }
+
+            var newType = type.CreateType();
+
+            scope.Define(enumName.Value, newType);
 
             return newType;
         }
