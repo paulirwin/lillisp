@@ -20,8 +20,8 @@ namespace Lillisp.Core
         /// they are not intended to mean the same thing. Here, macros are .NET functions that have access
         /// to the runtime, the current environment, and the AST of the expression. Therefore, they have
         /// the power to conditionally choose not to evaluate code, manipulate the environment (scope), or
-        /// otherwise cause mayhem. Regular expressions, on the other hand, can only operate with their
-        /// already- evaluated inputs. Ideally, most functions would be implemented as expressions rather
+        /// otherwise cause mayhem. Normal expressions, on the other hand, can only operate with their
+        /// already-evaluated inputs. Ideally, most functions would be implemented as expressions rather
         /// than macros, unless access to the runtime, AST, or environment is needed.
         /// </remarks>
         private static readonly IReadOnlyDictionary<string, MacroExpression> _systemMacros = new Dictionary<string, MacroExpression>
@@ -138,6 +138,8 @@ namespace Lillisp.Core
             ["error-object?"] = ExceptionExpressions.ErrorObject,
             ["error-object-irritants"] = ExceptionExpressions.ErrorObjectIrritants,
             ["error-object-message"] = ExceptionExpressions.ErrorObjectMessage,
+            ["exact?"] = TypeExpressions.IsExact,
+            ["exact-integer?"] = TypeExpressions.IsExactInteger,
             ["file-error?"] = ExceptionExpressions.FileError,
             ["file-exists?"] = FileExpressions.FileExists,
             ["force"] = DynamicExpressions.Force,
@@ -148,6 +150,7 @@ namespace Lillisp.Core
             ["get-output-string"] = PortExpressions.GetOutputString,
             ["imag-part"] = ComplexExpressions.ImaginaryPart,
             ["inc"] = MathExpressions.Increment,
+            ["inexact?"] = TypeExpressions.IsInexact,
             ["input-port?"] = PortExpressions.IsInputPort,
             ["input-port-open?"] = PortExpressions.IsInputPortOpen,
             ["integer?"] = TypeExpressions.IsInteger,

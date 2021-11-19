@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Rationals;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -293,6 +295,36 @@ namespace Lillisp.Core.Expressions
 
             // TODO: reduce extra allocations here
             return Encoding.UTF8.GetString(slice.ToByteArray());
+        }
+
+        public static object? IsExactInteger(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("exact? requires one argument");
+            }
+
+            return args[0] is int or uint or long or ulong or short or ushort or byte or sbyte or BigInteger;
+        }
+
+        public static object? IsExact(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("exact? requires one argument");
+            }
+
+            return args[0] is int or uint or long or ulong or short or ushort or byte or sbyte or decimal or BigInteger or Rational;
+        }
+
+        public static object? IsInexact(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("inexact? requires one argument");
+            }
+
+            return args[0] is float or double or Complex;
         }
 
         public static object? StringToUtf8(object?[] args)
