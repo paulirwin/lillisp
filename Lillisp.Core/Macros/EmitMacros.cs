@@ -34,8 +34,8 @@ namespace Lillisp.Core.Macros
 
             var type = module.DefineType(recordName.Value, TypeAttributes.Public | TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AutoLayout | TypeAttributes.AnsiClass);
 
-            //var equatable = typeof(IEquatable<>).MakeGenericType(type);
-            //type.AddInterfaceImplementation(equatable);
+            var equatable = typeof(IEquatable<>).MakeGenericType(type);
+            type.AddInterfaceImplementation(equatable);
 
             var props = new List<DynamicPropertyInfo>();
 
@@ -48,15 +48,158 @@ namespace Lillisp.Core.Macros
 
             var equalityContract = GenerateEqualityContractProperty(type);
 
+            var equatableEquals = GenerateIEquatableEqualsMethod(type, equalityContract, props);
+
+            GenerateEqualsOverrideMethod(type, equatableEquals);
+
+            var opEquality = GenerateEqualityOperator(type, equatableEquals);
+
+            GenerateInequalityOperator(type, opEquality);
+
             var printMembers = GeneratePrintMembersMethod(type, props);
             
             GenerateToStringMethod(recordName, type, printMembers);
-
+            
             var newType = type.CreateType();
 
             scope.Define(recordName.Value, newType);
 
             return newType;
+        }
+
+        private static void GenerateInequalityOperator(TypeBuilder type, MethodBuilder opEquality)
+        {
+            var op = type.DefineMethod("op_Inequality", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Static | MethodAttributes.SpecialName, CallingConventions.Standard, typeof(bool), new Type[] { type, type });
+            op.DefineParameter(1, ParameterAttributes.None, "left");
+            op.DefineParameter(2, ParameterAttributes.None, "right");
+
+            var gen = op.GetILGenerator();
+
+            gen.Emit(OpCodes.Ldarg_0); // left
+            gen.Emit(OpCodes.Ldarg_1); // right
+            gen.Emit(OpCodes.Call, opEquality);
+            gen.Emit(OpCodes.Ldc_I4_0);
+            gen.Emit(OpCodes.Ceq);
+            gen.Emit(OpCodes.Ret);
+        }
+
+        private static void GenerateEqualsOverrideMethod(TypeBuilder type, MethodBuilder equatableEquals)
+        {
+            var objectEquals = typeof(object).GetMethod(nameof(object.Equals), BindingFlags.Public | BindingFlags.Instance);
+            var equals = type.DefineMethod("Equals", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual, CallingConventions.HasThis, typeof(bool), new[] { typeof(object) });
+            equals.DefineParameter(1, ParameterAttributes.None, "obj");
+
+            var gen = equals.GetILGenerator();
+
+            gen.Emit(OpCodes.Ldarg_0); // this
+            gen.Emit(OpCodes.Ldarg_1); // obj
+            gen.Emit(OpCodes.Isinst, type);
+            gen.Emit(OpCodes.Callvirt, equatableEquals);
+            gen.Emit(OpCodes.Ret);
+        }
+
+        private static MethodBuilder GenerateIEquatableEqualsMethod(TypeBuilder type, PropertyInfo equalityContract, IList<DynamicPropertyInfo> props)
+        {
+            var equatableEquals = type.DefineMethod(nameof(IEquatable<object>.Equals), MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot, CallingConventions.HasThis, typeof(bool), new Type[] { type });
+            equatableEquals.DefineParameter(1, ParameterAttributes.None, "other");
+
+            var gen = equatableEquals.GetILGenerator();
+
+            var trueLabel = gen.DefineLabel();
+            var falseLabel = gen.DefineLabel();
+            var branchToRetLabel = gen.DefineLabel();
+            var retLabel = gen.DefineLabel();
+
+            gen.Emit(OpCodes.Ldarg_0); // this
+            gen.Emit(OpCodes.Ldarg_1); // other
+            gen.Emit(OpCodes.Beq, trueLabel);
+
+            gen.Emit(OpCodes.Ldarg_1); // other
+            gen.Emit(OpCodes.Brfalse, falseLabel);
+
+            gen.Emit(OpCodes.Ldarg_0); // this
+            gen.Emit(OpCodes.Callvirt, equalityContract.GetMethod!);
+            gen.Emit(OpCodes.Ldarg_1); // other
+            gen.Emit(OpCodes.Callvirt, equalityContract.GetMethod!);
+
+            var typeOpEquality = typeof(Type).GetMethod("op_Equality", new[] { typeof(Type), typeof(Type) });
+            gen.Emit(OpCodes.Call, typeOpEquality!);
+            gen.Emit(OpCodes.Brfalse, falseLabel);
+
+            bool first = true;
+
+            foreach (var prop in props)
+            {
+                var eqComparer = typeof(EqualityComparer<>).MakeGenericType(prop.PropertyType);
+                var eqDefault = eqComparer.GetProperty(nameof(EqualityComparer<object>.Default), BindingFlags.Public | BindingFlags.Static);
+                var eqEquals = eqComparer.GetMethod(nameof(EqualityComparer<object>.Equals), BindingFlags.Public | BindingFlags.Instance, new[] { prop.PropertyType, prop.PropertyType });
+
+                if (!first)
+                    gen.Emit(OpCodes.Brfalse_S, falseLabel);
+
+                gen.Emit(OpCodes.Call, eqDefault!.GetGetMethod()!);
+                gen.Emit(OpCodes.Ldarg_0); // this
+                gen.Emit(OpCodes.Ldfld, prop.BackingField);
+                gen.Emit(OpCodes.Ldarg_1); // other
+                gen.Emit(OpCodes.Ldfld, prop.BackingField);
+                gen.Emit(OpCodes.Callvirt, eqEquals!);                
+
+                first = false;
+            }
+
+            gen.Emit(OpCodes.Br_S, branchToRetLabel);
+            
+            gen.MarkLabel(falseLabel);
+            gen.Emit(OpCodes.Ldc_I4_0);
+            
+            gen.MarkLabel(branchToRetLabel);
+            gen.Emit(OpCodes.Br_S, retLabel);
+            
+            gen.MarkLabel(trueLabel);
+            gen.Emit(OpCodes.Ldc_I4_1);
+            
+            gen.MarkLabel(retLabel);
+            gen.Emit(OpCodes.Ret);
+
+            return equatableEquals;
+        }
+
+        private static MethodBuilder GenerateEqualityOperator(TypeBuilder type, MethodInfo equatableEquals)
+        {
+            var op = type.DefineMethod("op_Equality", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Static | MethodAttributes.SpecialName, CallingConventions.Standard, typeof(bool), new Type[] { type, type });
+            op.DefineParameter(1, ParameterAttributes.None, "left");
+            op.DefineParameter(2, ParameterAttributes.None, "right");
+
+            var gen = op.GetILGenerator();
+
+            var trueLabel = gen.DefineLabel();
+            var falseLabel = gen.DefineLabel();
+            var branchToRetLabel = gen.DefineLabel();
+            var retLabel = gen.DefineLabel();
+
+            gen.Emit(OpCodes.Ldarg_0); // left
+            gen.Emit(OpCodes.Ldarg_1); // right
+            gen.Emit(OpCodes.Beq_S, trueLabel);
+            gen.Emit(OpCodes.Ldarg_0); // left
+            gen.Emit(OpCodes.Brfalse_S, falseLabel);
+            gen.Emit(OpCodes.Ldarg_0); // left
+            gen.Emit(OpCodes.Ldarg_1); // right
+            gen.Emit(OpCodes.Callvirt, equatableEquals);
+            gen.Emit(OpCodes.Br_S, branchToRetLabel);
+
+            gen.MarkLabel(falseLabel);
+            gen.Emit(OpCodes.Ldc_I4_0);
+
+            gen.MarkLabel(branchToRetLabel);
+            gen.Emit(OpCodes.Br_S, retLabel);
+
+            gen.MarkLabel(trueLabel);
+            gen.Emit(OpCodes.Ldc_I4_1);
+
+            gen.MarkLabel(retLabel);
+            gen.Emit(OpCodes.Ret);
+
+            return op;
         }
 
         private static MethodBuilder GeneratePrintMembersMethod(TypeBuilder type, IList<DynamicPropertyInfo> props)
@@ -187,13 +330,15 @@ namespace Lillisp.Core.Macros
         {
             var equalityContract = type.DefineProperty("EqualityContract", PropertyAttributes.None, typeof(Type), Type.EmptyTypes);
             
-            var getter = type.DefineMethod("get_EqualityContract", MethodAttributes.Family | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot | MethodAttributes.SpecialName, CallingConventions.HasThis);
+            var getter = type.DefineMethod("get_EqualityContract", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.NewSlot | MethodAttributes.SpecialName, CallingConventions.HasThis, typeof(Type), Type.EmptyTypes);
             getter.SetCustomAttribute(new CustomAttributeBuilder(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes)!, new object?[0]));
+
+            var getTypeFromHandle = typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), BindingFlags.Public | BindingFlags.Static, new[] { typeof(RuntimeTypeHandle) })!;
 
             var gen = getter.GetILGenerator();
 
             gen.Emit(OpCodes.Ldtoken, type);
-            gen.Emit(OpCodes.Call, typeof(Type).GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) })!);
+            gen.Emit(OpCodes.Call, getTypeFromHandle);
             gen.Emit(OpCodes.Ret);
 
             equalityContract.SetGetMethod(getter);
