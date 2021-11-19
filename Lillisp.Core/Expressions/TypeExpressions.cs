@@ -349,6 +349,22 @@ namespace Lillisp.Core.Expressions
             };
         }
 
+        internal static object? IsNaN(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("nan? requires one argument");
+            }
+
+            return args[0] switch
+            {
+                Complex c => double.IsNaN(c.Real) || double.IsNaN(c.Imaginary),
+                double d => double.IsNaN(d),
+                float f => float.IsNaN(f),
+                _ => false
+            };
+        }
+
         public static object? IsExact(object?[] args)
         {
             if (args.Length != 1)

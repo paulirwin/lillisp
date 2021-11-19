@@ -29,5 +29,15 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("(nan? +nan.0)", true)]
+        [InlineData("(nan? 32)", false)]
+        [InlineData("(nan? +nan.0+5.0i)", true)]
+        [InlineData("(nan? 1+2i)", false)]
+        [Theory]
+        public void NanTests(string input, bool expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }

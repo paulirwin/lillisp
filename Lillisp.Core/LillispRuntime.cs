@@ -172,6 +172,7 @@ namespace Lillisp.Core
             ["make-vector"] = VectorExpressions.MakeVector,
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
+            ["nan?"] = TypeExpressions.IsNaN,
             ["not"] = BooleanExpressions.Not,
             ["null?"] = TypeExpressions.IsNull,
             ["numerator"] = RationalExpressions.Numerator,
