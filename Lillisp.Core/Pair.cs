@@ -94,6 +94,8 @@ namespace Lillisp.Core
             return GetEnumerator();
         }
 
+        public static Pair CastPair<T>(object car, object cdr) => new Pair(Convert.ChangeType(car, typeof(T)), Convert.ChangeType(cdr, typeof(T)));
+
         private class PairEnumerator : IEnumerator<object?>
         {
             private readonly Pair _startPair;

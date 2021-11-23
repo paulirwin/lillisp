@@ -12,29 +12,14 @@ namespace Lillisp.Core.Expressions
         {
             if (args.Length == 0)
             {
-                throw new ArgumentException("+ requires at least one argument");
+                return 0;
             }
 
             dynamic sum = args[0] ?? throw new NullReferenceException("Cannot apply + to null");
 
             if (args.Length == 1)
             {
-                // make positive as unary operator
-                // NOTE: dynamic dispatch doesn't seem to work with pattern matching for "< 0", so checking all signed numeric types
-                return sum switch
-                {
-                    Complex complex => complex.Real < 0 ? new Complex(-1 * complex.Real, complex.Imaginary) : complex, // TODO: I have no idea if this is correct
-                    BigInteger bi => bi < 0 ? -1 * bi : bi,
-                    Rational r => r < 0 ? -1 * r : r,
-                    sbyte sb => sb < 0 ? -1 * sb : sb,
-                    short s => s < 0 ? -1 * s : s,
-                    int i => i < 0 ? -1 * i : i,
-                    long l => l < 0 ? -1 * l : l,
-                    float f => f < 0 ? -1 * f : f,
-                    double d => d < 0 ? -1 * d : d,
-                    decimal d => d < 0 ? -1 * d : d,
-                    _ => sum
-                };
+                return args[0];
             }
 
             for (int i = 1; i < args.Length; i++)
@@ -69,14 +54,14 @@ namespace Lillisp.Core.Expressions
 
         public static dynamic? Multiply(dynamic?[] args)
         {
-            if (args.Length < 2)
+            if (args.Length == 0)
             {
-                throw new ArgumentException("* requires at least two arguments");
+                return 1;
             }
 
-            var result = args[0];
+            var result = 1;
 
-            for (int i = 1; i < args.Length; i++)
+            for (int i = 0; i < args.Length; i++)
             {
                 result *= args[i];
             }
@@ -301,6 +286,140 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
+        public static object? FloorDivide(object?[] args)
+        {
+            if (args.Length != 2 || args[0] is null)
+            {
+                throw new ArgumentException("floor/ requires two arguments");
+            }
+
+            if (args[1] is null or 0)
+            {
+                throw new ArgumentException("floor/'s second argument must not be null/zero");
+            }
+
+            return IntegerDivide(args, Math.Floor, Math.Floor);
+        }
+
+        public static object? FloorQuotient(object?[] args)
+        {
+            if (args.Length != 2 || args[0] is null)
+            {
+                throw new ArgumentException("floor-quotient requires two arguments");
+            }
+
+            if (args[1] is null or 0)
+            {
+                throw new ArgumentException("floor-quotient's second argument must not be null/zero");
+            }
+
+            var result = IntegerDivide(args, Math.Floor, Math.Floor);
+
+            return result.Car;
+        }
+
+        public static object? FloorRemainder(object?[] args)
+        {
+            if (args.Length != 2 || args[0] is null)
+            {
+                throw new ArgumentException("floor-remainder requires two arguments");
+            }
+
+            if (args[1] is null or 0)
+            {
+                throw new ArgumentException("floor-remainder's second argument must not be null/zero");
+            }
+
+            var result = IntegerDivide(args, Math.Floor, Math.Floor);
+
+            return result.Cdr;
+        }
+
+        public static object? TruncateDivide(object?[] args)
+        {
+            if (args.Length != 2 || args[0] is null)
+            {
+                throw new ArgumentException("truncate/ requires two arguments");
+            }
+
+            if (args[1] is null or 0)
+            {
+                throw new ArgumentException("truncate/'s second argument must not be null/zero");
+            }
+
+            return IntegerDivide(args, Math.Truncate, Math.Truncate);
+        }
+
+        private static Pair IntegerDivide(object?[] args, Func<decimal, decimal> decimalFunc, Func<double, double> doubleFunc)
+        {
+            if (args[0] is decimal d1 && args[1] is decimal d2)
+            {
+                var dResult = d1 / d2;
+                var dQuotient = decimalFunc(dResult);
+                var dRemainder = d1 - (d2 * dQuotient);
+
+                return new Pair(dQuotient, dRemainder);
+            }
+
+            var numerator = Convert.ToDouble(args[0]);
+            var denominator = Convert.ToDouble(args[1]);
+
+            var result = numerator / denominator;
+
+            var quotient = doubleFunc(result);
+            var remainder = numerator - (denominator * quotient);
+
+            return (args[0], args[1]) switch
+            {
+                (double, _) or (_, double) => new Pair(quotient, remainder),
+                (float, _) or (_, float) => Pair.CastPair<float>(quotient, remainder),
+                (BigInteger, _) or (_, BigInteger) => Pair.CastPair<BigInteger>(quotient, remainder),
+                (long, _) or (_, long) => Pair.CastPair<long>(quotient, remainder),
+                (ulong, _) or (_, ulong) => Pair.CastPair<ulong>(quotient, remainder),
+                (int, _) or (_, int) => Pair.CastPair<int>(quotient, remainder),
+                (uint, _) or (_, uint) => Pair.CastPair<uint>(quotient, remainder),
+                (short, _) or (_, short) => Pair.CastPair<short>(quotient, remainder),
+                (ushort, _) or (_, ushort) => Pair.CastPair<ushort>(quotient, remainder),
+                (sbyte, _) or (_, sbyte) => Pair.CastPair<sbyte>(quotient, remainder),
+                (byte, _) or (_, byte) => Pair.CastPair<byte>(quotient, remainder),
+                _ => Pair.CastPair<int>(quotient, remainder)
+            };
+        }
+
+        public static object? TruncateQuotient(object?[] args)
+        {
+            if (args.Length != 2 || args[0] is null)
+            {
+                throw new ArgumentException("truncate-quotient requires two arguments");
+            }
+
+            if (args[1] is null or 0)
+            {
+                throw new ArgumentException("truncate-quotient's second argument must not be null/zero");
+            }
+
+            var result = IntegerDivide(args, Math.Truncate, Math.Truncate);
+
+            return result.Car;
+        }
+
+        public static object? TruncateRemainder(object?[] args)
+        {
+            if (args.Length != 2 || args[0] is null)
+            {
+                throw new ArgumentException("truncate-remainder requires two arguments");
+            }
+
+            if (args[1] is null or 0)
+            {
+                throw new ArgumentException("truncate-remainder's second argument must not be null/zero");
+            }
+
+            var result = IntegerDivide(args, Math.Truncate, Math.Truncate);
+
+            return result.Cdr;
+        }
+
         public static object? Ln(object?[] args)
         {
             if (args.Length != 1)
@@ -368,5 +487,6 @@ namespace Lillisp.Core.Expressions
 
             return args[0] + 1;
         }
+
     }
 }

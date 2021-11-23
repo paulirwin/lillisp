@@ -10,14 +10,79 @@ namespace Lillisp.Tests
         [InlineData("(+ -1 3)", 2)]
         [InlineData("(+ 4 -1.5)", 2.5)]
         [InlineData("(+ 2 4 6)", 12)]
+        [InlineData("(+ 3)", 3)]
+        [InlineData("(+)", 0)]
         [Theory]
         public void AddTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
+            TestHelper.DefaultTest(input, expected);
+        }
 
-            var result = runtime.EvaluateProgram(input);
+        [InlineData("(* 3 4)", 12)]
+        [InlineData("(* 4)", 4)]
+        [InlineData("(*)", 1)]
+        [Theory]
+        public void MultiplyTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
 
-            Assert.Equal(expected, result);
+        [InlineData("(- 3 4)", -1)]
+        [InlineData("(- 3 4 5)", -6)]
+        [InlineData("(- 3)", -3)]
+        [Theory]
+        public void SubtractTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(abs -7)", 7)]
+        [Theory]
+        public void AbsTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(car (floor/ 5 2))", 2)]
+        [InlineData("(cdr (floor/ 5 2))", 1)]
+        [InlineData("(car (floor/ -5 2))", -3)]
+        [InlineData("(cdr (floor/ -5 2))", 1)]
+        [InlineData("(car (floor/ 5 -2))", -3)]
+        [InlineData("(cdr (floor/ 5 -2))", -1)]
+        [InlineData("(car (floor/ -5 -2))", 2)]
+        [InlineData("(cdr (floor/ -5 -2))", -1)]
+        [InlineData("(car (truncate/ 5 2))", 2)]
+        [InlineData("(cdr (truncate/ 5 2))", 1)]
+        [InlineData("(car (truncate/ -5 2))", -2)]
+        [InlineData("(cdr (truncate/ -5 2))", -1)]
+        [InlineData("(car (truncate/ 5 -2))", -2)]
+        [InlineData("(cdr (truncate/ 5 -2))", 1)]
+        [InlineData("(car (truncate/ -5 -2))", 2)]
+        [InlineData("(cdr (truncate/ -5 -2))", -1)]
+        [InlineData("(car (truncate/ -5.0 -2))", 2.0)]
+        [InlineData("(cdr (truncate/ -5.0 -2))", -1.0)]
+        [InlineData("(floor-quotient 5 2)", 2)]
+        [InlineData("(floor-quotient -5 2)", -3)]
+        [InlineData("(floor-quotient 5 -2)", -3)]
+        [InlineData("(floor-quotient -5 -2)", 2)]
+        [InlineData("(floor-remainder 5 2)", 1)]
+        [InlineData("(floor-remainder -5 2)", 1)]
+        [InlineData("(floor-remainder 5 -2)", -1)]
+        [InlineData("(floor-remainder -5 -2)", -1)]
+        [InlineData("(truncate-quotient 5 2)", 2)]
+        [InlineData("(truncate-quotient -5 2)", -2)]
+        [InlineData("(truncate-quotient 5 -2)", -2)]
+        [InlineData("(truncate-quotient -5 -2)", 2)]
+        [InlineData("(truncate-quotient -5.0 -2)", 2.0)]
+        [InlineData("(truncate-remainder 5 2)", 1)]
+        [InlineData("(truncate-remainder -5 2)", -1)]
+        [InlineData("(truncate-remainder 5 -2)", 1)]
+        [InlineData("(truncate-remainder -5 -2)", -1)]
+        [InlineData("(truncate-remainder -5.0 -2)", -1.0)]
+        [Theory]
+        public void FloorTruncateTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(sqrt 25)", 5)]
@@ -25,11 +90,7 @@ namespace Lillisp.Tests
         [Theory]
         public void SqrtTests(string input, double expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(>> 42 2)", 10)]
@@ -39,11 +100,7 @@ namespace Lillisp.Tests
         [Theory]
         public void ShiftTests(string input, int expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(log 1000)", 3d)]
