@@ -85,6 +85,17 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
+        [InlineData("(gcd 32 -36)", 4)]
+        [InlineData("(gcd)", 0)]
+        [InlineData("(lcm 32 -36)", 288)]
+        [InlineData("(lcm 32.0 -36)", 288.0)]
+        [InlineData("(lcm)", 1)]
+        [Theory]
+        public void GcdLcmTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
         [InlineData("(sqrt 25)", 5)]
         [InlineData("(sqrt (+ 2 2))", 2)]
         [Theory]

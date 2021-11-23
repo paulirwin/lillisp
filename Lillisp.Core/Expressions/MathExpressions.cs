@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Rationals;
 
@@ -299,6 +301,91 @@ namespace Lillisp.Core.Expressions
             }
 
             return IntegerDivide(args, Math.Floor, Math.Floor);
+        }
+
+        public static object? Gcd(object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                return 0;
+            }
+
+            static object? GcdAggregate(object? n1, object? n2) => (n1, n2) switch
+            {
+                (null, _) or (_, null) => null,
+                (BigInteger, _) or (_, BigInteger) => BigInteger.GreatestCommonDivisor((BigInteger)n1, (BigInteger)n2),
+                (long, _) or (_, long) => GcdInternal((long)n1, (long)n2),
+                (ulong, _) or (_, ulong) => GcdInternal((ulong)n1, (ulong)n2),
+                (uint, _) or (_, uint) => GcdInternal((uint)n1, (uint)n2),
+                _ => GcdInternal((int)n1, (int)n2)
+            };
+
+            return args.Aggregate(GcdAggregate);
+        }
+
+        private static long GcdInternal(long x, long y) => y == 0L ? Math.Abs(x) : GcdInternal(y, x % y);
+        private static ulong GcdInternal(ulong x, ulong y) => y == 0UL ? x : GcdInternal(y, x % y);
+        private static int GcdInternal(int x, int y) => y == 0 ? Math.Abs(x) : GcdInternal(y, x % y);
+        private static uint GcdInternal(uint x, uint y) => y == 0U ? x : GcdInternal(y, x % y);
+        private static double GcdInternal(double x, double y) => y == 0.0 ? Math.Abs(x) : GcdInternal(y, x % y);
+        private static float GcdInternal(float x, float y) => y == 0.0f ? Math.Abs(x) : GcdInternal(y, x % y);
+        private static decimal GcdInternal(decimal x, decimal y) => y == 0.0m ? Math.Abs(x) : GcdInternal(y, x % y);
+
+        private static readonly IList<Type> LcmTypePrecedence = new[]
+        {
+            typeof(double),
+            typeof(float),
+            typeof(decimal),
+            typeof(BigInteger),
+            typeof(ulong),
+            typeof(long),
+            typeof(uint),
+            typeof(int),
+        };
+
+        private static readonly int DefaultLcmTypePrecedence = LcmTypePrecedence.IndexOf(typeof(int));
+
+        public static object? Lcm(object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                return 1;
+            }
+
+            var resultType = typeof(int);
+            var resultTypePrecedence = DefaultLcmTypePrecedence;
+
+            foreach (var arg in args)
+            {
+                if (arg == null)
+                {
+                    return null;
+                }
+
+                var precedence = LcmTypePrecedence.IndexOf(arg.GetType());
+
+                if (precedence >= 0 && precedence < resultTypePrecedence)
+                {
+                    resultType = arg.GetType();
+                    resultTypePrecedence = precedence;
+                }
+            }
+
+            static object? LcmAggregate(object? n1, object? n2) => (n1, n2) switch
+            {
+                (null, _) or (_, null) => null,
+                (double a, double b) => Math.Abs(a / GcdInternal(a, b) * b),
+                (float a, float b) => Math.Abs(a / GcdInternal(a, b) * b),
+                (decimal a, decimal b) => Math.Abs(a / GcdInternal(a, b) * b),
+                (BigInteger a, BigInteger b) => a / BigInteger.GreatestCommonDivisor(a, b) * b,
+                (ulong a, ulong b) => a / GcdInternal(a, b) * b,
+                (long a, long b) => Math.Abs(a / GcdInternal(a, b) * b),
+                (uint a, uint b) => a / GcdInternal(a, b) * b,
+                (int a, int b) => Math.Abs(a / GcdInternal(a, b) * b),
+                _ => throw new NotImplementedException()
+            };
+
+            return args.Select(i => Convert.ChangeType(i, resultType)).Aggregate(LcmAggregate);
         }
 
         public static object? FloorQuotient(object?[] args)
