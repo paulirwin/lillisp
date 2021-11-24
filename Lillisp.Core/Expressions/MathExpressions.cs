@@ -71,21 +71,31 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
-        public static dynamic? Divide(dynamic?[] args)
+        public static object? Divide(object?[] args)
         {
-            if (args.Length < 2)
+            if (args.Length < 1 || args[0] == null)
             {
-                throw new ArgumentException("/ requires at least two arguments");
+                throw new ArgumentException("/ requires at least one argument");
             }
 
-            var result = args[0];
-
-            for (int i = 1; i < args.Length; i++)
+            if (args.Length == 1)
             {
-                result /= args[i];
+                return args[0] switch
+                {
+                    Rational r => (1 / r).CanonicalForm,
+                    Complex c => 1 / c,
+                    BigInteger or ulong or long or uint or int or ushort or short or sbyte or byte => new Rational(1, args[0]!.ToBigInteger()).CanonicalForm,
+                    decimal d => 1m / d,
+                    _ => 1.0 / (dynamic)args[0]!
+                };
             }
 
-            return result;
+            if (args.All(a => a.IsRationalNumber()))
+            {
+                return args.Select(a => a.ToRational()).Aggregate((result, next) => result / next).CanonicalForm;
+            }
+
+            return args.Cast<dynamic>().Aggregate((result, next) => result / next);
         }
 
         public static dynamic? Modulo(dynamic?[] args)

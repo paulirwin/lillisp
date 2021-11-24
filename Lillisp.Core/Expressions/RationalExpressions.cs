@@ -8,9 +8,9 @@ namespace Lillisp.Core.Expressions
     {
         public static object? Rationalize(object?[] args)
         {
-            if (args.Length != 2)
+            if (args.Length is 0 or > 2)
             {
-                throw new InvalidOperationException("rationalize requires two arguments");
+                throw new InvalidOperationException("rationalize requires one or two arguments");
             }
 
             if (args[0] is null)
@@ -30,9 +30,14 @@ namespace Lillisp.Core.Expressions
 
             var value = Convert.ToDouble(args[0]);
 
-            var y = Convert.ToDouble(args[1]);
+            double tolerance = 0;
 
-            return Rational.Approximate(value, y);
+            if (args.Length == 2)
+            {
+                tolerance = Convert.ToDouble(args[1]);
+            }
+
+            return Rational.Approximate(value, tolerance);
         }
 
         public static object? Numerator(object?[] args)

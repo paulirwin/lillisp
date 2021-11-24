@@ -36,6 +36,17 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
+        [InlineData("(str (/ 3 4 5))", "3/20")]
+        [InlineData("(str (/ 3))", "1/3")]
+        [InlineData("(/ 3.0 2)", 1.5)]
+        [InlineData("(/ 2.0)", 0.5)]
+        [InlineData("(str (/ 1/2 2))", "1/4")]
+        [Theory]
+        public void DivideTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
         [InlineData("(abs -7)", 7)]
         [Theory]
         public void AbsTests(string input, object expected)
@@ -92,6 +103,15 @@ namespace Lillisp.Tests
         [InlineData("(lcm)", 1)]
         [Theory]
         public void GcdLcmTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(str (numerator (/ 6 4)))", "3")]
+        [InlineData("(str (denominator (/ 6 4)))", "2")]
+        //[InlineData("(denominator (inexact (/ 6 4)))", 2.0)] // TODO: inexact function
+        [Theory]
+        public void NumeratorDenominatorTests(string input, object expected)
         {
             TestHelper.DefaultTest(input, expected);
         }

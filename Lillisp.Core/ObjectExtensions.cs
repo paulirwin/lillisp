@@ -80,5 +80,40 @@ namespace Lillisp.Core
         public static bool IsInfinite(this float value) => value is float.PositiveInfinity or float.NegativeInfinity;
 
         public static bool IsInfinite(this double value) => value is double.PositiveInfinity or double.NegativeInfinity;
+
+        public static BigInteger ToBigInteger(this object value)
+        {
+            return value switch
+            {
+                BigInteger bi => bi,
+                ulong ul => ul,
+                long l => l,
+                uint ui => ui,
+                int i => i,
+                ushort us => us,
+                short s => s,
+                sbyte sb => sb,
+                byte b => b,
+                _ => throw new InvalidOperationException("Value is not an integer type")
+            };
+        }
+
+        public static Rational ToRational(this object value)
+        {
+            return value switch
+            {
+                Rational r => r,
+                BigInteger bi => bi,
+                ulong ul => ul,
+                long l => l,
+                uint ui => ui,
+                int i => i,
+                ushort us => us,
+                short s => s,
+                sbyte sb => sb,
+                byte b => b,
+                _ => throw new InvalidOperationException("Value is not a rational type")
+            };
+        }
     }
 }
