@@ -39,5 +39,15 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("#b1111", 0b1111)]
+        [InlineData("#xabcd", 0xabcd)]
+        [InlineData("#o1234", 668)]
+        [InlineData("#d1234", 1234)]
+        [Theory]
+        public void RadixTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }

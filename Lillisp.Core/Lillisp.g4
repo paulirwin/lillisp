@@ -4,7 +4,7 @@ prog: form * EOF;
 
 form: atom | list | bytevector | vector | meta;
 
-atom: (number | STRING | symbol | CHARACTER);
+atom: (number | symbol | STRING | CHARACTER);
 
 list: '(' form* ')';
 
@@ -26,37 +26,60 @@ unquote: ',' form;
 
 comment_datum: '#;' form;
 
-symbol: OPERATOR | IDENTIFIER | ESCAPED_IDENTIFIER;
+number: prefixed_number | INTEGER | FLOAT | COMPLEX | RATIO | POS_INFINITY | NEG_INFINITY | NAN;
+
+prefixed_number: hex_prefixed | decimal_prefixed | octal_prefixed | binary_prefixed;
+
+hex_prefixed: HEX_PREFIXED_NUMBER;
+
+octal_prefixed: OCTAL_PREFIXED_NUMBER;
+
+binary_prefixed: BINARY_PREFIXED_NUMBER;
+
+decimal_prefixed: DECIMAL_PREFIX (INTEGER | FLOAT);
+
+symbol: DOT_LITERAL | BOOLEAN | IDENTIFIER | ESCAPED_IDENTIFIER;
+
+POS_INFINITY: '+inf.0';
+NEG_INFINITY: '-inf.0';
+NAN: '+nan.0' | '-nan.0';
+
+DOT_LITERAL: '.';
+
+HEX_PREFIXED_NUMBER: HEX_PREFIX HEX_DIGIT+;
+OCTAL_PREFIXED_NUMBER: OCTAL_PREFIX OCTAL_DIGIT+;
+BINARY_PREFIXED_NUMBER: BINARY_PREFIX BINARY_DIGIT+;
+
+INTEGER: NEGATE? DIGIT+;
+COMPLEX: ((NEGATE? (DIGIT | '.')+) | POS_INFINITY | NEG_INFINITY | NAN) ('+' | '-') ((DIGIT | '.')+ | 'inf.0' | 'nan.0') 'i';
+FLOAT: NEGATE? (DIGIT | '.')+ ('e' '-'? (DIGIT | '.')+)?;
+RATIO: NEGATE? DIGIT+ '/' DIGIT+;
+
+IDENTIFIER: (LETTER | SYMBOL_CHAR) (LETTER | DIGIT | SYMBOL_CHAR)*;
 
 CHARACTER: '#\\' ((LETTER | DIGIT | SYMBOL_CHAR)* | '(' | ')');
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 
-OPERATOR: SYMBOL_CHAR+;
+HEX_PREFIX: '#x';
+OCTAL_PREFIX: '#o';
+BINARY_PREFIX: '#b';
+DECIMAL_PREFIX: '#de' | '#di' | '#ed' | '#id' | '#d' | '#e' | '#i';
 
 ESCAPED_IDENTIFIER: '|' ( ~'|' | '\\' '|' )* '|';
 
-IDENTIFIER: (LETTER | DOT | HASH) (
-		LETTER
-		| DIGIT
-		| SYMBOL_CHAR
-	)*;
+BOOLEAN: '#t' | '#f';
 
-number: INTEGER | COMPLEX | FLOAT | RATIO | POS_INFINITY | NEG_INFINITY | NAN;
+HEX_DIGIT: '0'..'9' | 'a'..'f' | 'A'..'F';
+fragment DIGIT: '0'..'9';
+OCTAL_DIGIT: '0'..'7';
+BINARY_DIGIT: '0' | '1';
 
-INTEGER: NEGATE? (DIGIT)+;
-FLOAT: NEGATE? (DIGIT | '.')+ ('e' '-'? (DIGIT | '.')+)?;
-RATIO: NEGATE? DIGIT+ '/' DIGIT+;
-COMPLEX: ((NEGATE? (DIGIT | '.')+) | POS_INFINITY | NEG_INFINITY | NAN) ('+' | '-') ((DIGIT | '.')+ | 'inf.0' | 'nan.0') 'i';
-POS_INFINITY: '+inf.0';
-NEG_INFINITY: '-inf.0';
-NAN: '+nan.0' | '-nan.0';
+fragment LETTER: LOWER | UPPER;
+fragment LOWER: 'a'..'z';
+fragment UPPER: 'A'..'Z';
 
-LETTER: LOWER | UPPER;
-DIGIT: '0' ..'9';
-LOWER: 'a' ..'z';
-UPPER: 'A' ..'Z';
-SYMBOL_CHAR:
+fragment SYMBOL_CHAR:
 	'+'
 	| '-'
 	| '*'
@@ -76,19 +99,19 @@ SYMBOL_CHAR:
 	| '@'
 	| '~'
 	| '_';
-LPAREN: '(';
-RPAREN: ')';
-LBRACKET: '[';
-RBRACKET: ']';
-NEGATE: '-';
-UNDERSCORE: '_';
-QUOTE: '\'';
-DQUOTE: '"';
-COMMA: ',';
-BACKTICK: '`';
-ATSIGN: '@';
-DOT: '.';
-HASH: '#';
+fragment LPAREN: '(';
+fragment RPAREN: ')';
+fragment LBRACKET: '[';
+fragment RBRACKET: ']';
+fragment NEGATE: '-';
+fragment UNDERSCORE: '_';
+fragment QUOTE: '\'';
+fragment DQUOTE: '"';
+fragment COMMA: ',';
+fragment BACKTICK: '`';
+fragment ATSIGN: '@';
+fragment DOT: '.';
+fragment HASH: '#';
 
 BLOCK_COMMENT: '#|' .*? '|#' -> skip;
 

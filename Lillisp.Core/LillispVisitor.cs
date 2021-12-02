@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using Antlr4.Runtime.Tree;
 using Rationals;
 
 namespace Lillisp.Core
@@ -108,58 +109,7 @@ namespace Lillisp.Core
 
             if (number != null)
             {
-                var complex = number.COMPLEX();
-
-                if (complex != null)
-                {
-                    return ParseComplex(complex.GetText());
-                }
-
-                var ratio = number.RATIO();
-
-                if (ratio != null)
-                {
-                    return ParseRational(ratio.GetText());
-                }
-
-                var posInfinity = number.POS_INFINITY();
-
-                if (posInfinity != null)
-                {
-                    return new Atom(AtomType.Number, double.PositiveInfinity);
-                }
-
-                var negInfinity = number.NEG_INFINITY();
-
-                if (negInfinity != null)
-                {
-                    return new Atom(AtomType.Number, double.NegativeInfinity);
-                }
-
-                var nan = number.NAN();
-
-                if (nan != null)
-                {
-                    return new Atom(AtomType.Number, double.NaN);
-                }
-
-                var floatingPoint = number.FLOAT();
-
-                if (floatingPoint != null)
-                {
-                    double num = Convert.ToDouble(number.GetText());
-                    return new Atom(AtomType.Number, num);
-                }
-
-                var integer = number.INTEGER();
-
-                if (integer != null)
-                {
-                    int num = Convert.ToInt32(integer.GetText());
-                    return new Atom(AtomType.Number, num);
-                }
-
-                throw new NotImplementedException("Unknown number type");
+                return ParseNumber(number);
             }
 
             var str = context.STRING();
@@ -175,63 +125,252 @@ namespace Lillisp.Core
 
             if (symbol != null)
             {
-                var escapedSymbol = symbol.ESCAPED_IDENTIFIER();
-
-                if (escapedSymbol != null)
-                {
-                    var escapedText = symbol.GetText()[1..^1]; // exclude start and end bars
-                    var unescapedText = UnescapeString(escapedText);
-                    return new Symbol(unescapedText, escaped: true);
-                }
-                else
-                {
-                    var symbolText = symbol.GetText();
-
-                    return symbolText switch
-                    {
-                        "#t" or "#true" or "true" => new Atom(AtomType.Boolean, true),
-                        "#f" or "#false" or "false" => new Atom(AtomType.Boolean, false),
-                        _ => new Symbol(symbolText)
-                    };
-                }
+                return ParseSymbol(symbol);
             }
 
             var character = context.CHARACTER();
 
             if (character != null)
             {
-                var charText = character.GetText()[2..];
-                char c = charText.ToLowerInvariant() switch
-                {
-                    "" => ' ',
-                    "alarm" => '\u0007',
-                    "backspace" => '\u0008',
-                    "delete" => '\u007f',
-                    "escape" => '\u001b',
-                    "newline" => '\n',
-                    "null" => '\0',
-                    "return" => '\r',
-                    "space" => ' ',
-                    "tab" => '\t',
-                    _ => charText[0]
-                };
-
-                if (c == 'x' && charText.Length > 1)
-                {
-                    var hex = charText[1..];
-
-                    if (!ushort.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var hexCode))
-                    {
-                        throw new ArgumentException($"Invalid hex character escape: #\\{charText}");
-                    }
-
-                    c = (char)hexCode;
-                }
-
-                return new Atom(AtomType.Character, c);
+                return ParseCharacter(character);
             }
 
             throw new NotImplementedException("Unknown atom type");
+        }
+
+        private static Node ParseCharacter(ITerminalNode character)
+        {
+            var charText = character.GetText()[2..];
+            char c = charText.ToLowerInvariant() switch
+            {
+                "" => ' ',
+                "alarm" => '\u0007',
+                "backspace" => '\u0008',
+                "delete" => '\u007f',
+                "escape" => '\u001b',
+                "newline" => '\n',
+                "null" => '\0',
+                "return" => '\r',
+                "space" => ' ',
+                "tab" => '\t',
+                _ => charText[0]
+            };
+
+            if (c == 'x' && charText.Length > 1)
+            {
+                var hex = charText[1..];
+
+                if (!ushort.TryParse(hex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var hexCode))
+                {
+                    throw new ArgumentException($"Invalid hex character escape: #\\{charText}");
+                }
+
+                c = (char)hexCode;
+            }
+
+            return new Atom(AtomType.Character, c);
+        }
+
+        private static Node ParseSymbol(LillispParser.SymbolContext symbol)
+        {
+            var escapedSymbol = symbol.ESCAPED_IDENTIFIER();
+
+            if (escapedSymbol != null)
+            {
+                var escapedText = symbol.GetText()[1..^1]; // exclude start and end bars
+                var unescapedText = UnescapeString(escapedText);
+                return new Symbol(unescapedText, escaped: true);
+            }
+            else
+            {
+                var symbolText = symbol.GetText();
+
+                return symbolText switch
+                {
+                    "#t" or "#true" or "true" => new Atom(AtomType.Boolean, true),
+                    "#f" or "#false" or "false" => new Atom(AtomType.Boolean, false),
+                    _ => new Symbol(symbolText)
+                };
+            }
+        }
+
+        private static Node ParseNumber(LillispParser.NumberContext number)
+        {
+            var prefixedNumber = number.prefixed_number();
+
+            if (prefixedNumber != null)
+            {
+                return ParsePrefixedNumber(prefixedNumber);
+            }
+
+            var floatingPoint = number.FLOAT();
+
+            if (floatingPoint != null)
+            {
+                double num = Convert.ToDouble(floatingPoint.GetText());
+                return new Atom(AtomType.Number, num);
+            }
+
+            var integer = number.INTEGER();
+
+            if (integer != null)
+            {
+                int num = Convert.ToInt32(integer.GetText());
+                return new Atom(AtomType.Number, num);
+            }
+
+            var complex = number.COMPLEX();
+
+            if (complex != null)
+            {
+                return ParseComplex(complex.GetText());
+            }
+
+            var ratio = number.RATIO();
+
+            if (ratio != null)
+            {
+                return ParseRational(ratio.GetText());
+            }
+
+            var posInfinity = number.POS_INFINITY();
+
+            if (posInfinity != null)
+            {
+                return new Atom(AtomType.Number, double.PositiveInfinity);
+            }
+
+            var negInfinity = number.NEG_INFINITY();
+
+            if (negInfinity != null)
+            {
+                return new Atom(AtomType.Number, double.NegativeInfinity);
+            }
+
+            var nan = number.NAN();
+
+            if (nan != null)
+            {
+                return new Atom(AtomType.Number, double.NaN);
+            }
+
+            throw new NotImplementedException("Unknown number type");
+        }
+
+        private static Node ParsePrefixedNumber(LillispParser.Prefixed_numberContext prefixedNumber)
+        {
+            var binary = prefixedNumber.binary_prefixed();
+
+            if (binary != null)
+            {
+                return ParseBinaryNumber(binary);
+            }
+
+            var octal = prefixedNumber.octal_prefixed();
+
+            if (octal != null)
+            {
+                return ParseOctalNumber(octal);
+            }
+
+            var decimalNum = prefixedNumber.decimal_prefixed();
+
+            if (decimalNum != null)
+            {
+                return ParseDecimalNumber(decimalNum);
+            }
+
+            var hex = prefixedNumber.hex_prefixed();
+
+            if (hex != null)
+            {
+                return ParseHexNumber(hex);
+            }
+
+            throw new NotImplementedException("Unknown prefixed number type");
+        }
+
+        private static Node ParseHexNumber(LillispParser.Hex_prefixedContext hex)
+        {
+            var number = hex.GetText()[2..]; // trim off #x
+
+            int value = int.Parse(number, NumberStyles.HexNumber);
+
+            return new Atom(AtomType.Number, value);
+        }
+
+        private static bool? ParseExactPrefixDesignator(string prefixText)
+        {
+            if (prefixText.Contains('e'))
+            {
+                return true;
+            }
+            
+            if (prefixText.Contains('i'))
+            {
+                return false;
+            }
+
+            return null;
+        }
+
+        private static Node ParseDecimalNumber(LillispParser.Decimal_prefixedContext decimalNum)
+        {
+            var prefix = decimalNum.DECIMAL_PREFIX();
+            var prefixText = prefix.GetText().TrimStart('#');
+            bool? exact = ParseExactPrefixDesignator(prefixText);
+
+            var floatingPoint = decimalNum.FLOAT();
+
+            if (floatingPoint != null)
+            {
+                if (exact == true)
+                {
+                    decimal num = Convert.ToDecimal(floatingPoint.GetText());
+                    return new Atom(AtomType.Number, num);
+                }
+                else
+                {
+                    double num = Convert.ToDouble(floatingPoint.GetText());
+                    return new Atom(AtomType.Number, num);
+                }
+            }
+
+            var integer = decimalNum.INTEGER();
+
+            if (integer != null)
+            {
+                if (exact == false)
+                {
+                    double num = Convert.ToDouble(integer.GetText());
+                    return new Atom(AtomType.Number, num);
+                }
+                else
+                {
+                    int num = Convert.ToInt32(integer.GetText());
+                    return new Atom(AtomType.Number, num);
+                }
+            }
+
+            throw new NotImplementedException("Unknown prefixed decimal number type");
+        }
+
+        private static Node ParseOctalNumber(LillispParser.Octal_prefixedContext octal)
+        {
+            var number = octal.GetText()[2..]; // trim off #o
+
+            int value = Convert.ToInt32(number, 8);
+
+            return new Atom(AtomType.Number, value);
+        }
+
+        private static Node ParseBinaryNumber(LillispParser.Binary_prefixedContext binary)
+        {
+            var number = binary.GetText()[2..]; // trim off #b
+
+            int value = Convert.ToInt32(number, 2);
+
+            return new Atom(AtomType.Number, value);
         }
 
         private static Node ParseRational(string text)
