@@ -49,5 +49,18 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("#b1111_1111", 0b1111_1111)]
+        [InlineData("#o12_34", 668)]
+        [InlineData("#xab_cd", 0xabcd)]
+        [InlineData("#d1_000_000", 1_000_000)]
+        [InlineData("#d1_000_000.", 1_000_000.0)]
+        [InlineData("1_000_000", 1_000_000)]
+        [InlineData("1_000_000.250_111", 1_000_000.250_111)]
+        [Theory]
+        public void UnderscoreTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }

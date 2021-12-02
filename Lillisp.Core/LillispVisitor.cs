@@ -207,7 +207,7 @@ namespace Lillisp.Core
 
             if (floatingPoint != null)
             {
-                double num = Convert.ToDouble(floatingPoint.GetText());
+                double num = Convert.ToDouble(floatingPoint.GetText().Replace("_", ""));
                 return new Atom(AtomType.Number, num);
             }
 
@@ -215,7 +215,7 @@ namespace Lillisp.Core
 
             if (integer != null)
             {
-                int num = Convert.ToInt32(integer.GetText());
+                int num = Convert.ToInt32(integer.GetText().Replace("_", ""));
                 return new Atom(AtomType.Number, num);
             }
 
@@ -223,14 +223,14 @@ namespace Lillisp.Core
 
             if (complex != null)
             {
-                return ParseComplex(complex.GetText());
+                return ParseComplex(complex.GetText().Replace("_", ""));
             }
 
             var ratio = number.RATIO();
 
             if (ratio != null)
             {
-                return ParseRational(ratio.GetText());
+                return ParseRational(ratio.GetText().Replace("_", ""));
             }
 
             var posInfinity = number.POS_INFINITY();
@@ -292,7 +292,7 @@ namespace Lillisp.Core
 
         private static Node ParseHexNumber(LillispParser.Hex_prefixedContext hex)
         {
-            var number = hex.GetText()[2..]; // trim off #x
+            var number = hex.GetText()[2..].Replace("_", ""); // trim off #x
 
             int value = int.Parse(number, NumberStyles.HexNumber);
 
@@ -324,14 +324,16 @@ namespace Lillisp.Core
 
             if (floatingPoint != null)
             {
+                var floatText = floatingPoint.GetText().Replace("_", "");
+
                 if (exact == true)
                 {
-                    decimal num = Convert.ToDecimal(floatingPoint.GetText());
+                    decimal num = Convert.ToDecimal(floatText);
                     return new Atom(AtomType.Number, num);
                 }
                 else
                 {
-                    double num = Convert.ToDouble(floatingPoint.GetText());
+                    double num = Convert.ToDouble(floatText);
                     return new Atom(AtomType.Number, num);
                 }
             }
@@ -340,14 +342,16 @@ namespace Lillisp.Core
 
             if (integer != null)
             {
+                var intText = integer.GetText().Replace("_", "");
+
                 if (exact == false)
                 {
-                    double num = Convert.ToDouble(integer.GetText());
+                    double num = Convert.ToDouble(intText);
                     return new Atom(AtomType.Number, num);
                 }
                 else
                 {
-                    int num = Convert.ToInt32(integer.GetText());
+                    int num = Convert.ToInt32(intText);
                     return new Atom(AtomType.Number, num);
                 }
             }
@@ -357,7 +361,7 @@ namespace Lillisp.Core
 
         private static Node ParseOctalNumber(LillispParser.Octal_prefixedContext octal)
         {
-            var number = octal.GetText()[2..]; // trim off #o
+            var number = octal.GetText()[2..].Replace("_", ""); // trim off #o
 
             int value = Convert.ToInt32(number, 8);
 
@@ -366,7 +370,7 @@ namespace Lillisp.Core
 
         private static Node ParseBinaryNumber(LillispParser.Binary_prefixedContext binary)
         {
-            var number = binary.GetText()[2..]; // trim off #b
+            var number = binary.GetText()[2..].Replace("_", ""); // trim off #b
 
             int value = Convert.ToInt32(number, 2);
 
