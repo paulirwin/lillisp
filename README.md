@@ -287,6 +287,27 @@ Lillisp> (eqv? c c2)
 -> True
 ```
 
+You can also create .NET enum tyes with `defenum`. The first argument is the enum type name, followed by its values. Just like records, this is a real .NET enum type, dynamically IL-generated at runtime. 
+
+Example:
+
+```lisp
+Lillisp> (defenum Fruit Apple Banana Cranberry Date Elderberry)
+-> Fruit
+Lillisp> Fruit/Apple
+-> Apple
+Lillisp> (def myfruit Fruit/Apple)
+-> myfruit
+Lillisp> (str myfruit)
+-> "Apple"
+Lillisp> (eqv? myfruit Fruit/Apple)
+-> True
+Lillisp> (eqv? myfruit Fruit/Banana)
+-> False
+Lillisp> (Enum/GetValues Fruit)
+-> (Apple Banana Cranberry Date Elderberry)
+```
+
 ## LispINQ
 
 Work has started on adding a LINQ-like syntax to Lillisp, called LispINQ. Currently `from`, `where`, `orderby`, `thenby`, and `select` are supported to some degree.
