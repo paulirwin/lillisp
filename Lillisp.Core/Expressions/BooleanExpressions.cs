@@ -164,11 +164,11 @@ namespace Lillisp.Core.Expressions
                 throw new ArgumentException("At least one argument is not a number");
             }
 
-            dynamic first = args[0];
+            dynamic? first = args[0];
 
             for (int i = 1; i < args.Length; i++)
             {
-                dynamic arg = args[i];
+                dynamic? arg = args[i];
 
                 if (arg == null || !args[i].IsNumber())
                 {
