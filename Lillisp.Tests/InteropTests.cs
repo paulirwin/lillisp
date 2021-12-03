@@ -48,6 +48,24 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
+        [InlineData("(typeof (cast 1.0 Int32))", typeof(int))]
+        [InlineData("(typeof (cast #e1.0 Double))", typeof(double))]
+        [InlineData("(typeof (cast (numerator 3/4) Int32))", typeof(int))]
+        [Theory]
+        public void CastTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(typeof (convert 1.0 Int32))", typeof(int))]
+        [InlineData("(typeof (convert #e1.0 Double))", typeof(double))]
+        [InlineData("(typeof (convert 1 String))", typeof(string))]
+        [Theory]
+        public void ConvertTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
         [Fact]
         public void ExtensionMethodTest()
         {

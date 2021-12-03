@@ -31,26 +31,6 @@ namespace Lillisp.Core.Expressions
             return args[0].GetType();
         }
 
-        public static object? Cast(object?[] args)
-        {
-            if (args.Length != 2)
-            {
-                throw new ArgumentException("cast requires two arguments");
-            }
-
-            if (args[0] is null)
-            {
-                return null;
-            }
-
-            if (args[1] is not Type type)
-            {
-                throw new ArgumentException("Second parameter must be a Type");
-            }
-
-            return Convert.ChangeType(args[0], type);
-        }
-
         public static object? IsBoolean(object?[] args)
         {
             if (args.Length != 1)

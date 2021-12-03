@@ -13,14 +13,6 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
-        [InlineData("(typeof (cast 1.0 Int32))", typeof(int))]
-        [InlineData("(typeof (cast \"1\" Double)", typeof(double))]
-        [Theory]
-        public void CastTests(string input, Type expected)
-        {
-            TestHelper.DefaultTest(input, expected);
-        }
-
         [InlineData("(boolean? #t)", true)]
         [InlineData("(boolean? #f)", true)]
         [InlineData("(boolean? 0)", false)]
