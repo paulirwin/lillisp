@@ -152,6 +152,38 @@ namespace Lillisp.Core.Expressions
             return true;
         }
 
+        public static object? NumericallyEqual(object?[] args)
+        {
+            if (args.Length < 2)
+            {
+                throw new ArgumentException("= needs at least 2 arguments");
+            }
+
+            if (args[0] == null || !args[0].IsNumber())
+            {
+                throw new ArgumentException("At least one argument is not a number");
+            }
+
+            dynamic first = args[0];
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                dynamic arg = args[i];
+
+                if (arg == null || !args[i].IsNumber())
+                {
+                    throw new ArgumentException("At least one argument is not a number");
+                }
+
+                if (first != arg)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public static object? Equal(object?[] args)
         {
             if (args.Length < 2)

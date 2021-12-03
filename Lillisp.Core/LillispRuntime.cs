@@ -68,6 +68,7 @@ namespace Lillisp.Core
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
         {
+            ["="] = BooleanExpressions.NumericallyEqual,
             ["+"] = MathExpressions.Add,
             ["-"] = MathExpressions.Subtract,
             ["*"] = MathExpressions.Multiply,

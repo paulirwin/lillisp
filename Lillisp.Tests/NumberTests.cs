@@ -62,5 +62,18 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("(= 1 1)", true)]
+        [InlineData("(= 1 1 1)", true)]
+        [InlineData("(= 1.0 1.0)", true)]
+        [InlineData("(= #e1.0 #e1.0)", true)]
+        [InlineData("(= 1 2)", false)]
+        [InlineData("(= 1 1 2)", false)]
+        [InlineData("(= +nan.0 +nan.0)", false)]
+        [Theory]
+        public void NumericallyEqualTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }
