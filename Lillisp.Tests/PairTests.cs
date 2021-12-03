@@ -81,5 +81,15 @@ namespace Lillisp.Tests
             Assert.Equal(1, list.OfType<Atom>().ElementAt(0).Value);
             Assert.Equal(2, list.OfType<Atom>().ElementAt(1).Value);
         }
+
+        [InlineData("(car '(1 . 2))", 1)]
+        [InlineData("(cdr '(1 . 2))", 2)]
+        [InlineData("(equal? '(a . (b . (c . (d . (e . ()))))) '(a b c d e))", true)]
+        [InlineData("(equal? '(a . (b . (c . d))) '(a b c . d))", true)]
+        [Theory]
+        public void DottedPairTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }

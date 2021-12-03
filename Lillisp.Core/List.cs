@@ -27,5 +27,33 @@ namespace Lillisp.Core
 
             return (Node?)first ?? Nil.Value;
         }
+
+        public static Node ImproperListFromNodes(IEnumerable<object?> nodes)
+        {
+            Pair? list = null, current = null;
+
+            foreach (var node in nodes)
+            {
+                if (current == null)
+                {
+                    // first value
+                    current = new Pair(node, null);
+                    list = current;
+                }
+                else if (current.Cdr == null)
+                {
+                    // second value
+                    current.Cdr = node;
+                }
+                else 
+                {
+                    var p = new Pair(current.Cdr, node);
+                    current.Cdr = p;
+                    current = p;
+                }
+            }
+
+            return (Node?)list ?? Nil.Value;
+        }
     }
 }

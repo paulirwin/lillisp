@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -42,6 +43,11 @@ namespace Lillisp.Core
                 {
                     nodes.Add(childNode);
                 }
+            }
+
+            if (nodes.Count >= 3 && nodes[^2] is Symbol { Value: "." })
+            {
+                return List.ImproperListFromNodes(nodes.Take(nodes.Count - 2).Append(nodes[^1]));
             }
 
             return List.FromNodes(nodes);

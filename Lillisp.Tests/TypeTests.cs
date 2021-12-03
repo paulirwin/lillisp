@@ -114,6 +114,7 @@ namespace Lillisp.Tests
         [InlineData("(pair? #\\a)", false)]
         [InlineData("(pair? \"cat\")", false)]
         [InlineData("(pair? (lambda (x) x))", false)]
+        [InlineData("(pair? '(a . b))", true)]
         [InlineData("(pair? '(1 2 3))", true)]
         [InlineData("(pair? [1 2 3])", false)]
         [InlineData("(pair? '())", false)]

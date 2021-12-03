@@ -30,7 +30,7 @@ namespace Lillisp.Core
             {
                 childScope.Define(pSymbol.Value, args);
             }
-            else if (Parameters is Pair {IsList: true} parms)
+            else if (Parameters is Pair { IsList: true } parms)
             {
                 var list = parms.ToList();
 
@@ -41,20 +41,29 @@ namespace Lillisp.Core
                         throw new ArgumentException($"Unhandled parameter node type: {list[i].GetType()}");
                     }
 
-                    if (symbol.Value is ".")
+                    if (args.Length > i)
                     {
-                        if (list.Count > i + 2 || list.Count == i + 1)
-                        {
-                            throw new ArgumentException("One variable must follow the dot in lambda parameters");
-                        }
+                        var arg = args[i];
 
-                        if (list[i + 1] is not Symbol restSymbol)
-                        {
-                            throw new ArgumentException("Variable must follow the dot in lambda parameters");
-                        }
+                        childScope.Define(symbol.Value, arg);
+                    }
+                }
+            }
+            else if (Parameters is Pair { IsList: false } improperParms)
+            {
+                var list = improperParms.ToList();
 
-                        childScope.Define(restSymbol.Value, args.Skip(i).ToArray());
-                        
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list.ElementAt(i) is not Symbol symbol)
+                    {
+                        throw new ArgumentException($"Unhandled parameter node type: {list[i].GetType()}");
+                    }
+
+                    if (i == list.Count - 1)
+                    {
+                        childScope.Define(symbol.Value, args.Skip(i).ToArray());
+
                         break;
                     }
 
