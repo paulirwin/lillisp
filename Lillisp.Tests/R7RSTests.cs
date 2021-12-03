@@ -103,11 +103,49 @@ namespace Lillisp.Tests
         }
 
         [Fact]
+        public void R7RS_4_1_4_Lambda_Rest_Example_1_Define_Form()
+        {
+            var runtime = new LillispRuntime();
+
+            var prog = "(define (mylambda . x) x) (mylambda 3 4 5 6)";
+
+            var result = runtime.EvaluateProgram(prog);
+
+            Assert.IsAssignableFrom<IEnumerable<object>>(result);
+
+            var list = (result as IEnumerable<object>)!.ToList();
+
+            Assert.Equal(4, list.Count);
+            Assert.Equal(3, list[0]);
+            Assert.Equal(4, list[1]);
+            Assert.Equal(5, list[2]);
+            Assert.Equal(6, list[3]);
+        }
+
+        [Fact]
         public void R7RS_4_1_4_Lambda_Rest_Example_2()
         {
             var runtime = new LillispRuntime();
 
             var prog = "((lambda (x y . z) z) 3 4 5 6)";
+
+            var result = runtime.EvaluateProgram(prog);
+
+            Assert.IsAssignableFrom<IEnumerable<object>>(result);
+
+            var list = (result as IEnumerable<object>)!.ToList();
+
+            Assert.Equal(2, list.Count);
+            Assert.Equal(5, list[0]);
+            Assert.Equal(6, list[1]);
+        }
+
+        [Fact]
+        public void R7RS_4_1_4_Lambda_Rest_Example_2_Define_Form()
+        {
+            var runtime = new LillispRuntime();
+
+            var prog = "(define (mylambda x y . z) z) (mylambda 3 4 5 6)";
 
             var result = runtime.EvaluateProgram(prog);
 

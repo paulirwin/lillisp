@@ -105,18 +105,31 @@ namespace Lillisp.Core.Macros
                 return symbol;
             }
 
-            if (args[0] is Pair pair)
+            if (args[0] is Pair { IsList: true } list)
+            {
+                if (list.Car is not Symbol ps)
+                {
+                    throw new ArgumentException("The first item of define's first argument must be a symbol");
+                }
+
+                var lambdaArgs = list.Cdr is Pair cdrp
+                    ? cdrp
+                    : List.FromNodes(new [] { list.Cdr });
+
+                var lambda = Lambda(runtime, scope, new object?[] { lambdaArgs, args[1] });
+
+                scope.Define(ps.Value, lambda);
+
+                return ps;
+            }
+            else if (args[0] is Pair pair)
             {
                 if (pair.Car is not Symbol ps)
                 {
                     throw new ArgumentException("The first item of define's first argument must be a symbol");
                 }
 
-                var lambdaArgs = pair.Cdr is Pair cdrp
-                    ? cdrp
-                    : List.FromNodes(new [] { pair.Cdr });
-
-                var lambda = Lambda(runtime, scope, new object?[] { lambdaArgs, args[1] });
+                var lambda = Lambda(runtime, scope, new object?[] { pair.Cdr, args[1] });
 
                 scope.Define(ps.Value, lambda);
 
