@@ -53,7 +53,7 @@ The following command-line arguments are supported:
 Full docs coming at some point in the future. But it's basically a normal Lisp with mostly Scheme syntax. Check out LillispRuntime.cs and Library/core.lisp for built-in library methods.
 
 An incomplete list of features currently supported:
-* Data types: list, pair (partial support), vector, bytevector, number, boolean, character, string, symbol, nil, procedure
+* Data types: list, pair, vector, bytevector, number, boolean, character, string, symbol, nil, procedure
 * Number types: complex (rectangular `-3+2i` notation), real, rational (i.e. `3/8`), integer
 * Defining variables with `define` (aliased as `def`)
 * Mutating variables with `set!`
@@ -77,9 +77,6 @@ An incomplete list of features currently supported:
 Notable features not yet implemented from Scheme R7RS include:
 * Tail context for `and` and `or`
 * Macros
-* Dotted pairs
-* Inexact vs Exact number handling (limited to exact integer and inexact real (`System.Double`) literals currently)
-* Pipes
 * Libraries (as in, i.e. `import`)
 * Many base library methods, and other libraries
 
