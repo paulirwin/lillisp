@@ -306,6 +306,10 @@ Lillisp> (eqv? myfruit Fruit/Banana)
 -> False
 Lillisp> (Enum/GetValues Fruit)
 -> (Apple Banana Cranberry Date Elderberry)
+Lillisp> (cast 4 Fruit)
+-> Elderberry
+Lillisp> (cast Fruit/Cranberry Int32)
+-> 2
 ```
 
 ## LispINQ
