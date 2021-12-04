@@ -288,6 +288,7 @@ namespace Lillisp.Core
             // TODO: don't load all libraries by default, support `import`
             EvaluateLibraryResource("Lillisp.Core.Library.base.lisp");
             EvaluateLibraryResource("Lillisp.Core.Library.cxr.lisp");
+            EvaluateLibraryResource("Lillisp.Core.Library.inexact.lisp");
 
             _userScope = _globalScope.CreateChildScope();
         }

@@ -28,7 +28,7 @@ namespace Lillisp.Core
 
             if (Parameters is Symbol pSymbol)
             {
-                childScope.Define(pSymbol.Value, args);
+                childScope.Define(pSymbol.Value, List.FromNodes(args));
             }
             else if (Parameters is Pair { IsList: true } parms)
             {
@@ -62,7 +62,7 @@ namespace Lillisp.Core
 
                     if (i == list.Count - 1)
                     {
-                        childScope.Define(symbol.Value, args.Skip(i).ToArray());
+                        childScope.Define(symbol.Value, List.FromNodes(args.Skip(i)));
 
                         break;
                     }

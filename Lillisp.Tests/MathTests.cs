@@ -147,5 +147,22 @@ namespace Lillisp.Tests
             Assert.NotNull(result);
             Assert.Equal(expected, (double)result, 6);
         }
+
+        private const double eSquared = 7.3890560989306495;
+
+        [InlineData("(exp 1)", System.Math.E)]
+        [InlineData("(exp 2)", eSquared)]
+        [InlineData("(sin 0)", 0.0)]
+        [InlineData("(cos 0)", 1.0)]
+        [InlineData("(tan 0)", 0.0)]
+        [InlineData("(asin 0)", 0.0)]
+        [InlineData("(acos 1)", 0.0)]
+        [InlineData("(atan 0)", 0.0)]
+        [InlineData("(atan 0.5 0.5)", 0.78539816339744828)]
+        [Theory]
+        public void TranscendentalTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }
