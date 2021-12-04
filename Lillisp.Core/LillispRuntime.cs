@@ -23,6 +23,9 @@ namespace Lillisp.Core
         /// otherwise cause mayhem. Normal expressions, on the other hand, can only operate with their
         /// already-evaluated inputs. Ideally, most functions would be implemented as expressions rather
         /// than macros, unless access to the runtime, AST, or environment is needed.
+        /// 
+        /// Also note that "unquote" and "unquote-splicing" are implemented in LillispVisitor, as they
+        /// are special forms.
         /// </remarks>
         private static readonly IReadOnlyDictionary<string, MacroExpression> _systemMacros = new Dictionary<string, MacroExpression>
         {
@@ -53,6 +56,7 @@ namespace Lillisp.Core
             ["or"] = BooleanMacros.Or,
             ["parameterize"] = ParameterMacros.Parameterize,
             ["peek-char"] = PortMacros.PeekChar,
+            ["quasiquote"] = CoreMacros.Quasiquote,
             ["quote"] = CoreMacros.Quote,
             ["raise-continuable"] = ExceptionMacros.RaiseContinuable,
             ["read-bytevector"] = PortMacros.ReadBytevector,

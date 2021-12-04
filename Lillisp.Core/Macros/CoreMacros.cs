@@ -17,6 +17,16 @@ namespace Lillisp.Core.Macros
             return runtime.Evaluate(scope, new Quote(node));
         }
 
+        public static object? Quasiquote(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length == 0 || args[0] is not Node node)
+            {
+                throw new InvalidOperationException("quasiquote requires an argument");
+            }
+
+            return runtime.Evaluate(scope, new Quasiquote(node));
+        }
+
         public static object? Apply(LillispRuntime runtime, Scope scope, object?[] args)
         {
             if (args.Length < 2 || args[0] is not Node source || args[1] is not Node target)

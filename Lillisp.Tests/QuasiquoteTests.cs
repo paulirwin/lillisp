@@ -30,6 +30,29 @@ namespace Lillisp.Tests
         }
 
         [Fact]
+        public void BasicQuasiquoteSplicingTest_ProcedureForm()
+        {
+            var runtime = new LillispRuntime();
+
+            var result = runtime.EvaluateProgram("(quasiquote (+ (unquote-splicing (range 0 3))))") as Pair;
+
+            Assert.NotNull(result);
+
+            var resultList = result.ToList();
+
+            Assert.Equal(4, resultList.Count);
+
+            var sym = resultList[0] as Symbol;
+
+            Assert.NotNull(sym);
+            Assert.Equal("+", sym.Value);
+
+            Assert.Equal(0d, resultList[1]);
+            Assert.Equal(1d, resultList[2]);
+            Assert.Equal(2d, resultList[3]);
+        }
+
+        [Fact]
         public void BasicEvalTest()
         {
             var runtime = new LillispRuntime();
@@ -45,6 +68,18 @@ namespace Lillisp.Tests
             var runtime = new LillispRuntime();
 
             var program = "(define x 42)\n(eval `(define ,(string->symbol (string-append \"myvar\" (str x))) x))\nmyvar42";
+
+            var result = runtime.EvaluateProgram(program);
+
+            Assert.Equal(42, result);
+        }
+
+        [Fact]
+        public void EvalDefineTest_ProceduralForm()
+        {
+            var runtime = new LillispRuntime();
+
+            var program = "(define x 42)\n(eval (quasiquote (define (unquote (string->symbol (string-append \"myvar\" (str x)))) x)))\nmyvar42";
 
             var result = runtime.EvaluateProgram(program);
 

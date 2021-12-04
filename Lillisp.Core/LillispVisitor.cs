@@ -41,6 +41,20 @@ namespace Lillisp.Core
 
                 if (childNode != null)
                 {
+                    if (childNode is Symbol { Value: "unquote" or "unquote-splicing" } unquoteSym)
+                    {
+                        if (context.children.Count != 4) // ["(", "unquote" or "unquote-splicing", <some value>, ")"]
+                        {
+                            throw new ArgumentException("unquote or unquote-splicing procedural forms require exactly one argument");
+                        }
+
+                        var unquoteChild = context.children[2]; // <some value> above
+
+                        var node = Visit(unquoteChild);
+
+                        return new Unquote(node, unquoteSym.Value == "unquote-splicing");
+                    }
+
                     nodes.Add(childNode);
                 }
             }
