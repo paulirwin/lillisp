@@ -61,6 +61,7 @@ namespace Lillisp.Core
             ["read-string"] = PortMacros.ReadString,
             ["read-u8"] = PortMacros.ReadU8,
             ["set!"] = CoreMacros.Set,
+            ["unless"] = BooleanMacros.Unless,
             ["use"] = InteropMacros.Use,
             ["when"] = BooleanMacros.When,
             ["with-exception-handler"] = ExceptionMacros.WithExceptionHandler,

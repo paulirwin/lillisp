@@ -39,11 +39,7 @@ namespace Lillisp.Tests
         [Theory]
         public void ApplyTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
 
@@ -54,22 +50,14 @@ namespace Lillisp.Tests
         [Theory]
         public void IfTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(begin 4 2)", 2)]
         [Theory]
         public void BeginTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(begin (define x 10) (+ x 2))", 12)]
@@ -79,11 +67,7 @@ namespace Lillisp.Tests
         [Theory]
         public void DefineSetTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(begin (define (x y) (+ y y)) (x 3))", 6)]
@@ -91,11 +75,7 @@ namespace Lillisp.Tests
         [Theory]
         public void DefineLambdaFormTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("((lambda (x) (pow x 2)) 4)", 16d)]
@@ -104,22 +84,14 @@ namespace Lillisp.Tests
         [Theory]
         public void LambdaTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(begin (defun square (x) (pow x 2)) (square 4))", 16d)]
         [Theory]
         public void DefunTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(force (delay (+ 1 2)))", 3)]
@@ -127,11 +99,14 @@ namespace Lillisp.Tests
         [Theory]
         public void DelayTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
+            TestHelper.DefaultTest(input, expected);
+        }
 
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+        [InlineData("(unless (= 1 2.0) 1 2 3)", 3)]
+        [Theory]
+        public void UnlessTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
         }
     }
 }

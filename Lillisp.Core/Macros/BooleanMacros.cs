@@ -66,7 +66,33 @@ namespace Lillisp.Core.Macros
                 return Nil.Value;
             }
 
-            for (int i = 1; i < args.Length; i++)
+            result = EvaluateExpressionsWithTailCall(runtime, scope, args, 1, result);
+
+            return result;
+        }
+
+        public static object? Unless(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length < 2 || args[0] is not Node test)
+            {
+                throw new ArgumentException("unless requires at least a test and an expression argument");
+            }
+
+            var result = runtime.Evaluate(scope, test);
+
+            if (result.IsTruthy())
+            {
+                return Nil.Value;
+            }
+
+            result = EvaluateExpressionsWithTailCall(runtime, scope, args, 1, result);
+
+            return result;
+        }
+
+        private static object? EvaluateExpressionsWithTailCall(LillispRuntime runtime, Scope scope, object?[] args, int startArgIndex, object? result)
+        {
+            for (int i = startArgIndex; i < args.Length; i++)
             {
                 var arg = args[i];
 
