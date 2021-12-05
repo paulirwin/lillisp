@@ -423,5 +423,19 @@ namespace Lillisp.Core.Expressions
                 _ => throw new ArgumentException("string->symbol requires one string argument")
             };
         }
+
+        public static object? SymbolToString(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("symbol->string requires one symbol argument");
+            }
+
+            return args[0] switch
+            {
+                Symbol s => s.ToString(),
+                _ => throw new ArgumentException("symbol->string requires one symbol argument")
+            };
+        }
     }
 }

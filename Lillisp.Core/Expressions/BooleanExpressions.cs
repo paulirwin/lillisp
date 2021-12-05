@@ -218,5 +218,33 @@ namespace Lillisp.Core.Expressions
                 return obj?.GetHashCode() ?? 0;
             }
         }
+
+        public static object? SymbolEquals(object?[] args)
+        {
+            if (args.Length < 2)
+            {
+                throw new ArgumentException("symbol=? requires at least two arguments");
+            }
+
+            if (args[0] is not Symbol symbol)
+            {
+                throw new ArgumentException("At least one argument is not a symbol");
+            }
+
+            for (int i = 1; i < args.Length; i++)
+            {
+                if (args[i] is not Symbol symbol2)
+                {
+                    throw new ArgumentException("At least one argument is not a symbol");
+                }
+
+                if (!symbol.Equals(symbol2))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
