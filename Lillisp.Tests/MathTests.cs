@@ -164,5 +164,21 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("(floor 3.5)", 3.0)]
+        [InlineData("(ceiling 3.5)", 4.0)]
+        [InlineData("(truncate 3.5)", 3.0)]
+        [InlineData("(round 3.5)", 4.0)]
+        [InlineData("(floor -4.3)", -5.0)]
+        [InlineData("(ceiling -4.3)", -4.0)]
+        [InlineData("(truncate -4.3)", -4.0)]
+        [InlineData("(round -4.3)", -4.0)]
+        [InlineData("(round 7/2)", 4)]
+        [InlineData("(round 7)", 7)]
+        [Theory]
+        public void RoundingTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }

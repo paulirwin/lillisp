@@ -298,6 +298,74 @@ namespace Lillisp.Core.Expressions
             return result;
         }
 
+        public static object? Floor(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("floor requires one argument");
+            }
+
+            return args[0] switch
+            {
+                BigInteger or ulong or long or uint or int or ushort or short or sbyte or byte => args[0],
+                double d => Math.Floor(d),
+                decimal d => Math.Floor(d),
+                Rational r => (int)Math.Floor((decimal)r),
+                _ => Math.Floor(Convert.ToDouble(args[0]))
+            };
+        }
+
+        public static object? Ceiling(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("ceiling requires one argument");
+            }
+
+            return args[0] switch
+            {
+                BigInteger or ulong or long or uint or int or ushort or short or sbyte or byte => args[0],
+                double d => Math.Ceiling(d),
+                decimal d => Math.Ceiling(d),
+                Rational r => (int)Math.Ceiling((decimal)r),
+                _ => Math.Ceiling(Convert.ToDouble(args[0]))
+            };
+        }
+
+        public static object? Truncate(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("truncate requires one argument");
+            }
+
+            return args[0] switch
+            {
+                BigInteger or ulong or long or uint or int or ushort or short or sbyte or byte => args[0],
+                double d => Math.Truncate(d),
+                decimal d => Math.Truncate(d),
+                Rational r => (int)Math.Truncate((decimal)r),
+                _ => Math.Truncate(Convert.ToDouble(args[0]))
+            };
+        }
+
+        public static object? Round(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("round requires one argument");
+            }
+
+            return args[0] switch
+            {
+                BigInteger or ulong or long or uint or int or ushort or short or sbyte or byte => args[0],
+                double d => Math.Round(d),
+                decimal d => Math.Round(d),
+                Rational r => (int)Math.Round((decimal)r),
+                _ => Math.Round(Convert.ToDouble(args[0]))
+            };
+        }
+
         public static object? FloorDivide(object?[] args)
         {
             if (args.Length != 2 || args[0] is null)
