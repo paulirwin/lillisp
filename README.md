@@ -6,7 +6,7 @@ This repo contains the Lillisp core runtime (which includes the standard library
 
 ## What is Lillisp?
 
-Lillisp (prounounced "lill-isp", like "lilly") is a prototype Lisp-based language that is written in C# (with some library functions written in Lillisp itself) and runs on [.NET](https://dotnet.microsoft.com/). 
+Lillisp (prounounced "lill-isp", like "lillies") is a Lisp-based language that is written in C# (with some library functions written in Lillisp itself) and runs on [.NET](https://dotnet.microsoft.com/). 
 
 Currently, Lillisp can call some .NET code, but anything defined in it is not yet easily callable *from* .NET code. Lillisp can be used as a REPL, or you can specify a file to interpret. Compilation is on the roadmap but not yet supported.
 
@@ -71,6 +71,7 @@ An incomplete list of features currently supported:
 * Block-scoping variables with `let`
 * Rational number operations (`rationalize`, `numerator`/`denominator`, `simplify`)
 * Exceptions (`with-exception-handler`, `raise`, `error`, `raise-continuable`, etc.)
+* Record types with `define-record-type`
 * Almost all of the Scheme base library string-, vector-, port-, and bytevector-related functions
 * Almost all of the Scheme `char`, `complex`, `CxR`, and `lazy` library functions
 

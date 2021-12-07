@@ -38,6 +38,7 @@ namespace Lillisp.Core
             ["def"] = CoreMacros.Define,
             ["defenum"] = EmitMacros.DefineEnum,
             ["define"] = CoreMacros.Define,
+            ["define-record-type"] = CoreMacros.DefineRecordType,
             ["defrecord"] = EmitMacros.DefineRecord,
             ["defun"] = CoreMacros.Defun,
             ["delay"] = CoreMacros.Delay,

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Lillisp.Tests
 {
-    public class EnumTests
+    public class DotNetEnumTests
     {
         [Fact]
         public void BasicEnumTest()

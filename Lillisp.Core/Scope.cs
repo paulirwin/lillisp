@@ -25,6 +25,8 @@ namespace Lillisp.Core
 
         public AssemblyBuilder? AssemblyBuilder { get; set; }
 
+        public IDictionary<Symbol, RecordTypeDefinition> RecordTypes { get; } = new Dictionary<Symbol, RecordTypeDefinition>();
+
         public IDictionary<string, object?> Env { get; } = new Dictionary<string, object?>();
 
         public object? this[string key] => Resolve(key);
@@ -80,6 +82,11 @@ namespace Lillisp.Core
         public void DefineOrSet(string key, object? value)
         {
             Env[key] = value;
+        }
+
+        public void DefineRecordType(RecordTypeDefinition recordType)
+        {
+            RecordTypes[recordType.Name] = recordType;
         }
 
         public void Set(string key, object? value)

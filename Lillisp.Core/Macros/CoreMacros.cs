@@ -80,6 +80,183 @@ namespace Lillisp.Core.Macros
             return alt != null ? (alt is Pair altPair ? global::Lillisp.Core.LillispRuntime.TailCall(scope, altPair) : runtime.Evaluate(scope, alt)) : Nil.Value;
         }
 
+        public static object? DefineRecordType(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length < 3)
+            {
+                throw new ArgumentException("define-record-type requires at least 3 arguments");
+            }
+
+            if (args[0] is not Symbol name)
+            {
+                throw new ArgumentException("define-record-type's first argument must be a symbol");
+            }
+
+            if (args[1] is not Pair { IsList: true, Car: Symbol ctorName } ctor)
+            {
+                throw new ArgumentException("define-record-type's second argument must be a constructor list");
+            }
+
+            if (args[2] is not Symbol predName)
+            {
+                throw new ArgumentException("define-record-type's third argument must be a predicate name symbol");
+            }
+
+            var recordType = new RecordTypeDefinition(name, ctorName, predName);
+
+            for (int i = 3; i < args.Length; i++)
+            {
+                DefineRecordField(args[i], recordType);
+            }
+
+            var ctorArgs = ctor.Cast<Symbol>().Skip(1).ToList();
+
+            foreach (var ctorArg in ctorArgs)
+            {
+                if (!recordType.Fields.Any(i => i.Name.Equals(ctorArg)))
+                {
+                    throw new ArgumentException($"Constructor definition refers to field {ctorArg} that is not defined");
+                }
+
+                recordType.ConstructorParameters.Add(ctorArg);
+            }
+
+            var ctorFunc = BuildRecordConstructor(recordType);
+            scope.Define(ctorName.Value, ctorFunc);
+
+            var predFunc = BuildRecordPredicate(recordType);
+            scope.Define(predName.Value, predFunc);
+
+            foreach (var field in recordType.Fields)
+            {
+                var accessorFunc = BuildRecordAccessor(field);
+                scope.Define(field.Accessor.Value, accessorFunc);
+
+                if (field.Modifier != null)
+                {
+                    var modifierFunc = BuildRecordModifier(field);
+                    scope.Define(field.Modifier.Value, modifierFunc);
+                }
+            }
+
+            scope.DefineRecordType(recordType);
+
+            return Nil.Value;
+        }
+
+        private static Expression BuildRecordModifier(RecordFieldDefinition field)
+        {
+            if (field.Modifier == null)
+            {
+                throw new ArgumentException("Field does not have a modifier specified");
+            }
+
+            return args =>
+            {
+                if (args.Length != 2)
+                {
+                    throw new ArgumentException($"Record field modifier {field.Modifier} requires two arguments");
+                }
+
+                if (args[0] is not RecordInstance instance || instance.RecordType != field.RecordType)
+                {
+                    throw new ArgumentException($"Value is not an instance of record type {field.RecordType.Name}");
+                }
+
+                instance.Fields[field.Name] = args[1];
+
+                return Nil.Value;
+            };
+        }
+
+        private static Expression BuildRecordAccessor(RecordFieldDefinition field)
+        {
+            return args =>
+            {
+                if (args.Length != 1)
+                {
+                    throw new ArgumentException($"Record field accessor {field.Accessor} requires one argument");
+                }
+
+                if (args[0] is not RecordInstance instance || instance.RecordType != field.RecordType)
+                {
+                    throw new ArgumentException($"Value is not an instance of record type {field.RecordType.Name}");
+                }
+
+                return instance.Fields[field.Name];
+            };
+        }
+
+        private static Expression BuildRecordPredicate(RecordTypeDefinition recordType)
+        {
+            return args =>
+            {
+                if (args.Length != 1)
+                {
+                    throw new ArgumentException($"Record type predicate {recordType.PredicateName} requires one argument");
+                }
+
+                return args[0] is RecordInstance instance && instance.RecordType == recordType;
+            };
+        }
+
+        private static Expression BuildRecordConstructor(RecordTypeDefinition recordType)
+        {
+            return args =>
+            {
+                if (args.Length != recordType.ConstructorParameters.Count)
+                {
+                    throw new ArgumentException($"Record type constructor {recordType.ConstructorName} requires {recordType.ConstructorParameters.Count} argument{(recordType.ConstructorParameters.Count == 1 ? "" : "s")}");
+                }
+
+                var instance = new RecordInstance(recordType);
+
+                for (int i = 0; i < recordType.ConstructorParameters.Count; i++)
+                {
+                    var fieldName = recordType.ConstructorParameters[i];
+
+                    instance.Fields[fieldName] = args[i];
+                }
+
+                return instance;
+            };
+        }
+
+        private static void DefineRecordField(object? arg, RecordTypeDefinition recordType)
+        {
+            if (arg is not Pair { IsList: true, Car: Symbol fieldName } fieldSpec)
+            {
+                throw new ArgumentException("Field definitions for record types must be a list");
+            }
+
+            var fieldSpecList = fieldSpec.ToList();
+
+            if (fieldSpecList.Count is < 2 or > 3)
+            {
+                throw new ArgumentException("Field definitions must contain either an accessor only or an accessor and a modifier");
+            }
+
+            if (fieldSpecList[1] is not Symbol accessor)
+            {
+                throw new ArgumentException("Field definition accessor must be a symbol");
+            }
+
+            Symbol? modifier = null;
+
+            if (fieldSpecList.Count == 3)
+            {
+                if (fieldSpecList[2] is not Symbol modifierSym)
+                {
+                    throw new ArgumentException("Field definition modifier must be a symbol");
+                }
+
+                modifier = modifierSym;
+            }
+
+            var fieldDefinition = new RecordFieldDefinition(recordType, fieldName, accessor, modifier);
+            recordType.Fields.Add(fieldDefinition);
+        }
+
         public static object? Begin(LillispRuntime runtime, Scope scope, object?[] args)
         {
             object? result = null;

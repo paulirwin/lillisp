@@ -1,44 +1,30 @@
 ﻿using Lillisp.Core;
-using System.Text;
 using Xunit;
 
 namespace Lillisp.Tests
 {
     public class RecordTests
     {
-        [Fact]
-        public void BasicRecordTest()
+        private readonly LillispRuntime _runtime;
+
+        public RecordTests()
         {
-            var runtime = new LillispRuntime();
+            _runtime = new LillispRuntime();
 
-            var prog = new StringBuilder();
-
-            prog.AppendLine("(defrecord Customer (Id Int32) (Name String))");
-            prog.AppendLine("(def c (new Customer 123 \"foo bar\"))");
-            prog.AppendLine("(.Name c)");
-
-            var result = runtime.EvaluateProgram(prog.ToString()) as string;
-
-            Assert.NotNull(result);
-            Assert.Equal("foo bar", result);
+            _runtime.EvaluateProgram("(define-record-type <pare> (kons x y) pare? (x kar set-kar!) (y kdr))");
         }
 
-        [Fact]
-        public void RecordEqualityTest()
+        [InlineData("(pare? (kons 1 2))", true)]
+        [InlineData("(pare? (cons 1 2))", false)]
+        [InlineData("(kar (kons 1 2))", 1)]
+        [InlineData("(kdr (kons 1 2))", 2)]
+        [InlineData("(let ((k (kons 1 2))) (set-kar! k 3) (kar k))", 3)]
+        [Theory]
+        public void PareExampleTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
+            var result = _runtime.EvaluateProgram(input);
 
-            var prog = new StringBuilder();
-
-            prog.AppendLine("(defrecord Customer (Id Int32) (Name String))");
-            prog.AppendLine("(def c (new Customer 123 \"foo bar\"))");
-            prog.AppendLine("(def c2 (new Customer 123 \"foo bar\"))");
-            prog.AppendLine("(eqv? c c2)");
-
-            var result = runtime.EvaluateProgram(prog.ToString());
-
-            Assert.NotNull(result);
-            Assert.Equal(true, result);
+            Assert.Equal(expected, result);
         }
     }
 }
