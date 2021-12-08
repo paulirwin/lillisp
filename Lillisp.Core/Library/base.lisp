@@ -2,3 +2,9 @@
 (define (cadr x) (car (cdr x)))
 (define (cdar x) (cdr (car x)))
 (define (cddr x) (cdr (cdr x)))
+
+(define (odd? x) (= (% x 2) 1))
+(define (even? x) (= (% x 2) 0))
+(define (positive? x) (> x 0))
+(define (negative? x) (< x 0))
+(define (zero? x) (= x 0))

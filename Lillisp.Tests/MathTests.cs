@@ -180,5 +180,26 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("(zero? 0)", true)]
+        [InlineData("(zero? 0.0)", true)]
+        [InlineData("(zero? 1)", false)]
+        [InlineData("(positive? 0)", false)]
+        [InlineData("(positive? 101)", true)]
+        [InlineData("(positive? -30)", false)]
+        [InlineData("(negative? 0)", false)]
+        [InlineData("(negative? 101)", false)]
+        [InlineData("(negative? -30)", true)]
+        [InlineData("(odd? 0)", false)]
+        [InlineData("(odd? 101)", true)]
+        [InlineData("(odd? -30)", false)]
+        [InlineData("(even? 0)", true)]
+        [InlineData("(even? 101)", false)]
+        [InlineData("(even? -30)", true)]
+        [Theory]
+        public void NumberPredicateTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }
