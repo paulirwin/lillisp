@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using System.Text;
+using Rationals;
 
 namespace Lillisp.Core.Macros
 {

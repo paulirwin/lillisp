@@ -194,6 +194,7 @@ namespace Lillisp.Core
             ["null?"] = TypeExpressions.IsNull,
             ["numerator"] = RationalExpressions.Numerator,
             ["number?"] = TypeExpressions.IsNumber,
+            ["number->string"] = TypeExpressions.NumberToString,
             ["open-binary-input-file"] = PortExpressions.OpenBinaryInputFile,
             ["open-binary-output-file"] = PortExpressions.OpenBinaryOutputFile,
             ["open-input-bytevector"] = PortExpressions.OpenInputBytevector,
@@ -248,6 +249,7 @@ namespace Lillisp.Core
             ["string-set!"] = StringExpressions.StringSet,
             ["string-upcase"] = StringExpressions.Upcase,
             ["string->list"] = TypeExpressions.StringToList,
+            ["string->number"] = TypeExpressions.StringToNumber,
             ["string->symbol"] = TypeExpressions.StringToSymbol,
             ["string->utf8"] = TypeExpressions.StringToUtf8,
             ["substring"] = StringExpressions.Substring,
@@ -319,12 +321,12 @@ namespace Lillisp.Core
             return Evaluate(scope, prog);
         }
 
-        private static Node ParseProgramText(string program)
+        public static Node ParseProgramText(string program)
         {
             var lexer = new LillispLexer(new AntlrInputStream(program));
             var parser = new LillispParser(new CommonTokenStream(lexer));
             var visitor = new LillispVisitor();
-
+            
             var prog = visitor.Visit(parser.prog());
             return prog;
         }

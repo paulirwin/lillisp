@@ -29,9 +29,9 @@ namespace Lillisp.Core
                 StringBuilder sb => quote ? SymbolDisplay.FormatLiteral(sb.ToString(), true) : sb.ToString(),
                 char ch => quote ? SymbolDisplay.FormatLiteral(ch, true) : ch.ToString(),
                 Complex complex => FormatComplex(complex),
-                double.PositiveInfinity => "+inf.0",
-                double.NegativeInfinity => "-inf.0",
-                double.NaN => "+nan.0",
+                double.PositiveInfinity or float.PositiveInfinity => "+inf.0",
+                double.NegativeInfinity or float.NegativeInfinity => "-inf.0",
+                double.NaN or float.NaN => "+nan.0",
                 _ => result.ToString()
             };
         }

@@ -1,6 +1,7 @@
 ﻿using Rationals;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -436,6 +437,112 @@ namespace Lillisp.Core.Expressions
                 Symbol s => s.ToString(),
                 _ => throw new ArgumentException("symbol->string requires one symbol argument")
             };
+        }
+
+        public static object? NumberToString(object?[] args)
+        {
+            if (args.Length is < 1 or > 2)
+            {
+                throw new ArgumentException("number->string requires one or two arguments");
+            }
+
+            int radix = 10;
+
+            if (args.Length == 2)
+            {
+                radix = Convert.ToInt32(args[1]);
+            }
+
+            if (radix != 2 && radix != 8 && radix != 10 && radix != 16)
+            {
+                throw new ArgumentException("Invalid radix. Must be 2, 8, 10, or 16.");
+            }
+            
+            if (radix != 10 && args[0] is Rational or BigInteger or Complex or double or float or decimal or ulong)
+            {
+                throw new ArgumentException("Cannot use a radix other than 10 with the provided argument.");
+            }
+
+            return args[0] switch
+            {
+                Rational r => r.ToString(),
+                BigInteger bi => bi.ToString(), 
+                Complex c => c.ToString(),
+                double.NaN or float.NaN => "+nan.0",
+                double.PositiveInfinity or float.PositiveInfinity => "+inf.0",
+                double.NegativeInfinity or float.NegativeInfinity => "-inf.0",
+                double d => d.ToString(CultureInfo.InvariantCulture),
+                float f => f.ToString(CultureInfo.InvariantCulture),
+                decimal d => d.ToString(CultureInfo.InvariantCulture),
+                ulong ul => ul.ToString(),
+                long l => Convert.ToString(l, radix),
+                uint ui => Convert.ToString(ui, radix),
+                int i => Convert.ToString(i, radix),
+                ushort us => Convert.ToString(us, radix),
+                short s => Convert.ToString(s, radix),
+                byte b => Convert.ToString(b, radix),
+                sbyte sb => Convert.ToString(sb, radix),
+                _ => throw new ArgumentException("Argument is not a number")
+            };
+        }
+
+        public static object? StringToNumber(object?[] args)
+        {
+            if (args.Length is < 1 or > 2)
+            {
+                throw new ArgumentException("string->number requires one or two arguments");
+            }
+
+            int radix = 10;
+
+            if (args.Length == 2)
+            {
+                radix = Convert.ToInt32(args[1]);
+            }
+
+            if (radix != 2 && radix != 8 && radix != 10 && radix != 16)
+            {
+                throw new ArgumentException("Invalid radix. Must be 2, 8, 10, or 16.");
+            }
+
+            string s = args[0] switch
+            {
+                string s2 => s2,
+                StringBuilder sb => sb.ToString(),
+                _ => throw new ArgumentException("string->number's first argument must be a string"),
+            };
+
+            if (string.IsNullOrEmpty(s))
+            {
+                return false;
+            }
+
+            try
+            {
+                if (radix == 10)
+                {
+                    // HACK: make this parsing more specific to just numbers
+                    if (LillispRuntime.ParseProgramText(s) is not Program prog)
+                    {
+                        return false;
+                    }
+
+                    if (prog.Children.Count != 1 || prog.Children[0] is not Atom { AtomType: AtomType.Number } atom)
+                    {
+                        return false;
+                    }
+
+                    return atom.Value;
+                }
+                else
+                {
+                    return Convert.ToInt32(s, radix);
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

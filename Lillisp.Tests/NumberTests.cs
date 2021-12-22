@@ -1,4 +1,5 @@
 ﻿using Xunit;
+// ReSharper disable StringLiteralTypo
 
 namespace Lillisp.Tests
 {
@@ -72,6 +73,33 @@ namespace Lillisp.Tests
         [InlineData("(= +nan.0 +nan.0)", false)]
         [Theory]
         public void NumericallyEqualTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(number->string 3)", "3")]
+        [InlineData("(number->string 3.04)", "3.04")]
+        [InlineData("(number->string 3e10)", "30000000000")]
+        [InlineData("(number->string +inf.0)", "+inf.0")]
+        [InlineData("(number->string +nan.0)", "+nan.0")]
+        [InlineData("(number->string #xabcd)", "43981")]
+        [InlineData("(number->string #xabcd 16)", "abcd")]
+        [Theory]
+        public void NumberToStringTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(string->number \"3\")", 3)]
+        [InlineData("(string->number \"3.04\")", 3.04)]
+        [InlineData("(string->number \"3e10\")", 3e10)]
+        [InlineData("(string->number \"+inf.0\")", double.PositiveInfinity)]
+        [InlineData("(string->number \"+nan.0\")", double.NaN)]
+        [InlineData("(string->number \"abcd\")", false)]
+        [InlineData("(string->number \"#xabcd\")", 43981)]
+        [InlineData("(string->number \"abcd\" 16)", 43981)]
+        [Theory]
+        public void StringToNumberTests(string input, object expected)
         {
             TestHelper.DefaultTest(input, expected);
         }
