@@ -8,3 +8,4 @@
 (define (positive? x) (> x 0))
 (define (negative? x) (< x 0))
 (define (zero? x) (= x 0))
+(define (square x) (* x x))

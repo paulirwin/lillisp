@@ -61,7 +61,7 @@ namespace Lillisp.Core.Expressions
                 return 1;
             }
 
-            var result = 1;
+            dynamic result = 1;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -653,5 +653,43 @@ namespace Lillisp.Core.Expressions
             return args[0] + 1;
         }
 
+        public static object? ExactIntegerSqrt(object?[] args)
+        {
+            if (args.Length != 1 || args[0] == null || !args[0]!.IsInteger())
+            {
+                throw new ArgumentException("exact-integer-sqrt requires one integer argument");
+            }
+
+            if (args[0] is < 0)
+            {
+                throw new ArgumentException("exact-integer-sqrt requires a positive number");
+            }
+
+            if (args[0] is BigInteger)
+            {
+                throw new NotImplementedException("exact-integer-sqrt support for BigInteger is not yet implemented");
+            }
+
+            // Adapted from CC-SA code at https://en.wikipedia.org/wiki/Integer_square_root
+            dynamic k = args[0]!;
+            dynamic l = k - k; // this types l (as zero) to the same type as k
+            dynamic r = k + 1;
+
+            while (l != r - 1)
+            {
+                dynamic m = (l + r) / 2;
+
+                if (m * m <= k)
+                {
+                    l = m;
+                }
+                else
+                {
+                    r = m;
+                }
+            }
+
+            return new Pair(l, k - (l * l));
+        }
     }
 }

@@ -150,6 +150,8 @@ namespace Lillisp.Core
             ["error-object-message"] = ExceptionExpressions.ErrorObjectMessage,
             ["exact?"] = TypeExpressions.IsExact,
             ["exact-integer?"] = TypeExpressions.IsExactInteger,
+            ["exact-integer-sqrt"] = MathExpressions.ExactIntegerSqrt,
+            ["expt"] = MathExpressions.Power,
             ["file-error?"] = ExceptionExpressions.FileError,
             ["file-exists?"] = FileExpressions.FileExists,
             ["finite?"] = TypeExpressions.IsFinite,

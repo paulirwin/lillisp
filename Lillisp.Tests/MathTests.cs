@@ -19,6 +19,7 @@ namespace Lillisp.Tests
         }
 
         [InlineData("(* 3 4)", 12)]
+        [InlineData("(* 3 4.0)", 12.0)]
         [InlineData("(* 4)", 4)]
         [InlineData("(*)", 1)]
         [Theory]
@@ -198,6 +199,33 @@ namespace Lillisp.Tests
         [InlineData("(even? -30)", true)]
         [Theory]
         public void NumberPredicateTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(square 42)", 1764)]
+        [InlineData("(square 2.0)", 4.0)]
+        [Theory]
+        public void SquareTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(expt 2 3)", 8.0)] // note: integer exponentiation is not yet supported
+        [InlineData("(expt 2.0 3)", 8.0)]
+        [InlineData("(expt 4 0.5)", 2.0)]
+        [Theory]
+        public void ExptTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(car (exact-integer-sqrt 4))", 2)]
+        [InlineData("(cdr (exact-integer-sqrt 4))", 0)]
+        [InlineData("(car (exact-integer-sqrt 5))", 2)]
+        [InlineData("(cdr (exact-integer-sqrt 5))", 1)]
+        [Theory]
+        public void ExactIntegerSqrtTests(string input, object expected)
         {
             TestHelper.DefaultTest(input, expected);
         }
