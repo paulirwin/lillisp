@@ -103,5 +103,20 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("(eqv? (cast 2.04 Decimal) (exact 2.04))", true)]
+        [Theory]
+        public void ExactConversionTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(eqv? 2.04 (inexact (cast 2.04 Decimal)))", true)]
+        [InlineData("(eqv? 2.0 (inexact 2))", true)]
+        [Theory]
+        public void InexactConversionTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }

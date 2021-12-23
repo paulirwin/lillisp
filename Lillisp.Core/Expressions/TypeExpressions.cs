@@ -544,5 +544,39 @@ namespace Lillisp.Core.Expressions
                 return false;
             }
         }
+
+        public static object? ConvertToExact(object?[] args)
+        {
+            if (args.Length != 1 || args[0] == null)
+            {
+                throw new ArgumentException("exact requires exactly one argument");
+            }
+
+            return args[0] switch
+            {
+                Complex => throw new InvalidOperationException("Exact complex types are not yet supported"),
+                Rational or BigInteger or ulong or long or uint or int or ushort or short or sbyte or byte or decimal => args[0],
+                float f => (decimal)f,
+                double d => (decimal)d,
+                _ => throw new InvalidOperationException("Cannot convert the provided value to an exact number"),
+            };
+        }
+
+        public static object? ConvertToInexact(object?[] args)
+        {
+            if (args.Length != 1 || args[0] == null)
+            {
+                throw new ArgumentException("inexact requires exactly one argument");
+            }
+
+            return args[0] switch
+            {
+                Complex or float or double => args[0],
+                Rational r => (double)r,
+                BigInteger bi => (double)bi,
+                decimal or ulong or long or uint or int or ushort or short or sbyte or byte => Convert.ToDouble(args[0]),
+                _ => throw new InvalidOperationException("Cannot convert the provided value to an inexact number"),
+            };
+        }
     }
 }
