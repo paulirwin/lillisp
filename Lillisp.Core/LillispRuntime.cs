@@ -42,6 +42,7 @@ namespace Lillisp.Core
             ["defrecord"] = EmitMacros.DefineRecord,
             ["defun"] = CoreMacros.Defun,
             ["delay"] = CoreMacros.Delay,
+            ["delay-force"] = CoreMacros.DelayForce,
             ["display"] = PortMacros.Display,
             ["eval"] = CoreMacros.Eval,
             ["from"] = LispINQMacros.From,

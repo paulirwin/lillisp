@@ -1,5 +1,4 @@
-﻿using Lillisp.Core;
-using Xunit;
+﻿using Xunit;
 
 namespace Lillisp.Tests
 {
@@ -12,11 +11,7 @@ namespace Lillisp.Tests
         [Theory]
         public void CountTests(string input, int expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(get '(1 2 3) 0)", 1)]
@@ -25,11 +20,7 @@ namespace Lillisp.Tests
         [Theory]
         public void GetTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
-
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+            TestHelper.DefaultTest(input, expected);
         }
 
         [InlineData("(promise? (make-promise 7))", true)]
@@ -39,11 +30,16 @@ namespace Lillisp.Tests
         [Theory]
         public void MakePromiseTests(string input, object expected)
         {
-            var runtime = new LillispRuntime();
+            TestHelper.DefaultTest(input, expected);
+        }
 
-            var result = runtime.EvaluateProgram(input);
-
-            Assert.Equal(expected, result);
+        [InlineData("(force (delay-force 123))", 123)]
+        [InlineData("(define x 5) (define t (delay-force x)) (set! x 6) (force t)", 6)]
+        [InlineData("(define x 5) (define t (delay (+ x 2))) (set! x 6) (force (delay-force t))", 8)]
+        [Theory]
+        public void DelayForceTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
         }
     }
 }

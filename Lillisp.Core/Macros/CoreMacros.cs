@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 using Rationals;
 
 namespace Lillisp.Core.Macros
@@ -564,6 +565,26 @@ namespace Lillisp.Core.Macros
             }
 
             return new Lazy<object?>(() => runtime.Evaluate(scope, node));
+        }
+
+        public static object? DelayForce(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length != 1 || args[0] is not Node node)
+            {
+                throw new ArgumentException("delay-force requires one expression argument");
+            }
+
+            return new Lazy<object?>(() =>
+            {
+                var result = runtime.Evaluate(scope, node);
+
+                return result switch
+                {
+                    Lazy<object?> lazy => lazy.Value,
+                    Task<object?> task => task.Result,
+                    _ => result,
+                };
+            });
         }
 
         public static object? Include(LillispRuntime runtime, Scope scope, object?[] args)
