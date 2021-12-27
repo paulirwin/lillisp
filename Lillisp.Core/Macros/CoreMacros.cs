@@ -412,6 +412,26 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("let's first parameter must be a list");
             }
 
+            return LetInternal(runtime, scope, args, bindings, true, false);
+        }
+
+        public static object? LetStar(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length == 0)
+            {
+                throw new ArgumentException("let* requires at least one argument");
+            }
+
+            if (args[0] is not Pair bindings)
+            {
+                throw new ArgumentException("let*'s first parameter must be a list");
+            }
+
+            return LetInternal(runtime, scope, args, bindings, false, true);
+        }
+
+        private static object? LetInternal(LillispRuntime runtime, Scope scope, object?[] args, Pair bindings, bool requireDistinctVariables, bool evaluateInChildScope)
+        {
             var childScope = scope.CreateChildScope();
             var evaluatedSymbols = new HashSet<string>();
 
@@ -419,17 +439,17 @@ namespace Lillisp.Core.Macros
             {
                 if (binding is Symbol symbol)
                 {
-                    if (evaluatedSymbols.Contains(symbol.Value))
+                    if (requireDistinctVariables && evaluatedSymbols.Contains(symbol.Value))
                     {
                         throw new ArgumentException($"Variable {symbol} has already been defined in this scope");
                     }
 
-                    childScope.Define(symbol.Value, Nil.Value);
+                    childScope.DefineOrSet(symbol.Value, Nil.Value);
                     evaluatedSymbols.Add(symbol.Value);
                 }
-                else if (binding is Pair { IsList: true, Car: Symbol listSymbol} list)
+                else if (binding is Pair { IsList: true, Car: Symbol listSymbol } list)
                 {
-                    if (evaluatedSymbols.Contains(listSymbol.Value))
+                    if (requireDistinctVariables && evaluatedSymbols.Contains(listSymbol.Value))
                     {
                         throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
                     }
@@ -441,7 +461,9 @@ namespace Lillisp.Core.Macros
                         bindingValue = bindingValuePair.Car;
                     }
 
-                    childScope.Define(listSymbol.Value, runtime.Evaluate(childScope, bindingValue));
+                    var value = runtime.Evaluate(evaluateInChildScope ? childScope : scope, bindingValue);
+
+                    childScope.DefineOrSet(listSymbol.Value, value);
                     evaluatedSymbols.Add(listSymbol.Value);
                 }
                 else

@@ -51,6 +51,9 @@ namespace Lillisp.Core
             //["include-ci"] = CoreMacros.Include, // TODO
             ["lambda"] = CoreMacros.Lambda,
             ["let"] = CoreMacros.Let,
+            ["let*"] = CoreMacros.LetStar,
+            ["letrec"] = CoreMacros.Let,
+            ["letrec*"] = CoreMacros.LetStar,
             ["make-parameter"] = ParameterMacros.MakeParameter,
             ["map"] = CoreMacros.Map,
             ["new"] = InteropMacros.New,
