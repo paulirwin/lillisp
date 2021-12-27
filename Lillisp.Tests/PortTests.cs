@@ -61,5 +61,13 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("(parameterize ((current-input-port (open-input-string \"abc\"))) (char-ready?)))", true)]
+        [InlineData("(char-ready?)", true)]
+        [Theory]
+        public void CharReadyTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }

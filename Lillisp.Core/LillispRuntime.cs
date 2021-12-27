@@ -34,6 +34,7 @@ namespace Lillisp.Core
             ["and"] = BooleanMacros.And,
             ["apply"] = CoreMacros.Apply,
             ["begin"] = CoreMacros.Begin,
+            ["char-ready?"] = PortMacros.CharReady,
             ["cond"] = CoreMacros.Cond,
             ["def"] = CoreMacros.Define,
             ["defenum"] = EmitMacros.DefineEnum,

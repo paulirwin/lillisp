@@ -359,5 +359,27 @@ namespace Lillisp.Core.Macros
                 throw new ReadError(ex);
             }
         }
+
+        public static object? CharReady(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length > 1)
+            {
+                throw new ArgumentException("char-ready? requires zero or one arguments");
+            }
+
+            object? port = GetInputPort(runtime, scope, args.Length == 1 ? args[0] : null);
+
+            if (port is not TextReader tr)
+            {
+                throw new ArgumentException("Specified port is not a textual input port");
+            }
+
+            if (tr is StreamReader sr)
+            {
+                return sr.BaseStream.CanRead;
+            }
+
+            return true; // Deviation: all terminal streams return #t despite potential to hang
+        }
     }
 }
