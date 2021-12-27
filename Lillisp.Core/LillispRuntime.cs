@@ -184,6 +184,7 @@ namespace Lillisp.Core
             ["lcm"] = MathExpressions.Lcm,
             ["length"] = DynamicExpressions.Count,
             ["list"] = ListExpressions.List,
+            ["list?"] = TypeExpressions.IsList,
             ["list->string"] = TypeExpressions.ListToString,
             ["ln"] = MathExpressions.Ln,
             ["log"] = MathExpressions.Log,

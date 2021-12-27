@@ -250,6 +250,16 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
+        [InlineData("(list? '(a b c))", true)]
+        [InlineData("(list? '())", true)]
+        [InlineData("(list? '(a . b))", false)]
+        //[InlineData("(let ((x (list 'a)))\r\n(set-cdr! x x)\r\n(list? x))", false)] // TODO: support set-cdr!
+        [Theory]
+        public void ListCheckTests(string input, bool expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
         [InlineData("(char->integer #\\=)", 61)]
         [InlineData("(integer->char 61)", '=')]
         [InlineData("(string->list \"foo\")", new[] { 'f', 'o', 'o' })]

@@ -578,5 +578,15 @@ namespace Lillisp.Core.Expressions
                 _ => throw new InvalidOperationException("Cannot convert the provided value to an inexact number"),
             };
         }
+
+        public static object? IsList(object?[] args)
+        {
+            if (args.Length != 1)
+            {
+                throw new ArgumentException("list? requires one argument");
+            }
+
+            return Nil.Value.Equals(args[0]) || args[0] is Pair { IsList: true };
+        }
     }
 }
