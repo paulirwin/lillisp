@@ -232,6 +232,7 @@ namespace Lillisp.Core
             ["real?"] = TypeExpressions.IsReal,
             ["real-part"] = ComplexExpressions.RealPart,
             ["remainder"] = MathExpressions.TruncateRemainder,
+            ["reverse"] = ListExpressions.Reverse,
             ["round"] = MathExpressions.Round,
             ["simplify"] = RationalExpressions.Simplify,
             ["sqrt"] = MathExpressions.Sqrt,

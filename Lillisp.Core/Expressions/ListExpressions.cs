@@ -158,4 +158,14 @@ public static class ListExpressions
 
         return Core.List.FromNodes(Enumerable.Repeat(defaultValue, count));
     }
+
+    public static object? Reverse(object?[] args)
+    {
+        if (args.Length != 1 || args[0] is not Pair { IsList: true } listPair)
+        {
+            throw new ArgumentException("reverse requires one list argument");
+        }
+
+        return Core.List.FromNodes(listPair.Reverse());
+    }
 }

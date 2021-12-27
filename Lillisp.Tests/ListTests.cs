@@ -104,4 +104,16 @@ public class ListTests
 
         Assert.Equal(expected, (IEnumerable<object>)result);
     }
+
+    [InlineData("(reverse '(1 2 3))", new object[] { 3, 2, 1 })]
+    [InlineData("(list (caar (reverse '(1 (2 3) 4 (5 (6))))))", new object[] { 5 })]
+    [Theory]
+    public void ReverseTests(string input, object expected)
+    {
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(input);
+
+        Assert.Equal(expected, (IEnumerable<object>)result);
+    }
 }
