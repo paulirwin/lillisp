@@ -80,6 +80,7 @@ namespace Lillisp.Core
             ["use"] = InteropMacros.Use,
             ["when"] = BooleanMacros.When,
             ["with-exception-handler"] = ExceptionMacros.WithExceptionHandler,
+            ["write"] = PortMacros.Write,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>

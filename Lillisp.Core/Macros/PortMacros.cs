@@ -453,4 +453,19 @@ public static class PortMacros
 
         return result;
     }
+
+    public static object? Write(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length is 0 or > 2)
+        {
+            throw new ArgumentException("write requires one or two arguments");
+        }
+
+        var obj = runtime.Evaluate(scope, args[0]);
+        object? port = GetOutputPort(runtime, scope, args.Length == 2 ? args[1] : null);
+
+        DisplayWithPort(OutputFormatter.FormatPr(obj), port);
+
+        return Nil.Value;
+    }
 }
