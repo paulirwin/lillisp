@@ -63,6 +63,7 @@ public class PortTests
     }
 
     [InlineData("(parameterize ((current-output-port (open-output-string))) (write '(1 2 3 \"abc\")) (get-output-string (current-output-port)))", "(1 2 3 \"abc\")")]
+    [InlineData("(parameterize ((current-output-port (open-output-string))) (write-simple '(1 2 3 \"abc\")) (get-output-string (current-output-port)))", "(1 2 3 \"abc\")")]
     [Theory]
     public void WriteTests(string input, object expected)
     {

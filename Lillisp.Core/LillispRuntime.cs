@@ -81,6 +81,11 @@ namespace Lillisp.Core
             ["when"] = BooleanMacros.When,
             ["with-exception-handler"] = ExceptionMacros.WithExceptionHandler,
             ["write"] = PortMacros.Write,
+            ["write-simple"] = PortMacros.Write, // HACK: since datum labels not yet supported, all writes are "simple"
+            ["write-char"] = PortMacros.WriteChar,
+            ["write-string"] = PortMacros.WriteString,
+            ["write-u8"] = PortMacros.WriteU8,
+            ["write-bytevector"] = PortMacros.WriteBytevector,
         };
 
         private static readonly IReadOnlyDictionary<string, Expression> _systemFunctions = new Dictionary<string, Expression>
@@ -171,6 +176,7 @@ namespace Lillisp.Core
             ["floor/"] = MathExpressions.FloorDivide,
             ["floor-quotient"] = MathExpressions.FloorQuotient,
             ["floor-remainder"] = MathExpressions.FloorRemainder,
+            ["flush-output-port"] = PortExpressions.FlushOutputPort,
             ["force"] = DynamicExpressions.Force,
             ["gcd"] = MathExpressions.Gcd,
             ["get"] = DynamicExpressions.Get,

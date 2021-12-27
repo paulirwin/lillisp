@@ -185,7 +185,7 @@ namespace Lillisp.Core.Expressions
 
         public static object? ClosePort(object?[] args)
         {
-            if (args.Length != 1 || args[0] is not Stream or TextReader or TextWriter)
+            if (args.Length != 1 || args[0] is not (Stream or TextReader or TextWriter))
             {
                 throw new ArgumentException("close-port requires one port argument");
             }
@@ -200,7 +200,7 @@ namespace Lillisp.Core.Expressions
 
         public static object? CloseInputPort(object?[] args)
         {
-            if (args.Length != 1 || args[0] is not Stream or TextReader)
+            if (args.Length != 1 || args[0] is not (Stream or TextReader))
             {
                 throw new ArgumentException("close-input-port requires one input port argument");
             }
@@ -215,7 +215,7 @@ namespace Lillisp.Core.Expressions
 
         public static object? CloseOutputPort(object?[] args)
         {
-            if (args.Length != 1 || args[0] is not Stream or TextWriter)
+            if (args.Length != 1 || args[0] is not (Stream or TextWriter))
             {
                 throw new ArgumentException("close-output-port requires one output port argument");
             }
@@ -286,6 +286,25 @@ namespace Lillisp.Core.Expressions
         public static object? GetEofObject(object?[] args)
         {
             return EofObject.Instance;
+        }
+
+        public static object? FlushOutputPort(object?[] args)
+        {
+            if (args.Length != 1 || args[0] is not (Stream or TextWriter))
+            {
+                throw new ArgumentException("flush-output-port requires one output port argument");
+            }
+
+            if (args[0] is Stream stream)
+            {
+                stream.Flush();
+            }
+            else if (args[0] is TextWriter textWriter)
+            {
+                textWriter.Flush();
+            }
+
+            return Nil.Value;
         }
     }
 }
