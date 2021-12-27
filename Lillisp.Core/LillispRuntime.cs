@@ -34,6 +34,7 @@ namespace Lillisp.Core
             ["and"] = BooleanMacros.And,
             ["apply"] = CoreMacros.Apply,
             ["begin"] = CoreMacros.Begin,
+            ["call-with-port"] = PortMacros.CallWithPort,
             ["char-ready?"] = PortMacros.CharReady,
             ["cond"] = CoreMacros.Cond,
             ["def"] = CoreMacros.Define,
@@ -509,15 +510,33 @@ namespace Lillisp.Core
             }
 
             var args = pair.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
-            
-            return op switch
+
+            return InvokeExpression(scope, op, args);
+        }
+
+        public object? InvokePossibleTailCallExpression(Scope scope, object? expression, object?[] args)
+        {
+            var result = InvokeExpression(scope, expression, args);
+
+            while (result is TailCall tailCall)
+            {
+                result = EvaluatePossibleTailCallExpression(tailCall.Scope, tailCall.Node);
+            }
+
+            return result;
+        }
+
+        public object? InvokeExpression(Scope scope, object? expression, object?[] args)
+        {
+            return expression switch
             {
                 IInvokable invokable => invokable.Invoke(this, scope, args),
                 MethodInfo method => method.Invoke(null, args),
                 InteropStaticOverloadSet overloadSet => overloadSet.Invoke(args),
+                MacroExpression macro => macro(this, scope, args),
                 Expression expr => expr(args),
                 Type genericType => genericType.MakeGenericType(args.Cast<Type>().ToArray()),
-                _ => throw new InvalidOperationException($"Invalid operation: {op}")
+                _ => throw new InvalidOperationException($"Invalid operation: {expression}")
             };
         }
 

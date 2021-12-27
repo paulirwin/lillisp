@@ -84,5 +84,12 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("(let ((p (open-input-string \"abc\"))) (read-line p))", "abc")]
+        [Theory]
+        public void CallWithPortTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }
