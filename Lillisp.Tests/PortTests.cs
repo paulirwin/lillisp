@@ -54,5 +54,12 @@ namespace Lillisp.Tests
         {
             TestHelper.DefaultTest(input, expected);
         }
+
+        [InlineData("(parameterize ((current-input-port (open-input-string \"'(1 2 3)\"))) (eval (read)))", new object[] { 1, 2, 3 })]
+        [Theory]
+        public void ReadTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }

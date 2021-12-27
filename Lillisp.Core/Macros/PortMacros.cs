@@ -321,5 +321,43 @@ namespace Lillisp.Core.Macros
 
             return value;
         }
+
+        public static object? Read(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length > 1)
+            {
+                throw new ArgumentException("read-line requires zero or one arguments");
+            }
+
+            object? port = GetInputPort(runtime, scope, args.Length == 1 ? args[0] : null);
+
+            if (port is not TextReader tr)
+            {
+                throw new ArgumentException("Specified port is not a textual input port");
+            }
+
+            var input = tr.ReadToEnd();
+
+            if (input.Length == 0)
+            {
+                return EofObject.Instance;
+            }
+
+            try
+            {
+                var node = LillispRuntime.ParseProgramText(input);
+
+                if (node is not Program { Children.Count: > 0 } program)
+                {
+                    throw new InvalidOperationException("Input did not parse as an object");
+                }
+
+                return program.Children[0];
+            }
+            catch (Exception ex)
+            {
+                throw new ReadError(ex);
+            }
+        }
     }
 }

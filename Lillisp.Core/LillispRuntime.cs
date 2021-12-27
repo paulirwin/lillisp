@@ -64,6 +64,7 @@ namespace Lillisp.Core
             ["quasiquote"] = CoreMacros.Quasiquote,
             ["quote"] = CoreMacros.Quote,
             ["raise-continuable"] = ExceptionMacros.RaiseContinuable,
+            ["read"] = PortMacros.Read,
             ["read-bytevector"] = PortMacros.ReadBytevector,
             ["read-bytevector!"] = PortMacros.ReadBytevectorMutate,
             ["read-char"] = PortMacros.ReadChar,
