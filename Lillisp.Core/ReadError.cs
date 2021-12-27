@@ -2,9 +2,9 @@
 
 namespace Lillisp.Core;
 
-public sealed class FileError : Exception
+public sealed class ReadError : Exception
 {
-    public FileError(Exception innerException)
+    public ReadError(Exception innerException)
         : base(innerException.Message, innerException)
     {
     }

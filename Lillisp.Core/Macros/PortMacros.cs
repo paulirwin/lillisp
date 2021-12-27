@@ -297,5 +297,29 @@ namespace Lillisp.Core.Macros
 
             return countRead;
         }
+
+        public static object? ReadLine(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length > 1)
+            {
+                throw new ArgumentException("read-line requires zero or one arguments");
+            }
+
+            object? port = GetInputPort(runtime, scope, args.Length == 1 ? args[0] : null);
+
+            if (port is not TextReader tr)
+            {
+                throw new ArgumentException("Specified port is not a textual input port");
+            }
+
+            string? value = tr.ReadLine();
+
+            if (value == null)
+            {
+                return EofObject.Instance;
+            }
+
+            return value;
+        }
     }
 }

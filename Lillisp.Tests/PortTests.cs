@@ -47,5 +47,12 @@ namespace Lillisp.Tests
             Assert.Equal('C', list[2]);
             Assert.Equal(true, list[3]);
         }
+
+        [InlineData("(parameterize ((current-input-port (open-input-string \"ABC\\nDEF\"))) (list (read-line) (read-line)))", new object[] { "ABC", "DEF" })]
+        [Theory]
+        public void ReadLineTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
     }
 }
