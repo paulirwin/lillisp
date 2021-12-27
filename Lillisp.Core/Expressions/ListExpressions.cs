@@ -168,4 +168,70 @@ public static class ListExpressions
 
         return Core.List.FromNodes(listPair.Reverse());
     }
+
+    public static object? SetCar(object?[] args)
+    {
+        if (args.Length != 2)
+        {
+            throw new ArgumentException("set-car! requires two arguments");
+        }
+
+        if (args[0] is not Pair pair)
+        {
+            throw new ArgumentException("set-car!'s first argument must be a pair or list");
+        }
+
+        pair.Car = args[1];
+
+        return Nil.Value;
+    }
+
+    public static object? SetCdr(object?[] args)
+    {
+        if (args.Length != 2)
+        {
+            throw new ArgumentException("set-cdr! requires two arguments");
+        }
+
+        if (args[0] is not Pair pair)
+        {
+            throw new ArgumentException("set-cdr!'s first argument must be a pair or list");
+        }
+
+        pair.Cdr = args[1];
+
+        return Nil.Value;
+    }
+
+    public static object? ListSet(object?[] args)
+    {
+        if (args.Length != 3)
+        {
+            throw new ArgumentException("list-set! requires three arguments");
+        }
+
+        if (args[0] is not Pair { IsList: true } list)
+        {
+            throw new ArgumentException("list-set!'s first argument must be a list");
+        }
+
+        int k = Convert.ToInt32(args[1]);
+        object? obj = args[2];
+
+        object? next = list;
+        int i = 0;
+
+        while (next is Pair p)
+        {
+            if (i++ == k)
+            {
+                p.Car = obj;
+                return Nil.Value;
+            }
+
+            next = p.Cdr;
+        }
+
+        throw new InvalidOperationException("Invalid list element or end of list encountered");
+    }
 }

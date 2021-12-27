@@ -131,4 +131,19 @@ public class ListTests
     {
         TestHelper.DefaultTest(input, expected);
     }
+
+    [InlineData("(let ((x (list 1 2 3))) (set-car! x 4) x)", new object[] { 4, 2, 3 })]
+    [InlineData("(let ((x (list 1 2 3))) (set-cdr! x 4) (list? x))", false)]
+    [Theory]
+    public void SetCarCdrTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
+
+    [InlineData("(let ((ls (list 1 2 5)))\r\n(list-set! ls 2 3)\r\nls)", new object[] { 1, 2, 3 })]
+    [Theory]
+    public void ListSetTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
 }

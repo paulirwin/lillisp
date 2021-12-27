@@ -253,7 +253,7 @@ namespace Lillisp.Tests
         [InlineData("(list? '(a b c))", true)]
         [InlineData("(list? '())", true)]
         [InlineData("(list? '(a . b))", false)]
-        //[InlineData("(let ((x (list 'a)))\r\n(set-cdr! x x)\r\n(list? x))", false)] // TODO: support set-cdr!
+        [InlineData("(let ((x (list 'a)))\r\n(set-cdr! x 'b)\r\n(list? x))", false)]
         [Theory]
         public void ListCheckTests(string input, bool expected)
         {
