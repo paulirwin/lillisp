@@ -147,7 +147,7 @@ namespace Lillisp.Core
                 _pairStop = false;
             }
 
-            public object? Current => _currentNode ?? throw new InvalidOperationException("Must call MoveNext first");
+            public object? Current => _currentNode;
 
             object IEnumerator.Current => Current;
 

@@ -190,6 +190,7 @@ namespace Lillisp.Core
             ["log"] = MathExpressions.Log,
             ["magnitude"] = ComplexExpressions.Magnitude,
             ["make-bytevector"] = BytevectorExpressions.MakeBytevector,
+            ["make-list"] = ListExpressions.MakeList,
             ["make-polar"] = ComplexExpressions.MakePolar,
             ["make-promise"] = DynamicExpressions.MakePromise,
             ["make-rectangular"] = ComplexExpressions.MakeRectangular,
