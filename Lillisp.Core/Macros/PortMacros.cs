@@ -437,13 +437,20 @@ public static class PortMacros
 
         var port = runtime.Evaluate(scope, args[0]);
 
-        if (port is not Stream or TextReader or TextWriter)
+        if (port is not Stream and not TextReader and not TextWriter)
         {
             throw new InvalidOperationException("call-with-port's first argument must evaluate to a port");
         }
 
         var proc = runtime.Evaluate(scope, args[1]);
 
-        return runtime.InvokeExpression(scope, proc, new[] { port });
+        var result = runtime.InvokePossibleTailCallExpression(scope, proc, new[] { port });
+
+        if (port is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+
+        return result;
     }
 }

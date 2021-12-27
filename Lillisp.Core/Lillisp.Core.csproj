@@ -8,12 +8,14 @@
   <ItemGroup>
     <None Remove="Library\base.lisp" />
     <None Remove="Library\cxr.lisp" />
+    <None Remove="Library\file.lisp" />
     <None Remove="Library\inexact.lisp" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Library\base.lisp" />
     <EmbeddedResource Include="Library\cxr.lisp" />
+    <EmbeddedResource Include="Library\file.lisp" />
     <EmbeddedResource Include="Library\inexact.lisp" />
   </ItemGroup>
 
