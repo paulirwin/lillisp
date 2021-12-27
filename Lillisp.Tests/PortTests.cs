@@ -63,9 +63,24 @@ namespace Lillisp.Tests
         }
 
         [InlineData("(parameterize ((current-input-port (open-input-string \"abc\"))) (char-ready?)))", true)]
-        [InlineData("(char-ready?)", true)]
+        [InlineData("(char-ready?)", false)]
         [Theory]
         public void CharReadyTests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(parameterize ((current-input-port (open-input-bytevector (string->utf8 \"abc\")))) (peek-u8)))", (byte)97)]
+        [Theory]
+        public void PeekU8Tests(string input, object expected)
+        {
+            TestHelper.DefaultTest(input, expected);
+        }
+
+        [InlineData("(parameterize ((current-input-port (open-input-bytevector (string->utf8 \"abc\")))) (u8-ready?)))", true)]
+        [InlineData("(parameterize ((current-input-port (Console/OpenStandardInput))) (u8-ready?)))", false)]
+        [Theory]
+        public void U8ReadyTests(string input, object expected)
         {
             TestHelper.DefaultTest(input, expected);
         }

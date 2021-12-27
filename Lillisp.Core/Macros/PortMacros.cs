@@ -374,12 +374,59 @@ namespace Lillisp.Core.Macros
                 throw new ArgumentException("Specified port is not a textual input port");
             }
 
-            if (tr is StreamReader sr)
+            return tr switch
             {
-                return sr.BaseStream.CanRead;
+                StreamReader sr => sr.BaseStream.CanSeek,
+                StringReader => true,
+                _ => false
+            };
+        }
+
+        public static object? PeekU8(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length > 1)
+            {
+                throw new ArgumentException("peek-u8 requires zero or one arguments");
             }
 
-            return true; // Deviation: all terminal streams return #t despite potential to hang
+            object? port = GetInputPort(runtime, scope, args.Length == 1 ? args[0] : null);
+
+            if (port is not Stream stream)
+            {
+                throw new ArgumentException("Specified port is not a binary input port");
+            }
+
+            if (!stream.CanSeek)
+            {
+                throw new ArgumentException("Stream does not support peeking");
+            }
+
+            int value = stream.ReadByte();
+            stream.Seek(-1, SeekOrigin.Current);
+
+            if (value == -1)
+            {
+                return EofObject.Instance;
+            }
+
+            return (byte)value;
+        }
+
+        public static object? U8Ready(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length > 1)
+            {
+                throw new ArgumentException("u8-ready? requires zero or one arguments");
+            }
+
+            object? port = GetInputPort(runtime, scope, args.Length == 1 ? args[0] : null);
+
+            if (port is not Stream s)
+            {
+                throw new ArgumentException("Specified port is not a binary input port");
+            }
+
+            return s.CanSeek;
         }
     }
 }
