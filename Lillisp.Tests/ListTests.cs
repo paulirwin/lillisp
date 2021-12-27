@@ -116,4 +116,19 @@ public class ListTests
 
         Assert.Equal(expected, (IEnumerable<object>)result);
     }
+
+    [InlineData("(list-tail '(1 2 3 4 5) 3)", new object[] { 4, 5 })]
+    [InlineData("(list-tail '(1 2 3 4 5) 4)", new object[] { 5 })]
+    [Theory]
+    public void ListTailTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
+
+    [InlineData("(list-ref '(1 2 3 4 5) 3)", 4)]
+    [Theory]
+    public void ListRefTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
 }

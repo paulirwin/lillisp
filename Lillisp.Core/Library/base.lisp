@@ -9,3 +9,11 @@
 (define (negative? x) (< x 0))
 (define (zero? x) (= x 0))
 (define (square x) (* x x))
+
+(define list-tail
+	(lambda (x k)
+		(if (zero? k)
+		x
+		(list-tail (cdr x) (- k 1)))))
+(define list-ref
+	(lambda (x k) (car (list-tail x k))))
