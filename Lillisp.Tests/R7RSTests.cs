@@ -198,8 +198,7 @@ namespace Lillisp.Tests
 
         [InlineData("(cond ((> 3 2) \"greater\") ((< 3 2) \"less\"))", "greater")]
         [InlineData("(cond ((> 3 3) \"greater\") ((< 3 3) \"less\") (else \"equal\"))", "equal")]
-        // HACK: For some reason, Skip property not working... but need to support arrow syntax, assv, and cadr
-        //[InlineData("(cond ((assv 'b '((a 1) (b 2))) => cadr) (else #f))", 2d)]
+        [InlineData("(cond ((assv 'b '((a 1) (b 2))) => cadr) (else #f))", 2)]
         [Theory]
         public void R7RS_4_2_1_Cond_Examples(string input, object expected)
         {

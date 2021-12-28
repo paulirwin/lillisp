@@ -527,43 +527,20 @@ public static class CoreMacros
 
         foreach (var clause in clauses)
         {
-            var test = runtime.Evaluate(scope, clause.Car);
-
-            if (test.IsTruthy())
+            if (CondClauseUtility.EvaluateCondClause(runtime, scope, clause, out var result))
             {
-                object? result = Nil.Value;
-
-                var clauseForms = clause.ToList();
-
-                for (int i = 1; i < clauseForms.Count; i++)
-                {
-                    var expr = clauseForms[i];
-
-                    result = (i == clauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
-                }
-
                 return result;
             }
         }
 
         if (elseClause != null)
         {
-            object? result = Nil.Value;
-
-            var clauseForms = elseClause.ToList();
-
-            for (int i = 1; i < clauseForms.Count; i++)
-            {
-                var expr = clauseForms[i];
-
-                result = (i == clauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
-            }
-
-            return result;
+            return CondClauseUtility.EvaluateCondElseClause(runtime, scope, elseClause);
         }
 
         throw new InvalidOperationException("No clause matched for the cond expression");
     }
+
 
     public static object? Delay(LillispRuntime runtime, Scope scope, object?[] args)
     {

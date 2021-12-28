@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Lillisp.Core.Macros
 {
@@ -81,6 +82,71 @@ namespace Lillisp.Core.Macros
             }
 
             return handlerProc.Invoke(runtime, scope, new[] { arg }, disableTailCalls: true);
+        }
+
+        public static object? Guard(LillispRuntime runtime, Scope scope, object?[] args)
+        {
+            if (args.Length == 0 || args[0] is not Pair { IsList: true } condList)
+            {
+                throw new ArgumentException("guard requires at least one cond list argument");
+            }
+
+            if (condList.Car is not Symbol variableName)
+            {
+                throw new ArgumentException("First item in the guard cond list must be a variable name");
+            }
+
+            var body = args.Skip(1).ToList();
+
+            try
+            {
+                object? result = Nil.Value;
+                
+                foreach (var node in body)
+                {
+                    result = runtime.Evaluate(scope, node);
+                }
+
+                return result;
+            }
+            catch (RaisedException ex)
+            {
+                return EvaluateGuardCondList(runtime, scope, condList, variableName.Value, ex.Expression);
+            }
+            catch (Exception ex)
+            {
+                return EvaluateGuardCondList(runtime, scope, condList, variableName.Value, ex);
+            }
+        }
+
+        private static object? EvaluateGuardCondList(LillispRuntime runtime, Scope scope, Pair condList, string variableName, object? variable)
+        {
+            var childScope = scope.CreateChildScope();
+            childScope.Define(variableName, variable);
+
+            var clauses = condList.Skip(1).Cast<Pair>().ToArray();
+            Pair? elseClause = null;
+
+            if (clauses[^1].Car is Symbol { Value: "else" })
+            {
+                elseClause = clauses[^1];
+                clauses = clauses[..^1];
+            }
+
+            foreach (var clause in clauses)
+            {
+                if (CondClauseUtility.EvaluateCondClause(runtime, childScope, clause, out var result))
+                {
+                    return result;
+                }
+            }
+
+            if (elseClause != null)
+            {
+                return CondClauseUtility.EvaluateCondElseClause(runtime, childScope, elseClause);
+            }
+
+            throw new InvalidOperationException("No clause matched for the cond expression");
         }
     }
 }

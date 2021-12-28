@@ -1,10 +1,10 @@
-﻿namespace Lillisp.Core
+﻿namespace Lillisp.Core;
+
+public enum AtomType
 {
-    public enum AtomType
-    {
-        Number,
-        String,
-        Character,
-        Boolean
-    }
+    Number,
+    String,
+    Character,
+    Boolean,
+    RuntimeReference,
 }

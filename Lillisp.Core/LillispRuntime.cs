@@ -48,6 +48,7 @@ namespace Lillisp.Core
             ["display"] = PortMacros.Display,
             ["eval"] = CoreMacros.Eval,
             ["from"] = LispINQMacros.From,
+            ["guard"] = ExceptionMacros.Guard,
             ["if"] = CoreMacros.If,
             ["include"] = CoreMacros.Include,
             //["include-ci"] = CoreMacros.Include, // TODO
