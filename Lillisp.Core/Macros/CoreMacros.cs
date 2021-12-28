@@ -602,4 +602,86 @@ public static class CoreMacros
 
         return runtime.Evaluate(scope, runtime.Evaluate(scope, args[0]));
     }
+
+    public static object? Case(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("case requires at least one argument");
+        }
+
+        var key = runtime.Evaluate(scope, args[0]);
+
+        var clauses = args.Skip(1).Cast<Pair>().ToArray();
+        Pair? elseClause = null;
+
+        if (clauses[^1].Car is Symbol { Value: "else" })
+        {
+            elseClause = clauses[^1];
+            clauses = clauses[..^1];
+        }
+
+        foreach (var clause in clauses)
+        {
+            if (clause.Car is not Pair { IsList: true } datums)
+            {
+                throw new ArgumentException("Clause was in an invalid form");
+            }
+
+            foreach (var datum in datums.Cast<Node>())
+            {
+                var datumValue = runtime.Evaluate(scope, new Quote(datum));
+
+                if (Equals(datumValue, key))
+                {
+                    var clauseForms = clause.ToList();
+
+                    if (clauseForms.Count == 1)
+                    {
+                        return key;
+                    }
+
+                    if (clauseForms.Count == 3 && clauseForms[1] is Symbol { Value: "=>" })
+                    {
+                        var expr = clauseForms[2];
+                        var proc = runtime.Evaluate(scope, expr);
+                        return LillispRuntime.TailCall(scope, new Pair(proc, new Pair(new Atom(AtomType.RuntimeReference, key), Nil.Value)));
+                    }
+
+                    for (int i = 1; i < clauseForms.Count; i++)
+                    {
+                        var expr = clauseForms[i];
+
+                        return (i == clauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
+                    }
+                }
+            }
+        }
+
+        if (elseClause != null)
+        {
+            var elseClauseForms = elseClause.ToList();
+
+            if (elseClauseForms.Count == 1)
+            {
+                return key;
+            }
+
+            if (elseClauseForms.Count == 3 && elseClauseForms[1] is Symbol { Value: "=>" })
+            {
+                var expr = elseClauseForms[2];
+                var proc = runtime.Evaluate(scope, expr);
+                return LillispRuntime.TailCall(scope, new Pair(proc, new Pair(new Atom(AtomType.RuntimeReference, key), Nil.Value)));
+            }
+
+            for (int i = 1; i < elseClauseForms.Count; i++)
+            {
+                var expr = elseClauseForms[i];
+
+                return (i == elseClauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
+            }
+        }
+
+        return false;
+    }
 }
