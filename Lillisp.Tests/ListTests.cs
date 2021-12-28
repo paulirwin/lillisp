@@ -146,4 +146,32 @@ public class ListTests
     {
         TestHelper.DefaultTest(input, expected);
     }
+
+    [InlineData("(str (memq 'a '(a b c)))", "(a b c)")]
+    [InlineData("(str (memq 'b '(a b c)))", "(b c)")]
+    [InlineData("(memq 'a '(b c d))", false)]
+    [InlineData("(memq (list 'a) '(b (a) c))", false)]
+    [InlineData("(str (member (list 'a) '(b (a) c)))", "((a) c)")]
+    [InlineData("(member \"B\" '(\"a\" \"b\" \"c\") string-ci=?)", new object[] { "b", "c" })]
+    [InlineData("(memq 101 '(100 101 102))", false)]
+    [InlineData("(memv 101 '(100 101 102))", new object[] { 101, 102 })]
+    [Theory]
+    public void MemqMemvMemberTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
+
+    [InlineData("(define e '((a 1) (b 2) (c 3)))(str (assq 'a e))", "(a 1)")]
+    [InlineData("(define e '((a 1) (b 2) (c 3)))(str (assq 'b e))", "(b 2)")]
+    [InlineData("(define e '((a 1) (b 2) (c 3)))(assq 'd e)", false)]
+    [InlineData("(assq (list 'a) '(((a)) ((b)) ((c))))", false)]
+    [InlineData("(str (assoc (list 'a) '(((a)) ((b)) ((c)))))", "((a))")]
+    [InlineData("(str (assoc 2.0 '((1 1) (2 4) (3 9)) =))", "(2 4)")]
+    [InlineData("(assq 5 '((2 3) (5 7) (11 13)))", false)]
+    [InlineData("(str (assv 5 '((2 3) (5 7) (11 13))))", "(5 7)")]
+    [Theory]
+    public void AssqAssvAssocTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
 }
