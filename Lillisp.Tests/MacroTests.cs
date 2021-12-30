@@ -127,4 +127,43 @@ public class MacroTests
     {
         TestHelper.DefaultTest(input, expected);
     }
+
+    [Fact]
+    public void DefineSyntaxBasicTest()
+    {
+        string program = @"
+(define-syntax kwote
+  (syntax-rules ()
+    ((kwote exp)
+     (quote exp))))
+(kwote (""foo"" ""bar""))
+";
+
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(program);
+
+        Assert.Equal(new object[] { "foo", "bar" }, result);
+    }
+    
+    [Fact(Skip = "WIP")]
+    public void LetSyntaxBasicTest()
+    {
+        string program = @"
+(let-syntax 
+    ((given-that (syntax-rules ()
+        ((given-that test stmt1 stmt2 ...)
+        (if test (begin stmt1 stmt2 ...))))))
+(let 
+    ((if #t))
+    (given-that if (set! if ""now""))
+    if))
+";
+
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(program);
+
+        Assert.Equal("now", result);
+    }
 }

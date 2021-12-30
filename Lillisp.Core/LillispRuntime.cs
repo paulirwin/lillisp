@@ -42,6 +42,7 @@ namespace Lillisp.Core
             ["defenum"] = EmitMacros.DefineEnum,
             ["define"] = CoreMacros.Define,
             ["define-record-type"] = CoreMacros.DefineRecordType,
+            ["define-syntax"] = SchemeMacroMacros.DefineSyntax,
             ["defrecord"] = EmitMacros.DefineRecord,
             ["defun"] = CoreMacros.Defun,
             ["delay"] = CoreMacros.Delay,
@@ -56,6 +57,7 @@ namespace Lillisp.Core
             ["lambda"] = CoreMacros.Lambda,
             ["let"] = CoreMacros.Let,
             ["let*"] = CoreMacros.LetStar,
+            ["let-syntax"] = SchemeMacroMacros.LetSyntax,
             ["letrec"] = CoreMacros.Let,
             ["letrec*"] = CoreMacros.LetStar,
             ["make-parameter"] = ParameterMacros.MakeParameter,
@@ -516,7 +518,12 @@ namespace Lillisp.Core
 
             if (op is MacroExpression macro)
             {
-                return macro(this, scope, pair.Skip(1).Cast<object>().ToArray());
+                return macro(this, scope, pair.Skip(1).ToArray());
+            }
+
+            if (op is Syntax syntax)
+            {
+                return Evaluate(scope, syntax.Transform(pair.Skip(1).Cast<Node>().ToArray()));
             }
 
             var args = pair.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
