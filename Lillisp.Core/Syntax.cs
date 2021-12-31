@@ -5,6 +5,13 @@ namespace Lillisp.Core;
 
 public class Syntax
 {
+    public Syntax(Scope scope)
+    {
+        Scope = scope;
+    }
+
+    public Scope Scope { get; }
+
     public IList<Symbol> Literals { get; set; } = new List<Symbol>();
 
     public IList<SyntaxRule> Rules { get; set; } = new List<SyntaxRule>();
@@ -13,7 +20,7 @@ public class Syntax
     {
         foreach (var rule in Rules)
         {
-            if (rule.TryTransform(args, out var node) && node != null)
+            if (rule.TryTransform(Scope, args, out var node) && node != null)
             {
                 return node;
             }

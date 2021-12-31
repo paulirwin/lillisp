@@ -421,7 +421,8 @@ public static class CoreMacros
         return LetInternal(runtime, scope, args, bindings, false, true);
     }
 
-    private static object? LetInternal(LillispRuntime runtime, Scope scope, object?[] args, Pair bindings, bool requireDistinctVariables, bool evaluateInChildScope)
+    // TODO: refactor outside of this class
+    internal static object? LetInternal(LillispRuntime runtime, Scope scope, object?[] args, Pair bindings, bool requireDistinctVariables, bool evaluateInChildScope)
     {
         var childScope = scope.CreateChildScope();
         var evaluatedSymbols = new HashSet<string>();

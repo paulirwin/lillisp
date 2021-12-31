@@ -18,23 +18,52 @@ public static class SchemeMacroMacros
             throw new ArgumentException("define-syntax's first argument must be an identifier");
         }
 
-        if (args[1] is not Pair { Car: Symbol { Value: "syntax-rules" } } syntaxRules)
+        if (args[1] is not Pair { Car: Symbol { Value: "syntax-rules" } })
         {
             throw new ArgumentException("define-syntax's second argument must be a transformer spec");
         }
 
-        var macro = BuildMacro(syntaxRules);
+        var macro = runtime.Evaluate(scope, args[1]);
 
         scope.Define(keyword.Value, macro);
 
         return keyword;
     }
 
-    private static Syntax BuildMacro(Pair syntaxRules)
+    private static Node ResolvePatternNode(Node node, IList<Symbol> literals)
     {
-        var args = syntaxRules.Skip(1).ToList();
+        return node switch
+        {
+            Symbol symbol => literals.Contains(symbol) ? new SyntaxLiteral(symbol) : symbol,
+            Pair { Car: Node carNode, Cdr: Node cdrNode } pair => new Pair(ResolvePatternNode(carNode, literals), ResolvePatternNode(cdrNode, literals)), 
+            _ => node,
+        };
+    }
+
+    public static object? LetSyntax(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("let-syntax requires at least one argument");
+        }
+
+        if (args[0] is not Pair bindings)
+        {
+            throw new ArgumentException("let-syntax's first parameter must be a list");
+        }
+
+        if (bindings.Any(binding => binding is not Pair { Cdr: Pair { Car: Pair { Car: Symbol { Value: "syntax-rules" } } } }))
+        {
+            throw new ArgumentException("Only syntax-rules are supported for let-syntax bindings");
+        }
+
+        return CoreMacros.LetInternal(runtime, scope, args, bindings, true, false);
+    }
+
+    public static object? SyntaxRules(LillispRuntime runtime, Scope scope, object?[] args)
+    {
         var literals = args[0] is Pair literalPair ? literalPair.Cast<Symbol>().ToList() : new List<Symbol>();
-        var syntax = new Syntax { Literals = literals };
+        var syntax = new Syntax(scope) { Literals = literals };
 
         foreach (var syntaxRule in args.Skip(1).Cast<Pair>())
         {
@@ -55,25 +84,9 @@ public static class SchemeMacroMacros
 
             var rule = new SyntaxRule(keyword, patternNodes, templateNode);
 
-
             syntax.Rules.Add(rule);
         }
 
         return syntax;
-    }
-
-    private static Node ResolvePatternNode(Node node, IList<Symbol> literals)
-    {
-        return node switch
-        {
-            Symbol symbol => literals.Contains(symbol) ? new SyntaxLiteral(symbol) : symbol,
-            Pair { Car: Node carNode, Cdr: Node cdrNode } pair => new Pair(ResolvePatternNode(carNode, literals), ResolvePatternNode(cdrNode, literals)), 
-            _ => node,
-        };
-    }
-
-    public static object? LetSyntax(LillispRuntime runtime, Scope scope, object?[] args)
-    {
-        throw new NotImplementedException();
     }
 }

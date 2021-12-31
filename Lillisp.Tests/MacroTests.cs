@@ -146,7 +146,7 @@ public class MacroTests
         Assert.Equal(new object[] { "foo", "bar" }, result);
     }
     
-    [Fact(Skip = "WIP")]
+    [Fact]
     public void LetSyntaxBasicTest()
     {
         string program = @"
