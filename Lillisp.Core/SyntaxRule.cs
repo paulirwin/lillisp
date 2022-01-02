@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Lillisp.Core;
 
@@ -28,15 +29,20 @@ public class SyntaxRule
         for (int i = 0; i < PatternNodes.Count; i++)
         {
             var patternNode = PatternNodes[i];
-            var arg = args.Length > i ? args[i] : null;
+            int end = patternNode is Symbol { Value: "..." } ? Math.Max(i + 1, args.Length) : i + 1;
 
-            if (!NodeMatches(patternNode, arg))
-                return false;
-
-            if (patternNode is Symbol patternVariable)
+            for (int j = i; j < end; j++)
             {
-                replacements ??= new Dictionary<Symbol, Node?>();
-                replacements[patternVariable] = arg;
+                var arg = args.Length > j ? args[j] : null;
+
+                if (!NodeMatches(patternNode, arg))
+                    return false;
+
+                if (patternNode is Symbol patternVariable)
+                {
+                    replacements ??= new Dictionary<Symbol, Node?>();
+                    replacements[patternVariable] = arg;
+                }
             }
         }
 

@@ -166,4 +166,22 @@ public class MacroTests
 
         Assert.Equal("now", result);
     }
+
+    [Fact]
+    public void MacroEllipsisTest()
+    {
+string program = @"
+(define-syntax my-when
+  (syntax-rules ()
+    ((my-when c e ...)
+     (if c (begin e ...)))))
+(my-when #t 1 2 3)
+";
+
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(program);
+
+        Assert.Equal(3, result);
+    }
 }
