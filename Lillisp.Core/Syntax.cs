@@ -16,7 +16,7 @@ public class Syntax
 
     public IList<SyntaxRule> Rules { get; set; } = new List<SyntaxRule>();
 
-    public Node Transform(Node[] args)
+    public Node? Transform(Node[] args)
     {
         foreach (var rule in Rules)
         {

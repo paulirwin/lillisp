@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Lillisp.Core
 {
@@ -54,6 +55,18 @@ namespace Lillisp.Core
             }
 
             return (Node?)list ?? Nil.Value;
+        }
+
+        public static Node SpreadCar(SyntaxRestArgs restArgs, object? cdr)
+        {
+            IEnumerable<object?> enumerable = restArgs.Children;
+
+            if (cdr != null && cdr is not Nil)
+            {
+                enumerable = enumerable.Append(cdr);
+            }
+
+            return FromNodes(enumerable);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -60,6 +61,7 @@ namespace Lillisp.Core
             ["let-syntax"] = SchemeMacroMacros.LetSyntax,
             ["letrec"] = CoreMacros.Let,
             ["letrec*"] = CoreMacros.LetStar,
+            ["letrec-syntax"] = SchemeMacroMacros.LetSyntax,
             ["make-parameter"] = ParameterMacros.MakeParameter,
             ["map"] = CoreMacros.Map,
             ["new"] = InteropMacros.New,
@@ -438,8 +440,8 @@ namespace Lillisp.Core
                 Vector vector => EvaluateVector(scope, vector),
                 Bytevector bv => bv,
                 Pair pair => EvaluateExpression(scope, pair),
+                SyntaxBinding binding => TryEvaluateSymbol(binding.Scope, binding, arity, out var value) ? value : EvaluateSymbol(scope, binding, arity),
                 Symbol symbol => EvaluateSymbol(scope, symbol, arity),
-                SyntaxBinding binding => EvaluateSymbol(binding.Scope, binding.Symbol, arity),
                 Atom atom => atom.Value,
                 Quote quote => Quote(scope, quote),
                 Quasiquote quote => Quote(scope, quote),
@@ -457,25 +459,37 @@ namespace Lillisp.Core
         
         private static object? EvaluateSymbol(Scope scope, Symbol node, int? arity)
         {
+            if (TryEvaluateSymbol(scope, node, arity, out var value))
+            {
+                return value;
+            }
+
+            throw new ArgumentException($"Unable to resolve symbol {node}");
+        }
+
+        private static bool TryEvaluateSymbol(Scope scope, Symbol node, int? arity, out object? value)
+        {
+            value = null;
+
             string? symbol = node.Value;
 
             if (symbol is null or "null")
-                return null;
+                return true;
 
             if (symbol == "nil")
-                return Nil.Value;
+            {
+                value = Nil.Value;
+                return true;
+            }
 
-            object? value = scope.Resolve(symbol);
+            value = scope.Resolve(symbol);
 
             if (value != null)
-                return value;
+                return true;
 
             value = Interop.ResolveSymbol(scope, symbol, arity);
 
-            if (value != null)
-                return value;
-
-            throw new ArgumentException($"Unable to resolve symbol {node}");
+            return value != null;
         }
 
         private object? EvaluateExpression(Scope scope, Pair pair)
@@ -520,17 +534,33 @@ namespace Lillisp.Core
 
             if (op is MacroExpression macro)
             {
+                Debug.WriteLine("Invoking macro: {0}", pair.Car);
                 return macro(this, scope, pair.Skip(1).ToArray());
             }
 
             if (op is Syntax syntax)
             {
-                return Evaluate(scope, syntax.Transform(pair.Skip(1).Cast<Node>().ToArray()));
+                Debug.WriteLine("Evaluating syntax: {0}", pair);
+                var node = syntax.Transform(pair.Skip(1).Cast<Node>().Select(i => BindSyntaxArgNode(scope, i)).ToArray());
+                Debug.WriteLine("Syntax expanded to: {0}", node);
+                return Evaluate(scope, node);
             }
 
+            Debug.WriteLine("Invoking expression: {0}", pair.Car);
             var args = pair.Skip(1).Select(i => Evaluate(scope, i)).ToArray();
 
             return InvokeExpression(scope, op, args);
+        }
+
+        private static Node BindSyntaxArgNode(Scope scope, Node node)
+        {
+            return node switch
+            {
+                SyntaxBinding binding => binding, // pass-thru
+                Symbol symbol => new SyntaxBinding(symbol, scope),
+                Pair { Car: Node carNode, Cdr: Node cdrNode } => new Pair(BindSyntaxArgNode(scope, carNode), BindSyntaxArgNode(scope, cdrNode)),
+                _ => node,
+            };
         }
 
         public object? InvokePossibleTailCallExpression(Scope scope, object? expression, object?[] args)

@@ -170,7 +170,7 @@ public class MacroTests
     [Fact]
     public void MacroEllipsisTest()
     {
-string program = @"
+        string program = @"
 (define-syntax my-when
   (syntax-rules ()
     ((my-when c e ...)
@@ -183,5 +183,30 @@ string program = @"
         var result = runtime.EvaluateProgram(program);
 
         Assert.Equal(3, result);
+    }
+
+    [Fact]
+    public void LetRecSyntaxTest()
+    {
+        string program = @"
+(letrec-syntax
+    ((my-or 
+        (syntax-rules ()
+            ((my-or) #f)
+            ((my-or e) e)
+            ((my-or e1 e2 ...) (let ((temp e1)) (if temp temp (my-or e2 ...))))
+        )
+    ))
+    (let ((x #f) (y 7) (temp 8) (let odd?) (if even?))
+        (my-or x (let temp) (if y) y)
+    )
+)
+";
+
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(program);
+
+        Assert.Equal(7, result);
     }
 }
