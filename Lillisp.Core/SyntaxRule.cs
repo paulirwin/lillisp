@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace Lillisp.Core;
 
@@ -84,6 +87,23 @@ public class SyntaxRule
         {
             pair = carCdrPair;
             car = TransformPairCar(syntaxScope, replacements, restArgs, pair);
+        }
+
+        if (car is Symbol { Value: "syntax-error" })
+        {
+            if (pair.Cdr is not Pair { IsList: true } errorArgsCdr)
+            {
+                throw new SyntaxError("A syntax error was encountered upon macro expansion.", new List<object?>());
+            }
+
+            var errorArgs = errorArgsCdr.Select(i => i is Node iNode ? TransformNode(syntaxScope, iNode, replacements, restArgs) : i).ToList();
+
+            if (errorArgs.Count == 0)
+            {
+                throw new SyntaxError("A syntax error was encountered upon macro expansion.", new List<object?>());
+            }
+
+            throw new SyntaxError(errorArgs[0]?.ToString() ?? "(null)", errorArgs.Skip(1).ToList());
         }
 
         var cdr = pair.Cdr switch

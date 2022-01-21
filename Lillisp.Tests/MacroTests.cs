@@ -209,4 +209,32 @@ public class MacroTests
 
         Assert.Equal(7, result);
     }
+
+    [Fact]
+    public void SyntaxErrorTest()
+    {
+        string program = @"
+(letrec-syntax
+    ((err-or
+        (syntax-rules ()
+            ((err-or) #f)
+            ((err-or e) (syntax-error ""Expected many args, got"" e))
+            ((err-or e1 e2 ...) #t)
+        )
+    ))
+    (err-or 123)
+)
+";
+
+        var runtime = new LillispRuntime();
+
+        var error = Assert.Throws<SyntaxError>(() => runtime.EvaluateProgram(program));
+
+        Assert.Equal(1, error.Args.Count);
+
+        var atom = error.Args[0] as Atom;
+
+        Assert.NotNull(atom);
+        Assert.Equal(123, atom.Value);
+    }
 }
