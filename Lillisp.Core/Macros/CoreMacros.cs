@@ -756,9 +756,16 @@ public static class CoreMacros
                 runtime.Evaluate(childScope, command);
             }
 
+            var stepBindings = new List<(string var, object? value)>();
+
             foreach (var (var, step) in steps)
             {
-                childScope.Set(var, runtime.Evaluate(childScope, step));
+                stepBindings.Add((var, runtime.Evaluate(childScope, step)));
+            }
+
+            foreach (var (var, value) in stepBindings)
+            {
+                childScope.Set(var, value);
             }
         }
     }

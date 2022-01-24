@@ -240,6 +240,7 @@ public class MacroTests
 
     [InlineData("(do () (#t 1))", 1)]
     [InlineData("(do () (#t 1) 0)", 1)]
+    [InlineData("(let ((x '(1 3 5 7 9)))\r\n(do ((x x (cdr x))\r\n(sum 0 (+ sum (car x))))\r\n((null? x) sum)))", 25)]
     [Theory]
     public void DoTests(string input, object expected)
     {
