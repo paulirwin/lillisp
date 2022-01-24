@@ -685,4 +685,81 @@ public static class CoreMacros
 
         return false;
     }
+
+    public static object? Do(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("do requires at least two arguments");
+        }
+        
+        var childScope = scope.CreateChildScope();
+        var steps = new List<(string var, object? step)>();
+
+        if (args[0] is Pair { IsList: true } initExpressions)
+        {
+            foreach (var initExpression in initExpressions)
+            {
+                if (initExpression is not Pair { IsList: true } initPair)
+                {
+                    throw new ArgumentException("Unknown init expression format, must be a list of lists");
+                }
+
+                var initList = initPair.ToList();
+
+                if (initList.Count is < 2 or > 3)
+                {
+                    throw new ArgumentException("Init expressions must contain at least a variable and an init value");
+                }
+
+                if (initList[0] is not Symbol varSymbol)
+                {
+                    throw new ArgumentException("Variable init expressions must be a symbol");
+                }
+
+                childScope.DefineOrSet(varSymbol.Value, runtime.Evaluate(scope, initList[1]));
+
+                if (initList.Count == 3)
+                {
+                    steps.Add((varSymbol.Value, initList[2]));
+                }
+            }
+        }
+        else if (args[0] is not Nil)
+        {
+            throw new ArgumentException("Unknown init expressions format for do");
+        }
+
+        if (args[1] is not Pair { IsList: true } testExpression)
+        {
+            throw new ArgumentException("Unknown test expression format, must be a list");
+        }
+
+        while (true)
+        {
+            var testResult = runtime.Evaluate(childScope, testExpression.Car);
+
+            if (testResult.IsTruthy())
+            {
+                object? result = Nil.Value;
+
+                foreach (var expr in testExpression.Skip(1))
+                {
+                    result = runtime.Evaluate(childScope, expr);
+                }
+
+                return result;
+            }
+
+            foreach (var command in args.Skip(2))
+            {
+                runtime.Evaluate(childScope, command);
+            }
+
+            foreach (var (var, step) in steps)
+            {
+                childScope.Set(var, runtime.Evaluate(childScope, step));
+            }
+        }
+    }
 }

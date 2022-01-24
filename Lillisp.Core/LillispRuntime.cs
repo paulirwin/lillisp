@@ -49,6 +49,7 @@ namespace Lillisp.Core
             ["delay"] = CoreMacros.Delay,
             ["delay-force"] = CoreMacros.DelayForce,
             ["display"] = PortMacros.Display,
+            ["do"] = CoreMacros.Do,
             ["eval"] = CoreMacros.Eval,
             ["from"] = LispINQMacros.From,
             ["guard"] = ExceptionMacros.Guard,

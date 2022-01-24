@@ -237,4 +237,31 @@ public class MacroTests
         Assert.NotNull(atom);
         Assert.Equal(123, atom.Value);
     }
+
+    [InlineData("(do () (#t 1))", 1)]
+    [InlineData("(do () (#t 1) 0)", 1)]
+    [Theory]
+    public void DoTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
+
+    [Fact]
+    public void DoR7RSTest()
+    {
+        const string program = "(do ((vec (make-vector 5))\r\n(i 0 (+ i 1)))\r\n((= i 5) vec)\r\n(vector-set! vec i i))";
+
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(program) as Vector;
+
+        Assert.NotNull(result);
+
+        Assert.Equal(5, result.Count);
+        Assert.Equal(0, result[0]);
+        Assert.Equal(1, result[1]);
+        Assert.Equal(2, result[2]);
+        Assert.Equal(3, result[3]);
+        Assert.Equal(4, result[4]);
+    }
 }
