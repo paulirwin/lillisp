@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Lillisp.Core;
 using Xunit;
 
@@ -264,5 +265,54 @@ public class MacroTests
         Assert.Equal(2, result[2]);
         Assert.Equal(3, result[3]);
         Assert.Equal(4, result[4]);
+    }
+
+    [Fact]
+    public void NamedLetR7RSTest()
+    {
+        const string program = @"
+(let loop ((numbers '(3 -2 1 6 -5))
+           (nonneg '())
+           (neg '()))
+    (cond ((null? numbers) (list nonneg neg))
+        ((>= (car numbers) 0)
+         (loop (cdr numbers)
+            (cons (car numbers) nonneg)
+            neg))
+        ((< (car numbers) 0)
+         (loop (cdr numbers)
+            nonneg
+            (cons (car numbers) neg)))))";
+
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(program) as Pair;
+
+        Assert.NotNull(result);
+
+        var carPair = result.Car as Pair;
+        
+        Assert.NotNull(carPair);
+
+        var carList = carPair.ToList();
+
+        Assert.Equal(3, carList.Count);
+        Assert.Equal(6, carList[0]);
+        Assert.Equal(1, carList[1]);
+        Assert.Equal(3, carList[2]);
+
+        var cdrPair = result.Cdr as Pair;
+
+        Assert.NotNull(cdrPair);
+
+        var cdrCarPair = cdrPair.Car as Pair;
+
+        Assert.NotNull(cdrCarPair);
+
+        var cdrList = cdrCarPair.ToList();
+
+        Assert.Equal(2, cdrList.Count);
+        Assert.Equal(-5, cdrList[0]);
+        Assert.Equal(-2, cdrList[1]);
     }
 }

@@ -57,7 +57,7 @@ public static class SchemeMacroMacros
             throw new ArgumentException("Only syntax-rules are supported for let-syntax bindings");
         }
 
-        return CoreMacros.LetInternal(runtime, scope, args, bindings, true, false);
+        return CoreMacros.LetInternal(runtime, scope, args.Skip(1).ToArray(), null, bindings, true, false);
     }
 
     public static object? SyntaxRules(LillispRuntime runtime, Scope scope, object?[] args)

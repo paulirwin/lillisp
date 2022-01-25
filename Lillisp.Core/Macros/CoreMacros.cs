@@ -398,12 +398,17 @@ public static class CoreMacros
             throw new ArgumentException("let requires at least one argument");
         }
 
-        if (args[0] is not Pair bindings)
+        if (args[0] is Pair bindings)
         {
-            throw new ArgumentException("let's first parameter must be a list");
+            return LetInternal(runtime, scope, args.Skip(1).ToArray(), null, bindings, true, false);
+        }
+        
+        if (args[0] is Symbol namedLet && args.Length > 1 && args[1] is Pair namedLetBindings)
+        {
+            return LetInternal(runtime, scope, args.Skip(2).ToArray(), namedLet.Value, namedLetBindings, true, false);
         }
 
-        return LetInternal(runtime, scope, args, bindings, true, false);
+        throw new ArgumentException("let's first parameter must be a list or symbol");
     }
 
     public static object? LetStar(LillispRuntime runtime, Scope scope, object?[] args)
@@ -418,30 +423,30 @@ public static class CoreMacros
             throw new ArgumentException("let*'s first parameter must be a list");
         }
 
-        return LetInternal(runtime, scope, args, bindings, false, true);
+        return LetInternal(runtime, scope, args.Skip(1).ToArray(), null, bindings, false, true);
     }
 
     // TODO: refactor outside of this class
-    internal static object? LetInternal(LillispRuntime runtime, Scope scope, object?[] args, Pair bindings, bool requireDistinctVariables, bool evaluateInChildScope)
+    internal static object? LetInternal(LillispRuntime runtime, Scope scope, object?[] args, string? namedLet, Pair bindings, bool requireDistinctVariables, bool evaluateInChildScope)
     {
         var childScope = scope.CreateChildScope();
-        var evaluatedSymbols = new HashSet<string>();
+        var evaluatedSymbols = new List<Symbol>();
 
         foreach (var binding in bindings)
         {
             if (binding is Symbol symbol)
             {
-                if (requireDistinctVariables && evaluatedSymbols.Contains(symbol.Value))
+                if (requireDistinctVariables && evaluatedSymbols.Contains(symbol))
                 {
                     throw new ArgumentException($"Variable {symbol} has already been defined in this scope");
                 }
 
                 childScope.DefineOrSet(symbol.Value, Nil.Value);
-                evaluatedSymbols.Add(symbol.Value);
+                evaluatedSymbols.Add(symbol);
             }
             else if (binding is Pair { IsList: true, Car: Symbol listSymbol } list)
             {
-                if (requireDistinctVariables && evaluatedSymbols.Contains(listSymbol.Value))
+                if (requireDistinctVariables && evaluatedSymbols.Contains(listSymbol))
                 {
                     throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
                 }
@@ -456,7 +461,7 @@ public static class CoreMacros
                 var value = runtime.Evaluate(evaluateInChildScope ? childScope : scope, bindingValue);
 
                 childScope.DefineOrSet(listSymbol.Value, value);
-                evaluatedSymbols.Add(listSymbol.Value);
+                evaluatedSymbols.Add(listSymbol);
             }
             else
             {
@@ -464,9 +469,15 @@ public static class CoreMacros
             }
         }
 
+        if (namedLet != null)
+        {
+            var namedLetProc = CreateProcedure(List.FromNodes(evaluatedSymbols), args.Cast<Node>().ToArray());
+            childScope.DefineOrSet(namedLet, namedLetProc);
+        }
+
         object? result = Nil.Value;
 
-        for (int i = 1; i < args.Length; i++)
+        for (int i = 0; i < args.Length; i++)
         {
             if (args[i] is Node node)
             {
