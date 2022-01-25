@@ -33,3 +33,29 @@
 				(if (predicate obj (caar alist)) (car alist) (assoc obj (cdr alist) predicate))))))
 (define assq (lambda (obj alist) (assoc obj alist eq?)))
 (define assv (lambda (obj alist) (assoc obj alist eqv?)))
+
+#| this doesn't currently work...
+(define-syntax case-lambda
+	(syntax-rules ()
+		((case-lambda (params body0 ...) ...)
+			(lambda args
+				(let ((len (length args)))
+					(letrec-syntax
+						((cl (syntax-rules ::: ()
+							((cl)
+							 (error "no matching clause"))
+							((cl ((p :::) . body) . rest)
+							 (if (= len (length '(p :::)))
+								(apply (lambda (p :::)
+											. body)
+										args)
+								(cl . rest)))
+						((cl ((p ::: . tail) . body)
+							. rest)
+						 (if (>= len (length '(p :::)))
+							(apply
+							 (lambda (p ::: . tail)
+								. body)
+							 args)
+							(cl . rest))))))
+						(cl (params body0 ...) ...))))))) |#

@@ -780,4 +780,40 @@ public static class CoreMacros
             }
         }
     }
+
+    public static object? CaseLambda(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("case-lambda requires at least one argument");
+        }
+
+        var cases = new Dictionary<int, Procedure>();
+
+        foreach (var caseArg in args)
+        {
+            if (caseArg is not Pair { Car: Pair argCar, Cdr: Pair argCdr })
+            {
+                throw new InvalidOperationException("Invalid form for case-lambda case");
+            }
+
+            var argList = argCar.ToList();
+
+            cases[argList.Count] = CreateProcedure(List.FromNodes(argList), argCdr.Cast<Node>().ToArray());
+        }
+
+        MacroExpression caseLambda = (runtime2, scope2, args2) =>
+        {
+            int argCount = args2.Length;
+
+            if (!cases.TryGetValue(argCount, out var proc))
+            {
+                throw new ArgumentException("No matching case in case-lambda");
+            }
+
+            return proc.Invoke(runtime2, scope2, args2.Select(arg => runtime2.Evaluate(scope2, arg)).ToArray());
+        };
+
+        return caseLambda;
+    }
 }

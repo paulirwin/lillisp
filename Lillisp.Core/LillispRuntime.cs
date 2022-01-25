@@ -37,6 +37,7 @@ namespace Lillisp.Core
             ["begin"] = CoreMacros.Begin,
             ["call-with-port"] = PortMacros.CallWithPort,
             ["case"] = CoreMacros.Case,
+            ["case-lambda"] = CoreMacros.CaseLambda,
             ["char-ready?"] = PortMacros.CharReady,
             ["cond"] = CoreMacros.Cond,
             ["def"] = CoreMacros.Define,

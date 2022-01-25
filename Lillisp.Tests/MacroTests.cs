@@ -315,4 +315,40 @@ public class MacroTests
         Assert.Equal(-5, cdrList[0]);
         Assert.Equal(-2, cdrList[1]);
     }
+
+    [Fact]
+    public void CaseLambdaR7RSTest()
+    {
+        const string myRange = @"
+(define my-range
+    (case-lambda
+        ((e) (my-range 0 e))
+        ((b e) (do ((r '() (cons e r))
+                (e (- e 1) (- e 1)))
+                ((< e b) r)))))";
+
+        var runtime = new LillispRuntime();
+        runtime.EvaluateProgram(myRange);
+
+        var result = runtime.EvaluateProgram("(my-range 3)") as Pair;
+
+        Assert.NotNull(result);
+
+        var resultList = result.ToList();
+
+        Assert.Equal(3, resultList.Count);
+        Assert.Equal(0, resultList[0]);
+        Assert.Equal(1, resultList[1]);
+        Assert.Equal(2, resultList[2]);
+
+        result = runtime.EvaluateProgram("(my-range 3 5)") as Pair;
+
+        Assert.NotNull(result);
+
+        resultList = result.ToList();
+
+        Assert.Equal(2, resultList.Count);
+        Assert.Equal(3, resultList[0]);
+        Assert.Equal(4, resultList[1]);
+    }
 }
