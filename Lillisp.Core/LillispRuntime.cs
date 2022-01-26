@@ -83,6 +83,7 @@ namespace Lillisp.Core
             ["read-string"] = PortMacros.ReadString,
             ["read-u8"] = PortMacros.ReadU8,
             ["set!"] = CoreMacros.Set,
+            ["string-map"] = CoreMacros.StringMap,
             ["syntax-rules"] = SchemeMacroMacros.SyntaxRules,
             ["u8-ready?"] = PortMacros.U8Ready,
             ["unless"] = BooleanMacros.Unless,

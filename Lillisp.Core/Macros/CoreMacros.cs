@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Lillisp.Core.Macros;
@@ -815,5 +816,44 @@ public static class CoreMacros
         };
 
         return caseLambda;
+    }
+
+    public static object? StringMap(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("string-map requires at least two arguments");
+        }
+
+        var proc = runtime.Evaluate(scope, args[0]);
+        var strings = args.Skip(1)
+            .Select(i => runtime.Evaluate(scope, i))
+            .Select(i => i switch
+            {
+                StringBuilder sb => sb.ToString(),
+                string s => s,
+                _ => throw new ArgumentException("Argument provided to string-map is not a string")
+            })
+            .ToList();
+
+        var minLength = strings.Min(i => i.Length);
+        var result = new StringBuilder();
+
+        for (int i = 0; i < minLength; i++)
+        {
+            var index = i;
+            var procArgs = strings.Select(s => (object)s[index]).ToArray();
+
+            var resultChar = runtime.InvokePossibleTailCallExpression(scope, proc, procArgs);
+
+            if (resultChar is not char c)
+            {
+                throw new ArgumentException("Proc provided to string-map returned something other than a char");
+            }
+
+            result.Append(c);
+        }
+
+        return result.ToString();
     }
 }
