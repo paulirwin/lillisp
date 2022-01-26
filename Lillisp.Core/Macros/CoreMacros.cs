@@ -856,4 +856,37 @@ public static class CoreMacros
 
         return result.ToString();
     }
+
+    public static object? VectorMap(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("vector-map requires at least two arguments");
+        }
+
+        var proc = runtime.Evaluate(scope, args[0]);
+        var vectors = args.Skip(1)
+            .Select(i => runtime.Evaluate(scope, i))
+            .Select(i => i switch
+            {
+                Vector v => v,
+                _ => throw new ArgumentException("Argument provided to vector-map is not a vector")
+            })
+            .ToList();
+
+        var minLength = vectors.Min(i => i.Count);
+        var result = new Vector();
+
+        for (int i = 0; i < minLength; i++)
+        {
+            var index = i;
+            var procArgs = vectors.Select(s => s[index]).ToArray();
+
+            var resultObj = runtime.InvokePossibleTailCallExpression(scope, proc, procArgs);
+            
+            result.Add(resultObj);
+        }
+
+        return result;
+    }
 }

@@ -88,6 +88,7 @@ namespace Lillisp.Core
             ["u8-ready?"] = PortMacros.U8Ready,
             ["unless"] = BooleanMacros.Unless,
             ["use"] = InteropMacros.Use,
+            ["vector-map"] = CoreMacros.VectorMap,
             ["when"] = BooleanMacros.When,
             ["with-exception-handler"] = ExceptionMacros.WithExceptionHandler,
             ["write"] = PortMacros.Write,
@@ -377,7 +378,7 @@ namespace Lillisp.Core
             return node switch
             {
                 Program program => program.Children.Select(i => Quote(scope, i)).ToArray(),
-                Vector vector => vector, // TODO: is this correct?
+                Vector vector => new Vector(vector.Select(i => Quote(scope, i))),
                 Bytevector bv => bv, // TODO: is this correct?
                 Pair pair => QuotePair(Quote(scope, pair.Car), Quote(scope, pair.Cdr)),
                 Symbol symbol => symbol,
