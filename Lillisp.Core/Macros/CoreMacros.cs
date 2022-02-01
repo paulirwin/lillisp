@@ -889,4 +889,100 @@ public static class CoreMacros
 
         return result;
     }
+
+    public static object? ForEach(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("for-each requires at least two arguments");
+        }
+
+        var proc = runtime.Evaluate(scope, args[0]);
+
+        var lists = args.Skip(1)
+            .Select(i => runtime.Evaluate(scope, i))
+            .Select(i => i switch
+            {
+                IEnumerable<object?> v => v.ToList(),
+                _ => throw new ArgumentException("Argument provided to for-each is not enumerable")
+            })
+            .ToList();
+
+        var minLength = lists.Min(i => i.Count);
+        object? result = null;
+
+        for (int i = 0; i < minLength; i++)
+        {
+            var index = i;
+            var procArgs = lists.Select(s => s[index]).ToArray();
+
+            result = runtime.InvokePossibleTailCallExpression(scope, proc, procArgs);
+        }
+
+        return result;
+    }
+
+    public static object? StringForEach(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("string-for-each requires at least two arguments");
+        }
+
+        var proc = runtime.Evaluate(scope, args[0]);
+        var strings = args.Skip(1)
+            .Select(i => runtime.Evaluate(scope, i))
+            .Select(i => i switch
+            {
+                StringBuilder sb => sb.ToString(),
+                string s => s,
+                _ => throw new ArgumentException("Argument provided to string-for-each is not a string")
+            })
+            .ToList();
+
+        var minLength = strings.Min(i => i.Length);
+        object? result = null;
+
+        for (int i = 0; i < minLength; i++)
+        {
+            var index = i;
+            var procArgs = strings.Select(s => (object)s[index]).ToArray();
+
+            result = runtime.InvokePossibleTailCallExpression(scope, proc, procArgs);
+        }
+
+        return result;
+    }
+
+    public static object? VectorForEach(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("vector-for-each requires at least two arguments");
+        }
+
+        var proc = runtime.Evaluate(scope, args[0]);
+
+        var vectors = args.Skip(1)
+            .Select(i => runtime.Evaluate(scope, i))
+            .Select(i => i switch
+            {
+                Vector v => v,
+                _ => throw new ArgumentException("Argument provided to vector-for-each is not a vector")
+            })
+            .ToList();
+
+        var minLength = vectors.Min(i => i.Count);
+        object? result = null;
+
+        for (int i = 0; i < minLength; i++)
+        {
+            var index = i;
+            var procArgs = vectors.Select(s => s[index]).ToArray();
+
+            result = runtime.InvokePossibleTailCallExpression(scope, proc, procArgs);
+        }
+
+        return result;
+    }
 }

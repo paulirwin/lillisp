@@ -351,4 +351,28 @@ public class MacroTests
         Assert.Equal(3, resultList[0]);
         Assert.Equal(4, resultList[1]);
     }
+
+    [Fact]
+    public void ForEachTest()
+    {
+        const string program = @"
+(let ((v (make-vector 5)))
+    (for-each 
+        (lambda (i) (vector-set! v i (* i i)))
+        '(0 1 2 3 4))
+v)
+";
+
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(program) as Vector;
+
+        Assert.NotNull(result);
+        Assert.Equal(5, result.Count);
+        Assert.Equal(0, result[0]);
+        Assert.Equal(1, result[1]);
+        Assert.Equal(4, result[2]);
+        Assert.Equal(9, result[3]);
+        Assert.Equal(16, result[4]);
+    }
 }

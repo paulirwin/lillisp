@@ -201,6 +201,26 @@ public class VectorTests
         VectorTest(input, expected);
     }
 
+    [InlineData("(let ((v (make-list 5))) (vector-for-each (lambda (i) (list-set! v i (* i i))) '#(0 1 2 3 4)) v)", new object[] { 0, 1, 4, 9, 16 })]
+    [Theory]
+    public void VectorForEachTests(string input, object[] expected)
+    {
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(input) as Pair;
+
+        Assert.NotNull(result);
+
+        var resultList = result.ToList();
+
+        Assert.Equal(5, resultList.Count);
+        Assert.Equal(0, resultList[0]);
+        Assert.Equal(1, resultList[1]);
+        Assert.Equal(4, resultList[2]);
+        Assert.Equal(9, resultList[3]);
+        Assert.Equal(16, resultList[4]);
+    }
+
     private static void VectorTest(string input, object[] expectedVector)
     {
         var runtime = new LillispRuntime();

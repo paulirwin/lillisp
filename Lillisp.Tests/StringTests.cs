@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using Lillisp.Core;
 using Xunit;
 // ReSharper disable StringLiteralTypo
@@ -174,5 +175,31 @@ public class StringTests
     public void StringMapTests(string input, object expected)
     {
         TestHelper.DefaultTest(input, expected);
+    }
+
+    [Fact]
+    public void StringForEachTest()
+    {
+        const string program = @"
+(let ((v '()))
+    (string-for-each
+        (lambda (c) (set! v (cons (char->integer c) v)))
+        ""abcde"")
+v)
+";
+        var runtime = new LillispRuntime();
+
+        var result = runtime.EvaluateProgram(program) as Pair;
+
+        Assert.NotNull(result);
+
+        var resultList = result.ToList();
+
+        Assert.Equal(5, resultList.Count);
+        Assert.Equal(101, resultList[0]);
+        Assert.Equal(100, resultList[1]);
+        Assert.Equal(99, resultList[2]);
+        Assert.Equal(98, resultList[3]);
+        Assert.Equal(97, resultList[4]);
     }
 }
