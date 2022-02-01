@@ -12,6 +12,11 @@ public class Values : IEnumerable<object?>
         _values = values;
     }
 
+    public Values(params object?[] values)
+    {
+        _values = values;
+    }
+
     public IEnumerator<object?> GetEnumerator() => _values.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

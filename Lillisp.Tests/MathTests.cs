@@ -220,10 +220,10 @@ namespace Lillisp.Tests
             TestHelper.DefaultTest(input, expected);
         }
 
-        [InlineData("(car (exact-integer-sqrt 4))", 2)]
-        [InlineData("(cdr (exact-integer-sqrt 4))", 0)]
-        [InlineData("(car (exact-integer-sqrt 5))", 2)]
-        [InlineData("(cdr (exact-integer-sqrt 5))", 1)]
+        [InlineData("(let-values (((root rem) (exact-integer-sqrt 4))) root)", 2)]
+        [InlineData("(let-values (((root rem) (exact-integer-sqrt 4))) rem)", 0)]
+        [InlineData("(let-values (((root rem) (exact-integer-sqrt 5))) root)", 2)]
+        [InlineData("(let-values (((root rem) (exact-integer-sqrt 5))) rem)", 1)]
         [Theory]
         public void ExactIntegerSqrtTests(string input, object expected)
         {

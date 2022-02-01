@@ -689,7 +689,7 @@ namespace Lillisp.Core.Expressions
                 }
             }
 
-            return new Pair(l, k - (l * l));
+            return new Values(l, k - (l * l));
         }
     }
 }

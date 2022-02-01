@@ -22,4 +22,18 @@ public class ValuesTests
         Assert.Equal(2, list[1]);
         Assert.Equal(3, list[2]);
     }
+
+    [InlineData("(let-values (((root rem) (exact-integer-sqrt 32))) (* root rem))", 35)]
+    [Theory]
+    public void LetValuesTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
+
+    [InlineData("(let ((a #\\a) (b #\\b) (x #\\x) (y #\\y)) (let*-values (((a b) (values x y)) ((x y) (values a b))) (list a b x y)))", new object[] { 'x', 'y', 'x', 'y' })]
+    [Theory]
+    public void LetStarValuesTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
 }

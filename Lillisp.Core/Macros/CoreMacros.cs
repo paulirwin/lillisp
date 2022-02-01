@@ -985,4 +985,116 @@ public static class CoreMacros
 
         return result;
     }
+
+    public static object? LetValues(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("let-values requires at least one argument");
+        }
+
+        if (args[0] is not Pair bindings)
+        {
+            throw new ArgumentException("The first argument to let-values must be a list");
+        }
+
+        return LetValuesInternal(runtime, scope, args, bindings, true, false);
+    }
+
+    public static object? LetStarValues(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("let*-values requires at least one argument");
+        }
+
+        if (args[0] is not Pair bindings)
+        {
+            throw new ArgumentException("The first argument to let*-values must be a list");
+        }
+
+        return LetValuesInternal(runtime, scope, args, bindings, false, true);
+    }
+
+    private static object? LetValuesInternal(LillispRuntime runtime, Scope scope, object?[] args, Pair bindings, bool requireDistinctVariablesAcrossFormals, bool evaluateInChildScope)
+    {
+        var childScope = scope.CreateChildScope();
+        var evaluatedSymbols = new List<Symbol>();
+
+        foreach (var binding in bindings)
+        {
+            if (binding is not Pair { Car: Pair formalsPair } bindingPair)
+            {
+                throw new ArgumentException($"Unknown binding format: {binding}");
+            }
+
+            var formals = new List<Symbol>();
+
+            foreach (var formal in formalsPair)
+            {
+                if (formal is not Symbol formalSymbol)
+                {
+                    throw new ArgumentException("Variables must be symbols in binding syntax");
+                }
+
+                if (requireDistinctVariablesAcrossFormals && evaluatedSymbols.Contains(formalSymbol))
+                {
+                    throw new ArgumentException($"Variable {formalSymbol} has already been defined in this scope");
+                }
+
+                if (formals.Contains(formalSymbol))
+                {
+                    throw new ArgumentException($"Variable {formalSymbol} has already been defined in this formals list");
+                }
+
+                formals.Add(formalSymbol);
+            }
+            
+            var bindingValue = bindingPair.Cdr;
+
+            if (bindingValue is Pair { IsList: true } bindingValuePair)
+            {
+                bindingValue = bindingValuePair.Car;
+            }
+
+            var value = runtime.Evaluate(evaluateInChildScope ? childScope : scope, bindingValue);
+
+            if (value is not Values values)
+            {
+                throw new InvalidOperationException("Result of binding init expression is not multiple return values");
+            }
+
+            var valuesList = values.ToList();
+
+            if (valuesList.Count != formals.Count)
+            {
+                throw new InvalidOperationException($"Init expression returned {valuesList.Count} values but expected {formals.Count} values");
+            }
+
+            for (int i = 0; i < valuesList.Count; i++)
+            {
+                var formal = formals[i];
+                var init = valuesList[i];
+
+                childScope.DefineOrSet(formal.Value, init);
+                evaluatedSymbols.Add(formal);
+            }
+        }
+
+        object? result = Nil.Value;
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            if (args[i] is Node node)
+            {
+                result = (i == args.Length - 1 && node is Pair pair) ? LillispRuntime.TailCall(childScope, pair) : runtime.Evaluate(childScope, node);
+            }
+            else
+            {
+                result = args[i]; // should not happen?
+            }
+        }
+
+        return result;
+    }
 }
