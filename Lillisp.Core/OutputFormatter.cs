@@ -21,6 +21,7 @@ namespace Lillisp.Core
             return result switch
             {
                 null => nullAsString ? "null" : null,
+                Values values => string.Join(Environment.NewLine, values.Select(i => Format(i, quote, nullAsString))),
                 Vector vector => $"[{string.Join(" ", vector.Select(i => Format(i, quote, nullAsString)))}]",
                 Pair pair => pair.ToString(i => Format(i, quote, nullAsString)),
                 ICollection objArray => $"({string.Join(" ", objArray.Cast<object>().Select(i => Format(i, quote, nullAsString)))})",

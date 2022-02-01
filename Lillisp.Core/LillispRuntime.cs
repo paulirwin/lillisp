@@ -305,6 +305,7 @@ namespace Lillisp.Core
             ["truncate-remainder"] = MathExpressions.TruncateRemainder,
             ["typeof"] = TypeExpressions.TypeOf,
             ["utf8->string"] = TypeExpressions.Utf8ToString,
+            ["values"] = ValuesExpressions.Values,
             ["vector"] = VectorExpressions.Vector,
             ["vector-append"] = VectorExpressions.Append,
             ["vector-copy"] = VectorExpressions.VectorCopy,
