@@ -321,6 +321,60 @@ public static class CoreMacros
 
         throw new ArgumentException("define's first argument must be a symbol, a pair, or a list");
     }
+    
+    public static object? DefineValues(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length != 2)
+        {
+            throw new ArgumentException("define-values requires two arguments");
+        }
+
+        if (args[0] is not Pair formalsPair)
+        {
+            throw new ArgumentException("define-values' first parameter must be a list");
+        }
+
+        var formals = new List<Symbol>();
+
+        foreach (var formal in formalsPair)
+        {
+            if (formal is not Symbol formalSymbol)
+            {
+                throw new ArgumentException("Variables in define-values must be symbols");
+            }
+
+            if (formals.Contains(formalSymbol))
+            {
+                throw new ArgumentException($"Variable {formalSymbol.Value} is already defined in this scope");
+            }
+
+            formals.Add(formalSymbol);
+        }
+
+        var value = runtime.Evaluate(scope, args[1]);
+
+        if (value is not Values values)
+        {
+            throw new InvalidOperationException("Init expression did not return multiple return values");
+        }
+
+        var valuesList = values.ToList();
+
+        if (formals.Count != valuesList.Count)
+        {
+            throw new InvalidOperationException($"Init expression returned {valuesList.Count} values but expected {formals.Count} values");
+        }
+
+        for (int i = 0; i < valuesList.Count; i++)
+        {
+            var formal = formals[i];
+            var init = valuesList[i];
+
+            scope.DefineOrSet(formal.Value, init);
+        }
+
+        return Nil.Value;
+    }
 
     public static object? Set(LillispRuntime runtime, Scope scope, object?[] args)
     {
@@ -399,11 +453,11 @@ public static class CoreMacros
             throw new ArgumentException("let requires at least one argument");
         }
 
-        if (args[0] is Pair bindings)
+        if (args[0] is Pair or Nil)
         {
-            return LetInternal(runtime, scope, args.Skip(1).ToArray(), null, bindings, true, false);
+            return LetInternal(runtime, scope, args.Skip(1).ToArray(), null, args[0] as Pair, true, false);
         }
-        
+
         if (args[0] is Symbol namedLet && args.Length > 1 && args[1] is Pair namedLetBindings)
         {
             return LetInternal(runtime, scope, args.Skip(2).ToArray(), namedLet.Value, namedLetBindings, true, false);
@@ -419,54 +473,57 @@ public static class CoreMacros
             throw new ArgumentException("let* requires at least one argument");
         }
 
-        if (args[0] is not Pair bindings)
+        if (args[0] is not Pair or Nil)
         {
             throw new ArgumentException("let*'s first parameter must be a list");
         }
 
-        return LetInternal(runtime, scope, args.Skip(1).ToArray(), null, bindings, false, true);
+        return LetInternal(runtime, scope, args.Skip(1).ToArray(), null, args[0] as Pair, false, true);
     }
 
     // TODO: refactor outside of this class
-    internal static object? LetInternal(LillispRuntime runtime, Scope scope, object?[] args, string? namedLet, Pair bindings, bool requireDistinctVariables, bool evaluateInChildScope)
+    internal static object? LetInternal(LillispRuntime runtime, Scope scope, object?[] args, string? namedLet, Pair? bindings, bool requireDistinctVariables, bool evaluateInChildScope)
     {
         var childScope = scope.CreateChildScope();
         var evaluatedSymbols = new List<Symbol>();
 
-        foreach (var binding in bindings)
+        if (bindings != null)
         {
-            if (binding is Symbol symbol)
+            foreach (var binding in bindings)
             {
-                if (requireDistinctVariables && evaluatedSymbols.Contains(symbol))
+                if (binding is Symbol symbol)
                 {
-                    throw new ArgumentException($"Variable {symbol} has already been defined in this scope");
-                }
+                    if (requireDistinctVariables && evaluatedSymbols.Contains(symbol))
+                    {
+                        throw new ArgumentException($"Variable {symbol} has already been defined in this scope");
+                    }
 
-                childScope.DefineOrSet(symbol.Value, Nil.Value);
-                evaluatedSymbols.Add(symbol);
-            }
-            else if (binding is Pair { IsList: true, Car: Symbol listSymbol } list)
-            {
-                if (requireDistinctVariables && evaluatedSymbols.Contains(listSymbol))
+                    childScope.DefineOrSet(symbol.Value, Nil.Value);
+                    evaluatedSymbols.Add(symbol);
+                }
+                else if (binding is Pair { IsList: true, Car: Symbol listSymbol } list)
                 {
-                    throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
+                    if (requireDistinctVariables && evaluatedSymbols.Contains(listSymbol))
+                    {
+                        throw new ArgumentException($"Variable {listSymbol} has already been defined in this scope");
+                    }
+
+                    var bindingValue = list.Cdr;
+
+                    if (bindingValue is Pair { IsList: true } bindingValuePair)
+                    {
+                        bindingValue = bindingValuePair.Car;
+                    }
+
+                    var value = runtime.Evaluate(evaluateInChildScope ? childScope : scope, bindingValue);
+
+                    childScope.DefineOrSet(listSymbol.Value, value);
+                    evaluatedSymbols.Add(listSymbol);
                 }
-
-                var bindingValue = list.Cdr;
-
-                if (bindingValue is Pair { IsList: true } bindingValuePair)
+                else
                 {
-                    bindingValue = bindingValuePair.Car;
+                    throw new ArgumentException($"Unknown binding format: {binding}");
                 }
-
-                var value = runtime.Evaluate(evaluateInChildScope ? childScope : scope, bindingValue);
-
-                childScope.DefineOrSet(listSymbol.Value, value);
-                evaluatedSymbols.Add(listSymbol);
-            }
-            else
-            {
-                throw new ArgumentException($"Unknown binding format: {binding}");
             }
         }
 

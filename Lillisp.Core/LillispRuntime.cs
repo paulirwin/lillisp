@@ -45,6 +45,7 @@ namespace Lillisp.Core
             ["define"] = CoreMacros.Define,
             ["define-record-type"] = CoreMacros.DefineRecordType,
             ["define-syntax"] = SchemeMacroMacros.DefineSyntax,
+            ["define-values"] = CoreMacros.DefineValues,
             ["defrecord"] = EmitMacros.DefineRecord,
             ["defun"] = CoreMacros.Defun,
             ["delay"] = CoreMacros.Delay,
