@@ -35,6 +35,8 @@ namespace Lillisp.Core
             ["and"] = BooleanMacros.And,
             ["apply"] = CoreMacros.Apply,
             ["begin"] = CoreMacros.Begin,
+            ["call/cc"] = ContinuationMacros.CallWithCurrentContinuation,
+            ["call-with-current-continuation"] = ContinuationMacros.CallWithCurrentContinuation,
             ["call-with-port"] = PortMacros.CallWithPort,
             ["case"] = CoreMacros.Case,
             ["case-lambda"] = CoreMacros.CaseLambda,
