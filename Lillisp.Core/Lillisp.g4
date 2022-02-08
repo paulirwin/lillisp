@@ -4,7 +4,7 @@ prog: form * EOF;
 
 form: atom | list | bytevector | vector | meta;
 
-atom: (number | symbol | STRING | CHARACTER);
+atom: (number | symbol | REGEX | STRING | CHARACTER);
 
 list: '(' form* ')';
 
@@ -60,6 +60,8 @@ RATIO: NEGATE? (DIGIT | UNDERSCORE)+ '/' (DIGIT | UNDERSCORE)+;
 IDENTIFIER: (LETTER | SYMBOL_CHAR) (LETTER | DIGIT | SYMBOL_CHAR)*;
 
 CHARACTER: '#\\' ((LETTER | DIGIT | SYMBOL_CHAR)* | '(' | ')');
+
+REGEX: '/' ( ~'/' | '\\' '/' )* '/';
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 

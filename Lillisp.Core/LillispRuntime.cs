@@ -229,6 +229,7 @@ namespace Lillisp.Core
             ["make-rectangular"] = ComplexExpressions.MakeRectangular,
             ["make-string"] = StringExpressions.MakeString,
             ["make-vector"] = VectorExpressions.MakeVector,
+            ["match?"] = RegularExpressions.IsMatch,
             ["max"] = MathExpressions.Max,
             ["min"] = MathExpressions.Min,
             ["modulo"] = MathExpressions.FloorRemainder,
@@ -458,6 +459,7 @@ namespace Lillisp.Core
                 Atom atom => atom.Value,
                 Quote quote => Quote(scope, quote),
                 Quasiquote quote => Quote(scope, quote),
+                RegexLiteral regex => regex.ToRegex(),
                 Nil nil => nil,
                 _ => node
             };
