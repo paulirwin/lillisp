@@ -38,4 +38,28 @@ public class ContinuationTests
 
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void R7RSDynamicWindExample()
+    {
+        const string program = @"
+(let ((path '())
+      (c #f))
+    (let ((add (lambda (s)
+                (set! path (cons s path)))))
+        (dynamic-wind
+            (lambda () (add ""connect""))
+            (lambda ()
+                (add (call-with-current-continuation
+                    (lambda (c0)
+                        (set! c c0)
+                        ""talk1""))))
+            (lambda () (add ""disconnect"")))
+        (if (< (length path) 4)
+            (c ""talk2"")
+            (reverse path))))
+";
+
+        TestHelper.DefaultTest(program, new object[] { "connect", "talk1", "disconnect", "connect", "talk2", "disconnect" });
+    }
 }

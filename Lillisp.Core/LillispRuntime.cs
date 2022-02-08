@@ -54,6 +54,7 @@ namespace Lillisp.Core
             ["delay-force"] = CoreMacros.DelayForce,
             ["display"] = PortMacros.Display,
             ["do"] = CoreMacros.Do,
+            ["dynamic-wind"] = ContinuationMacros.DynamicWind,
             ["eval"] = CoreMacros.Eval,
             ["for-each"] = CoreMacros.ForEach,
             ["from"] = LispINQMacros.From,
@@ -375,7 +376,7 @@ namespace Lillisp.Core
             var lexer = new LillispLexer(new AntlrInputStream(program));
             var parser = new LillispParser(new CommonTokenStream(lexer));
             var visitor = new LillispVisitor();
-            
+
             var prog = visitor.Visit(parser.prog());
             return prog;
         }
@@ -469,7 +470,7 @@ namespace Lillisp.Core
 
             return new Vector(items);
         }
-        
+
         private static object? EvaluateSymbol(Scope scope, Symbol node, int? arity)
         {
             if (TryEvaluateSymbol(scope, node, arity, out var value))
@@ -597,7 +598,9 @@ namespace Lillisp.Core
                 InteropStaticOverloadSet overloadSet => overloadSet.Invoke(args),
                 MacroExpression macro => macro(this, scope, args),
                 Expression expr => expr(args),
+                Delegate d => d.DynamicInvoke(args),
                 Type genericType => genericType.MakeGenericType(args.Cast<Type>().ToArray()),
+                Exception ex => throw ex,
                 _ => throw new InvalidOperationException($"Invalid operation: {expression}")
             };
         }
@@ -630,6 +633,57 @@ namespace Lillisp.Core
             var prog = ParseProgramText(text);
 
             Evaluate(_globalScope, prog);
+        }
+
+        public object? DynamicInvoke(Scope scope, object? thunk, object?[] args)
+        {
+            var currentScope = scope;
+            var windings = new List<DynamicWinding>();
+
+            while (currentScope != null)
+            {
+                if (currentScope.DynamicWinding != null)
+                {
+                    var winding = currentScope.DynamicWinding;
+
+                    while (winding != null)
+                    {
+                        windings.Insert(0, winding);
+                        winding = winding.Parent;
+                    }
+                }
+
+                currentScope = currentScope.Parent;
+            }
+
+            foreach (var winding in windings)
+            {
+                if (winding.Before != null)
+                {
+                    InvokePossibleTailCallExpression(winding.Scope, winding.Before, Array.Empty<object>());
+                }
+            }
+
+            object? result;
+
+            try
+            {
+                result = InvokePossibleTailCallExpression(scope, thunk, args);
+            }
+            catch (EscapeProcedureException ex)
+            {
+                result = ex.ReturnValue;
+            }
+
+            foreach (var winding in Enumerable.Reverse(windings))
+            {
+                if (winding.After != null)
+                {
+                    InvokePossibleTailCallExpression(winding.Scope, winding.After, Array.Empty<object>());
+                }
+            }
+
+            return result;
         }
     }
 }

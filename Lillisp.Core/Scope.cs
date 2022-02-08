@@ -23,6 +23,8 @@ namespace Lillisp.Core
 
         public Procedure? ExceptionHandler { get; set; }
 
+        public DynamicWinding? DynamicWinding { get; set; }
+
         public AssemblyBuilder? AssemblyBuilder { get; set; }
 
         public IDictionary<Symbol, RecordTypeDefinition> RecordTypes { get; } = new Dictionary<Symbol, RecordTypeDefinition>();
@@ -111,5 +113,10 @@ namespace Lillisp.Core
         }
 
         public Scope CreateChildScope() => new(this);
+
+        public void DynamicWind(object? before, object? after)
+        {
+            DynamicWinding = new DynamicWinding(this, DynamicWinding, before, after);
+        }
     }
 }
