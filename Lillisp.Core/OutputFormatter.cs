@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Lillisp.Core
@@ -30,6 +31,7 @@ namespace Lillisp.Core
                 StringBuilder sb => quote ? SymbolDisplay.FormatLiteral(sb.ToString(), true) : sb.ToString(),
                 char ch => quote ? SymbolDisplay.FormatLiteral(ch, true) : ch.ToString(),
                 Complex complex => FormatComplex(complex),
+                Regex regex => new RegexLiteral(regex).ToString(),
                 double.PositiveInfinity or float.PositiveInfinity => "+inf.0",
                 double.NegativeInfinity or float.NegativeInfinity => "-inf.0",
                 double.NaN or float.NaN => "+nan.0",

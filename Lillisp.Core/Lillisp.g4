@@ -61,7 +61,7 @@ IDENTIFIER: (LETTER | SYMBOL_CHAR) (LETTER | DIGIT | SYMBOL_CHAR)*;
 
 CHARACTER: '#\\' ((LETTER | DIGIT | SYMBOL_CHAR)* | '(' | ')');
 
-REGEX: '/' ( ~'/' | '\\' '/' )* '/';
+REGEX: '/' ( ~('/' | ' ') | '\\' '/' | '\\' ' ' )* '/';
 
 STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 

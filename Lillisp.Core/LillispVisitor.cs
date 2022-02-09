@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Rationals;
 
@@ -33,7 +34,15 @@ public class LillispVisitor : LillispBaseVisitor<Node>
 
     public override Node VisitList(LillispParser.ListContext context)
     {
+        if (context.children.Count == 2
+            && context.children[0] is ITerminalNode { Symbol: CommonToken { Text: "(" } }
+            && context.children[1] is ITerminalNode { Symbol: CommonToken { Text: ")" } })
+        {
+            return Nil.Value;
+        }
+
         var nodes = new List<Node>();
+        bool isComplete = false;
 
         foreach (var child in context.children)
         {
@@ -57,6 +66,15 @@ public class LillispVisitor : LillispBaseVisitor<Node>
 
                 nodes.Add(childNode);
             }
+            else if (child is ITerminalNode { Symbol: CommonToken { Text: ")" } })
+            {
+                isComplete = true;
+            }
+        }
+
+        if (!isComplete)
+        {
+            throw new InvalidOperationException("Incomplete list syntax, expected closing parenthesis.");
         }
 
         if (nodes.Count >= 3 && nodes[^2] is Symbol { Value: "." })
