@@ -141,6 +141,24 @@ public class LillispVisitor : LillispBaseVisitor<Node>
         throw new NotImplementedException("Unknown integer type");
     }
 
+    public override Node VisitRegex(LillispParser.RegexContext context)
+    {
+        var literal = context.REGEX_PATTERN();
+
+        if (literal == null)
+        {
+            throw new InvalidOperationException("Regex pattern unable to be parsed");
+        }
+
+        var text = literal.GetText()[1..];
+        var lastSlashPos = text.LastIndexOf('/');
+
+        var pattern = text[..lastSlashPos];
+        var flags = text[lastSlashPos..].TrimStart('/');
+
+        return new RegexLiteral(pattern, flags);
+    }
+
     public override Node VisitAtom(LillispParser.AtomContext context)
     {
         var number = context.number();
@@ -148,14 +166,6 @@ public class LillispVisitor : LillispBaseVisitor<Node>
         if (number != null)
         {
             return ParseNumber(number);
-        }
-
-        var regex = context.REGEX();
-
-        if (regex != null)
-        {
-            // TODO: support options
-            return new RegexLiteral(regex.GetText()[1..^1]);
         }
 
         var str = context.STRING();

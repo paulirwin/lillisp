@@ -35,6 +35,8 @@ namespace Lillisp.Core
                 double.PositiveInfinity or float.PositiveInfinity => "+inf.0",
                 double.NegativeInfinity or float.NegativeInfinity => "-inf.0",
                 double.NaN or float.NaN => "+nan.0",
+                true => "#t",
+                false => "#f",
                 _ => result.ToString()
             };
         }

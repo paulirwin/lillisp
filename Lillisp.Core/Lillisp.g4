@@ -2,9 +2,9 @@ grammar Lillisp;
 
 prog: form * EOF;
 
-form: atom | list | bytevector | vector | meta;
+form: regex | atom | list | bytevector | vector | meta;
 
-atom: (number | symbol | REGEX | STRING | CHARACTER);
+atom: (number | symbol | STRING | CHARACTER);
 
 list: '(' form* ')';
 
@@ -38,11 +38,14 @@ binary_prefixed: BINARY_PREFIXED_NUMBER;
 
 decimal_prefixed: DECIMAL_PREFIX (INTEGER | FLOAT);
 
+regex: REGEX_PATTERN IDENTIFIER?;
+
 symbol: DOT_LITERAL | ELLIPSIS_LITERAL | UNDERSCORE_LITERAL | BOOLEAN | IDENTIFIER | ESCAPED_IDENTIFIER;
 
 POS_INFINITY: '+inf.0';
 NEG_INFINITY: '-inf.0';
 NAN: '+nan.0' | '-nan.0';
+BOOLEAN: '#t' | '#f';
 
 DOT_LITERAL: '.';
 ELLIPSIS_LITERAL: '...';
@@ -57,22 +60,25 @@ COMPLEX: ((NEGATE? (DIGIT | UNDERSCORE | '.')+) | POS_INFINITY | NEG_INFINITY | 
 FLOAT: NEGATE? (DIGIT | UNDERSCORE | '.')+ ('e' '-'? (DIGIT | UNDERSCORE | '.')+)?;
 RATIO: NEGATE? (DIGIT | UNDERSCORE)+ '/' (DIGIT | UNDERSCORE)+;
 
-IDENTIFIER: (LETTER | SYMBOL_CHAR) (LETTER | DIGIT | SYMBOL_CHAR)*;
-
 CHARACTER: '#\\' ((LETTER | DIGIT | SYMBOL_CHAR)* | '(' | ')');
 
-REGEX: '/' ( ~('/' | ' ') | '\\' '/' | '\\' ' ' )* '/';
-
-STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
-
-HEX_PREFIX: '#x';
-OCTAL_PREFIX: '#o';
-BINARY_PREFIX: '#b';
-DECIMAL_PREFIX: '#de' | '#di' | '#ed' | '#id' | '#d' | '#e' | '#i';
+REGEX_PATTERN: '/' ( ~('/' | ' ') | '\\' '/' | '\\' ' ' )* '/' REGEX_FLAGS;
 
 ESCAPED_IDENTIFIER: '|' ( ~'|' | '\\' '|' )* '|';
 
-BOOLEAN: '#t' | '#f';
+IDENTIFIER: IDENTIFIER_START IDENTIFIER_PART*;
+
+STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
+
+fragment REGEX_FLAGS: IDENTIFIER_PART*;
+
+fragment IDENTIFIER_START: (LETTER | SYMBOL_CHAR);
+fragment IDENTIFIER_PART: (LETTER | DIGIT | SYMBOL_CHAR);
+
+fragment HEX_PREFIX: '#x';
+fragment OCTAL_PREFIX: '#o';
+fragment BINARY_PREFIX: '#b';
+fragment DECIMAL_PREFIX: '#de' | '#di' | '#ed' | '#id' | '#d' | '#e' | '#i';
 
 fragment HEX_DIGIT: '0'..'9' | 'a'..'f' | 'A'..'F';
 fragment DIGIT: '0'..'9';
