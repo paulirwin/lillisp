@@ -46,10 +46,12 @@ public class Program
 
         var visitor = new LillispVisitor();
 
+        string? programText = null;
+
         while (true)
         {
             Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write("Lillisp> ");
+            Console.Write(programText == null ? ">>> " : "... ");
             Console.ForegroundColor = ConsoleColor.White;
 
             string? input = Console.ReadLine();
@@ -64,56 +66,92 @@ public class Program
                 continue;
             }
 
-            if (input.Equals("exit", StringComparison.OrdinalIgnoreCase)
-                || input.Equals("quit", StringComparison.OrdinalIgnoreCase))
+            if (programText == null)
             {
-                break;
-            }
-
-            if (input.Equals("clear", StringComparison.OrdinalIgnoreCase)
-                || input.Equals("cls", StringComparison.OrdinalIgnoreCase))
-            {
-                Console.Clear();
-                continue;
-            }
-
-            if (input.Equals("reset", StringComparison.OrdinalIgnoreCase))
-            {
-                runtime = CreateRuntime(options);
-                Console.WriteLine("Runtime environment reset to defaults.");
-                continue;
-            }
-
-            try
-            {
-                var lexer = new LillispLexer(new AntlrInputStream(input));
-                var parser = new LillispParser(new CommonTokenStream(lexer));
-
-                var prog = visitor.Visit(parser.prog());
-
-                if (options.ShowAst)
+                if (input.Equals("exit", StringComparison.OrdinalIgnoreCase)
+                    || input.Equals("quit", StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.Write("AST: ");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine(prog);
+                    break;
                 }
 
-                object? result = runtime.EvaluateProgram(prog);
+                if (input.Equals("clear", StringComparison.OrdinalIgnoreCase)
+                    || input.Equals("cls", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.Clear();
+                    continue;
+                }
 
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Write("-> ");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(OutputFormatter.FormatRepl(result) ?? "null");
+                if (input.Equals("reset", StringComparison.OrdinalIgnoreCase))
+                {
+                    runtime = CreateRuntime(options);
+                    Console.WriteLine("Runtime environment reset to defaults.");
+                    continue;
+                }
+
+                programText = input;
+            }
+            else
+            {
+                programText += " " + input;
+            }
+
+            Node? programNode = null;
+            
+            try
+            {
+                var lexer = new LillispLexer(new AntlrInputStream(programText));
+                var parser = new LillispParser(new CommonTokenStream(lexer));
+
+                programNode = visitor.Visit(parser.prog());
+            }
+            catch (IncompleteParseException)
+            {
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("ERROR: ");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine(ex.Message);
+                PrintException(ex);
+                continue;
+            }
+
+            if (programNode != null)
+            {
+                EvaluateAndPrint(runtime, options, programNode);
+                programText = null;
             }
         }
+    }
+
+    private static void EvaluateAndPrint(LillispRuntime runtime, ReplOptions options, Node programNode)
+    {
+        if (options.ShowAst)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write("AST: ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(programNode);
+        }
+
+        try
+        {
+            object? result = runtime.EvaluateProgram(programNode);
+
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write("-> ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(OutputFormatter.FormatRepl(result) ?? "null");
+        }
+        catch (Exception ex)
+        {
+            PrintException(ex);
+        }
+    }
+
+    private static void PrintException(Exception ex)
+    {
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.Write("ERROR: ");
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.WriteLine(ex.Message);
     }
 
     private static void PrintSystemInfo()

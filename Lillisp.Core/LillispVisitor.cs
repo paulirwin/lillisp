@@ -71,7 +71,7 @@ public class LillispVisitor : LillispBaseVisitor<Node>
 
         if (!isComplete)
         {
-            throw new InvalidOperationException("Incomplete list syntax, expected closing parenthesis.");
+            throw new IncompleteParseException();
         }
 
         if (nodes.Count >= 3 && nodes[^2] is Symbol { Value: "." })
@@ -85,6 +85,7 @@ public class LillispVisitor : LillispBaseVisitor<Node>
     public override Node VisitVector(LillispParser.VectorContext context)
     {
         var nodes = new List<Node>();
+        bool isComplete = false;
 
         foreach (var child in context.children)
         {
@@ -94,7 +95,17 @@ public class LillispVisitor : LillispBaseVisitor<Node>
             {
                 nodes.Add(childNode);
             }
+            else if (child is ITerminalNode { Symbol: CommonToken { Text: ")" or "]" } })
+            {
+                isComplete = true;
+            }
         }
+
+        if (!isComplete)
+        {
+            throw new IncompleteParseException();
+        }
+
 
         return new Vector(nodes);
     }
@@ -102,6 +113,7 @@ public class LillispVisitor : LillispBaseVisitor<Node>
     public override Node VisitBytevector(LillispParser.BytevectorContext context)
     {
         var bv = new Bytevector();
+        bool isComplete = false;
 
         foreach (var child in context.children)
         {
@@ -109,6 +121,11 @@ public class LillispVisitor : LillispBaseVisitor<Node>
 
             if (childNode == null)
             {
+                if (child is ITerminalNode { Symbol: CommonToken { Text: ")" } })
+                {
+                    isComplete = true;
+                }
+
                 continue;
             }
 
@@ -120,6 +137,11 @@ public class LillispVisitor : LillispBaseVisitor<Node>
             {
                 throw new InvalidOperationException("Only integer literals between 0-255 are supported for bytevector literal values.");
             }
+        }
+
+        if (!isComplete)
+        {
+            throw new IncompleteParseException();
         }
 
         return bv;
