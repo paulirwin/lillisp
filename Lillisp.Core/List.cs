@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Lillisp.Core;
+﻿namespace Lillisp.Core;
 
 public static class List
 {

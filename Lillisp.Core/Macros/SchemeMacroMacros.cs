@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Lillisp.Core.Macros;
+﻿namespace Lillisp.Core.Macros;
 
 public static class SchemeMacroMacros
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Lillisp.Core.Expressions;
+﻿namespace Lillisp.Core.Expressions;
 
 public static class TimeExpressions
 {

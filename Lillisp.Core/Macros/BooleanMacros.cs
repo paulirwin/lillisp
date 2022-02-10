@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Lillisp.Core.Macros;
+﻿namespace Lillisp.Core.Macros;
 
 public static class BooleanMacros
 {

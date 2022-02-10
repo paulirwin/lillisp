@@ -1,7 +1,5 @@
-﻿using System;
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
 using System.Reflection;
 using Antlr4.Runtime;
 using Lillisp.Core;

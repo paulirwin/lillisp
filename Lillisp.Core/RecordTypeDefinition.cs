@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Lillisp.Core;
+﻿namespace Lillisp.Core;
 
 public record RecordTypeDefinition(Symbol Name, Symbol ConstructorName, Symbol PredicateName)
 {

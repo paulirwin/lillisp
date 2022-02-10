@@ -1,32 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Library\base.lisp" />
-    <None Remove="Library\cxr.lisp" />
-    <None Remove="Library\file.lisp" />
-    <None Remove="Library\inexact.lisp" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Library\base.lisp" />
+		<None Remove="Library\cxr.lisp" />
+		<None Remove="Library\file.lisp" />
+		<None Remove="Library\inexact.lisp" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="Library\base.lisp" />
-    <EmbeddedResource Include="Library\cxr.lisp" />
-    <EmbeddedResource Include="Library\file.lisp" />
-    <EmbeddedResource Include="Library\inexact.lisp" />
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Library\base.lisp" />
+		<EmbeddedResource Include="Library\cxr.lisp" />
+		<EmbeddedResource Include="Library\file.lisp" />
+		<EmbeddedResource Include="Library\inexact.lisp" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Antlr4.CodeGenerator" Version="4.6.6">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
-    <PackageReference Include="Rationals" Version="2.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Antlr4.CodeGenerator" Version="4.6.6">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
+		<PackageReference Include="Rationals" Version="2.0.0" />
+	</ItemGroup>
 
 </Project>

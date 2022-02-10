@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Lillisp.Core;
+﻿namespace Lillisp.Core;
 
 internal static class CondClauseUtility
 {

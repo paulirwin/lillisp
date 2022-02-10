@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+﻿using System.Numerics;
 using Rationals;
 
 // ReSharper disable IntVariableOverflowInUncheckedContext - allow for runtime exceptions in these cases

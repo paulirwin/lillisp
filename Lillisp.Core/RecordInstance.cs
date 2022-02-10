@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Lillisp.Core;
+﻿namespace Lillisp.Core;
 
 public record RecordInstance(RecordTypeDefinition RecordType)
 {

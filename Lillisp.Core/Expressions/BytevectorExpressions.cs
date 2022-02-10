@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Lillisp.Core.Expressions;
+﻿namespace Lillisp.Core.Expressions;
 
 public static class BytevectorExpressions
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Lillisp.Core;
+﻿namespace Lillisp.Core;
 
 public class SyntaxBinding : Symbol
 {

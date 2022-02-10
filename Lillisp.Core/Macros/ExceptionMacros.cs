@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Lillisp.Core.Macros;
+﻿namespace Lillisp.Core.Macros;
 
 public static class ExceptionMacros
 {

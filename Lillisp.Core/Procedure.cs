@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Lillisp.Core;
+﻿namespace Lillisp.Core;
 
 public class Procedure : IInvokable
 {

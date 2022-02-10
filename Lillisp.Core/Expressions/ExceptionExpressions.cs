@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-
-namespace Lillisp.Core.Expressions;
+﻿namespace Lillisp.Core.Expressions;
 
 public static class ExceptionExpressions
 {
