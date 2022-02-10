@@ -1,6 +1,5 @@
-﻿namespace Lillisp.Core
+﻿namespace Lillisp.Core;
+
+public abstract class Node
 {
-    public abstract class Node
-    {
-    }
 }

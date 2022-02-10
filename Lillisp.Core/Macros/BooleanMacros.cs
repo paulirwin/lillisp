@@ -1,108 +1,107 @@
 ﻿using System;
 
-namespace Lillisp.Core.Macros
+namespace Lillisp.Core.Macros;
+
+public static class BooleanMacros
 {
-    public static class BooleanMacros
+    public static object? And(LillispRuntime runtime, Scope scope, object?[] args)
     {
-        public static object? And(LillispRuntime runtime, Scope scope, object?[] args)
+        if (args.Length < 2)
         {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("and requires at least two arguments");
-            }
+            throw new ArgumentException("and requires at least two arguments");
+        }
             
-            foreach (var arg in args)
-            {
-                object? value = arg is Node node ? runtime.Evaluate(scope, node) : arg;
-
-                if (!value.IsTruthy())
-                    return false;
-            }
-
-            return true;
-        }
-
-        public static object? Or(LillispRuntime runtime, Scope scope, object?[] args)
+        foreach (var arg in args)
         {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("or requires at least two arguments");
-            }
+            object? value = arg is Node node ? runtime.Evaluate(scope, node) : arg;
 
-            foreach (var arg in args)
-            {
-                object? value = arg is Node node ? runtime.Evaluate(scope, node) : arg;
-
-                if (value.IsTruthy())
-                    return true;
-            }
-
-            return false;
+            if (!value.IsTruthy())
+                return false;
         }
 
-        /// <summary>
-        /// The test is evaluated, and if it evaluates to
-        /// a true value, the expressions are evaluated in order.
-        /// </summary>
-        /// <remarks>
-        /// Scheme R7RS states that the return value is unspecified. In order to support tail recursion,
-        /// we are returning the result of the last expression if the test evaluates true, otherwise nil. 
-        /// </remarks>
-        /// <param name="runtime">The current runtime.</param>
-        /// <param name="scope">The current scope (environment)</param>
-        /// <param name="args">The arguments to `when`</param>
-        /// <returns>Returns the result of the last expression, or nil.</returns>
-        public static object? When(LillispRuntime runtime, Scope scope, object?[] args)
+        return true;
+    }
+
+    public static object? Or(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2)
         {
-            if (args.Length < 2 || args[0] is not Node test)
-            {
-                throw new ArgumentException("when requires at least a test and an expression argument");
-            }
-
-            var result = runtime.Evaluate(scope, test);
-
-            if (!result.IsTruthy())
-            {
-                return Nil.Value;
-            }
-
-            result = EvaluateExpressionsWithTailCall(runtime, scope, args, 1, result);
-
-            return result;
+            throw new ArgumentException("or requires at least two arguments");
         }
 
-        public static object? Unless(LillispRuntime runtime, Scope scope, object?[] args)
+        foreach (var arg in args)
         {
-            if (args.Length < 2 || args[0] is not Node test)
-            {
-                throw new ArgumentException("unless requires at least a test and an expression argument");
-            }
+            object? value = arg is Node node ? runtime.Evaluate(scope, node) : arg;
 
-            var result = runtime.Evaluate(scope, test);
-
-            if (result.IsTruthy())
-            {
-                return Nil.Value;
-            }
-
-            result = EvaluateExpressionsWithTailCall(runtime, scope, args, 1, result);
-
-            return result;
+            if (value.IsTruthy())
+                return true;
         }
 
-        private static object? EvaluateExpressionsWithTailCall(LillispRuntime runtime, Scope scope, object?[] args, int startArgIndex, object? result)
+        return false;
+    }
+
+    /// <summary>
+    /// The test is evaluated, and if it evaluates to
+    /// a true value, the expressions are evaluated in order.
+    /// </summary>
+    /// <remarks>
+    /// Scheme R7RS states that the return value is unspecified. In order to support tail recursion,
+    /// we are returning the result of the last expression if the test evaluates true, otherwise nil. 
+    /// </remarks>
+    /// <param name="runtime">The current runtime.</param>
+    /// <param name="scope">The current scope (environment)</param>
+    /// <param name="args">The arguments to `when`</param>
+    /// <returns>Returns the result of the last expression, or nil.</returns>
+    public static object? When(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2 || args[0] is not Node test)
         {
-            for (int i = startArgIndex; i < args.Length; i++)
-            {
-                var arg = args[i];
-
-                if (arg is Node node)
-                {
-                    result = (i == args.Length - 1 && node is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, node);
-                }
-            }
-
-            return result;
+            throw new ArgumentException("when requires at least a test and an expression argument");
         }
+
+        var result = runtime.Evaluate(scope, test);
+
+        if (!result.IsTruthy())
+        {
+            return Nil.Value;
+        }
+
+        result = EvaluateExpressionsWithTailCall(runtime, scope, args, 1, result);
+
+        return result;
+    }
+
+    public static object? Unless(LillispRuntime runtime, Scope scope, object?[] args)
+    {
+        if (args.Length < 2 || args[0] is not Node test)
+        {
+            throw new ArgumentException("unless requires at least a test and an expression argument");
+        }
+
+        var result = runtime.Evaluate(scope, test);
+
+        if (result.IsTruthy())
+        {
+            return Nil.Value;
+        }
+
+        result = EvaluateExpressionsWithTailCall(runtime, scope, args, 1, result);
+
+        return result;
+    }
+
+    private static object? EvaluateExpressionsWithTailCall(LillispRuntime runtime, Scope scope, object?[] args, int startArgIndex, object? result)
+    {
+        for (int i = startArgIndex; i < args.Length; i++)
+        {
+            var arg = args[i];
+
+            if (arg is Node node)
+            {
+                result = (i == args.Length - 1 && node is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, node);
+            }
+        }
+
+        return result;
     }
 }

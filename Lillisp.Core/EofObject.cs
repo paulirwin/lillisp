@@ -1,11 +1,10 @@
-﻿namespace Lillisp.Core
+﻿namespace Lillisp.Core;
+
+public sealed class EofObject
 {
-    public sealed class EofObject
-    {
-        public static readonly EofObject Instance = new();
+    public static readonly EofObject Instance = new();
 
-        private EofObject() {}
+    private EofObject() {}
 
-        public override string ToString() => "{EOF}";
-    }
+    public override string ToString() => "{EOF}";
 }

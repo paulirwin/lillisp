@@ -1,37 +1,36 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 
-namespace Lillisp.Core
+namespace Lillisp.Core;
+
+public class Symbol : Node
 {
-    public class Symbol : Node
+    public Symbol(string value, bool escaped = false)
     {
-        public Symbol(string value, bool escaped = false)
-        {
-            Value = string.Intern(value);
-            Escaped = escaped;
-        }
+        Value = string.Intern(value);
+        Escaped = escaped;
+    }
 
-        public string Value { get; }
+    public string Value { get; }
 
-        public bool Escaped { get; }
+    public bool Escaped { get; }
 
-        public override string ToString() => Escaped ? $"|{SymbolDisplay.FormatLiteral(Value, false)}|" : Value;
+    public override string ToString() => Escaped ? $"|{SymbolDisplay.FormatLiteral(Value, false)}|" : Value;
 
-        protected bool Equals(Symbol other)
-        {
-            return Value == other.Value;
-        }
+    protected bool Equals(Symbol other)
+    {
+        return Value == other.Value;
+    }
 
-        public override bool Equals(object? obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Symbol) obj);
-        }
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != this.GetType()) return false;
+        return Equals((Symbol) obj);
+    }
 
-        public override int GetHashCode()
-        {
-            return Value.GetHashCode();
-        }
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
     }
 }

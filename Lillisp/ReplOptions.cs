@@ -1,7 +1,6 @@
-﻿namespace Lillisp
+﻿namespace Lillisp;
+
+public class ReplOptions
 {
-    public class ReplOptions
-    {
-        public bool ShowAst { get; set; }
-    }
+    public bool ShowAst { get; set; }
 }

@@ -1,6 +1,5 @@
-﻿namespace Lillisp.Core
+﻿namespace Lillisp.Core;
+
+public record RecordFieldDefinition(RecordTypeDefinition RecordType, Symbol Name, Symbol Accessor, Symbol? Modifier = null)
 {
-    public record RecordFieldDefinition(RecordTypeDefinition RecordType, Symbol Name, Symbol Accessor, Symbol? Modifier = null)
-    {
-    }
 }

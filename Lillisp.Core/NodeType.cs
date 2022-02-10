@@ -1,10 +1,9 @@
-﻿namespace Lillisp.Core
+﻿namespace Lillisp.Core;
+
+public enum NodeType
 {
-    public enum NodeType
-    {
-        Program,
-        List,
-        Atom,
-        Quote
-    }
+    Program,
+    List,
+    Atom,
+    Quote
 }

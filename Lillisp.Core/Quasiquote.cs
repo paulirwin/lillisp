@@ -1,14 +1,13 @@
-﻿namespace Lillisp.Core
+﻿namespace Lillisp.Core;
+
+public class Quasiquote : Node
 {
-    public class Quasiquote : Node
+    public Quasiquote(Node value)
     {
-        public Quasiquote(Node value)
-        {
-            Value = value;
-        }
-
-        public Node Value { get; }
-
-        public override string ToString() => $"'{Value}";
+        Value = value;
     }
+
+    public Node Value { get; }
+
+    public override string ToString() => $"'{Value}";
 }

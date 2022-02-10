@@ -1,15 +1,14 @@
-﻿namespace Lillisp.Core
+﻿namespace Lillisp.Core;
+
+public class TailCall
 {
-    public class TailCall
+    public TailCall(Scope scope, Pair node)
     {
-        public TailCall(Scope scope, Pair node)
-        {
-            Scope = scope;
-            Node = node;
-        }
-
-        public Scope Scope { get; }
-
-        public Pair Node { get; }
+        Scope = scope;
+        Node = node;
     }
+
+    public Scope Scope { get; }
+
+    public Pair Node { get; }
 }

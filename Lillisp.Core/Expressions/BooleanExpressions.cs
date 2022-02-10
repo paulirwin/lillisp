@@ -2,249 +2,248 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Lillisp.Core.Expressions
+namespace Lillisp.Core.Expressions;
+
+public static class BooleanExpressions
 {
-    public static class BooleanExpressions
+    public static dynamic? LessThan(dynamic?[] args)
     {
-        public static dynamic? LessThan(dynamic?[] args)
+        if (args.Length < 2)
         {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("< needs at least 2 arguments");
-            }
-
-            var prev = args[0];
-
-            for (int i = 1; i < args.Length; i++)
-            {
-                var next = args[i];
-
-                if (prev >= next)
-                    return false;
-
-                prev = next;
-            }
-
-            return true;
+            throw new ArgumentException("< needs at least 2 arguments");
         }
 
-        public static dynamic? GreaterThan(dynamic?[] args)
+        var prev = args[0];
+
+        for (int i = 1; i < args.Length; i++)
         {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("> needs at least 2 arguments");
-            }
+            var next = args[i];
 
-            var prev = args[0];
+            if (prev >= next)
+                return false;
 
-            for (int i = 1; i < args.Length; i++)
-            {
-                var next = args[i];
-
-                if (prev <= next)
-                    return false;
-
-                prev = next;
-            }
-
-            return true;
+            prev = next;
         }
 
-        public static dynamic? LessThanOrEqual(dynamic?[] args)
+        return true;
+    }
+
+    public static dynamic? GreaterThan(dynamic?[] args)
+    {
+        if (args.Length < 2)
         {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("<= needs at least 2 arguments");
-            }
-
-            var prev = args[0];
-
-            for (int i = 1; i < args.Length; i++)
-            {
-                var next = args[i];
-
-                if (prev > next)
-                    return false;
-
-                prev = next;
-            }
-
-            return true;
+            throw new ArgumentException("> needs at least 2 arguments");
         }
 
-        public static dynamic? GreaterThanOrEqual(dynamic?[] args)
+        var prev = args[0];
+
+        for (int i = 1; i < args.Length; i++)
         {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException(">= needs at least 2 arguments");
-            }
+            var next = args[i];
 
-            var prev = args[0];
+            if (prev <= next)
+                return false;
 
-            for (int i = 1; i < args.Length; i++)
-            {
-                var next = args[i];
-
-                if (prev < next)
-                    return false;
-
-                prev = next;
-            }
-
-            return true;
+            prev = next;
         }
 
-        public static object? Equivalent(object?[] args)
+        return true;
+    }
+
+    public static dynamic? LessThanOrEqual(dynamic?[] args)
+    {
+        if (args.Length < 2)
         {
-            if (args.Length < 2)
+            throw new ArgumentException("<= needs at least 2 arguments");
+        }
+
+        var prev = args[0];
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            var next = args[i];
+
+            if (prev > next)
+                return false;
+
+            prev = next;
+        }
+
+        return true;
+    }
+
+    public static dynamic? GreaterThanOrEqual(dynamic?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException(">= needs at least 2 arguments");
+        }
+
+        var prev = args[0];
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            var next = args[i];
+
+            if (prev < next)
+                return false;
+
+            prev = next;
+        }
+
+        return true;
+    }
+
+    public static object? Equivalent(object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("eqv? needs at least 2 arguments");
+        }
+
+        var first = args[0];
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            if (!Equals(first, args[i]))
             {
-                throw new ArgumentException("eqv? needs at least 2 arguments");
+                return false;
             }
+        }
 
-            var first = args[0];
+        return true;
+    }
 
-            for (int i = 1; i < args.Length; i++)
+    public static object? Not(object?[] args)
+    {
+        if (args.Length != 1)
+        {
+            throw new ArgumentException("not needs one argument");
+        }
+
+        return !args[0].IsTruthy() ? true : Nil.Value;
+    }
+
+    public static object? ReferencesEqual(object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("eq? needs at least 2 arguments");
+        }
+
+        var first = args[0];
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            // HACK: Symbols are currently different objects, even though the value is interned. Should they be part of some global symbol cache?
+            if (first is Symbol firstSym && args[i] is Symbol secondSym)
             {
-                if (!Equals(first, args[i]))
+                if (!ReferenceEquals(firstSym.Value, secondSym.Value))
                 {
                     return false;
                 }
             }
-
-            return true;
+            else if (!ReferenceEquals(first, args[i]))
+            {
+                return false;
+            }
         }
 
-        public static object? Not(object?[] args)
-        {
-            if (args.Length != 1)
-            {
-                throw new ArgumentException("not needs one argument");
-            }
+        return true;
+    }
 
-            return !args[0].IsTruthy() ? true : Nil.Value;
+    public static object? NumericallyEqual(object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("= needs at least 2 arguments");
         }
 
-        public static object? ReferencesEqual(object?[] args)
+        if (args[0] == null || !args[0].IsNumber())
         {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("eq? needs at least 2 arguments");
-            }
-
-            var first = args[0];
-
-            for (int i = 1; i < args.Length; i++)
-            {
-                // HACK: Symbols are currently different objects, even though the value is interned. Should they be part of some global symbol cache?
-                if (first is Symbol firstSym && args[i] is Symbol secondSym)
-                {
-                    if (!ReferenceEquals(firstSym.Value, secondSym.Value))
-                    {
-                        return false;
-                    }
-                }
-                else if (!ReferenceEquals(first, args[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            throw new ArgumentException("At least one argument is not a number");
         }
 
-        public static object? NumericallyEqual(object?[] args)
-        {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("= needs at least 2 arguments");
-            }
+        dynamic? first = args[0];
 
-            if (args[0] == null || !args[0].IsNumber())
+        for (int i = 1; i < args.Length; i++)
+        {
+            dynamic? arg = args[i];
+
+            if (arg == null || !args[i].IsNumber())
             {
                 throw new ArgumentException("At least one argument is not a number");
             }
 
-            dynamic? first = args[0];
-
-            for (int i = 1; i < args.Length; i++)
+            if (first != arg)
             {
-                dynamic? arg = args[i];
-
-                if (arg == null || !args[i].IsNumber())
-                {
-                    throw new ArgumentException("At least one argument is not a number");
-                }
-
-                if (first != arg)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public static object? Equal(object?[] args)
-        {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("eq? needs at least 2 arguments");
-            }
-
-            var first = args[0];
-
-            for (int i = 1; i < args.Length; i++)
-            {
-                if (!EqualEqualityComparer.Instance.Equals(first, args[i]))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private class EqualEqualityComparer : IEqualityComparer<object?>
-        {
-            public static readonly EqualEqualityComparer Instance = new();
-
-            public new bool Equals(object? x, object? y)
-            {
-                return object.Equals(x, y) || (x is IEnumerable<object?> firstEnumerable && y is IEnumerable<object?> secondEnumerable && firstEnumerable.SequenceEqual(secondEnumerable, Instance));
-            }
-
-            public int GetHashCode(object? obj)
-            {
-                return obj?.GetHashCode() ?? 0;
+                return false;
             }
         }
 
-        public static object? SymbolEquals(object?[] args)
-        {
-            if (args.Length < 2)
-            {
-                throw new ArgumentException("symbol=? requires at least two arguments");
-            }
+        return true;
+    }
 
-            if (args[0] is not Symbol symbol)
+    public static object? Equal(object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("eq? needs at least 2 arguments");
+        }
+
+        var first = args[0];
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            if (!EqualEqualityComparer.Instance.Equals(first, args[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private class EqualEqualityComparer : IEqualityComparer<object?>
+    {
+        public static readonly EqualEqualityComparer Instance = new();
+
+        public new bool Equals(object? x, object? y)
+        {
+            return object.Equals(x, y) || (x is IEnumerable<object?> firstEnumerable && y is IEnumerable<object?> secondEnumerable && firstEnumerable.SequenceEqual(secondEnumerable, Instance));
+        }
+
+        public int GetHashCode(object? obj)
+        {
+            return obj?.GetHashCode() ?? 0;
+        }
+    }
+
+    public static object? SymbolEquals(object?[] args)
+    {
+        if (args.Length < 2)
+        {
+            throw new ArgumentException("symbol=? requires at least two arguments");
+        }
+
+        if (args[0] is not Symbol symbol)
+        {
+            throw new ArgumentException("At least one argument is not a symbol");
+        }
+
+        for (int i = 1; i < args.Length; i++)
+        {
+            if (args[i] is not Symbol symbol2)
             {
                 throw new ArgumentException("At least one argument is not a symbol");
             }
 
-            for (int i = 1; i < args.Length; i++)
+            if (!symbol.Equals(symbol2))
             {
-                if (args[i] is not Symbol symbol2)
-                {
-                    throw new ArgumentException("At least one argument is not a symbol");
-                }
-
-                if (!symbol.Equals(symbol2))
-                {
-                    return false;
-                }
+                return false;
             }
-
-            return true;
         }
+
+        return true;
     }
 }

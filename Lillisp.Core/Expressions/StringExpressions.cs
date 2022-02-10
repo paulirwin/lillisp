@@ -3,548 +3,547 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Lillisp.Core.Expressions
+namespace Lillisp.Core.Expressions;
+
+public static class StringExpressions
 {
-    public static class StringExpressions
+    public static object? Print(object?[] args)
     {
-        public static object? Print(object?[] args)
+        string output = string.Join(' ', args.Select(OutputFormatter.FormatPrint));
+
+        Console.Write(output);
+
+        return Nil.Value;
+    }
+
+    public static object? PrintLn(object?[] args)
+    {
+        string output = string.Join(' ', args.Select(OutputFormatter.FormatPrint));
+
+        Console.WriteLine(output);
+
+        return Nil.Value;
+    }
+
+    public static object? Str(object?[] args)
+    {
+        if (args.Length != 1)
         {
-            string output = string.Join(' ', args.Select(OutputFormatter.FormatPrint));
-
-            Console.Write(output);
-
-            return Nil.Value;
+            throw new ArgumentException("str needs exactly one argument");
         }
 
-        public static object? PrintLn(object?[] args)
+        return OutputFormatter.FormatPrint(args[0]);
+    }
+
+    public static object? Prn(object?[] args)
+    {
+        string output = string.Join(' ', args.Select(OutputFormatter.FormatPr));
+
+        Console.WriteLine(output);
+
+        return Nil.Value;
+    }
+
+    public static object? Pr(object?[] args)
+    {
+        string output = string.Join(' ', args.Select(OutputFormatter.FormatPr));
+
+        Console.Write(output);
+
+        return Nil.Value;
+    }
+
+    public static object? MakeString(object?[] args)
+    {
+        if (args.Length is 0 or > 2)
         {
-            string output = string.Join(' ', args.Select(OutputFormatter.FormatPrint));
-
-            Console.WriteLine(output);
-
-            return Nil.Value;
+            throw new ArgumentException("make-string requires one or two arguments");
         }
 
-        public static object? Str(object?[] args)
+        int k = Convert.ToInt32(args[0]);
+        var sb = new StringBuilder(k);
+
+        if (args.Length == 2)
         {
-            if (args.Length != 1)
+            if (args[1] is not char c)
             {
-                throw new ArgumentException("str needs exactly one argument");
+                throw new ArgumentException("make-string's second argument must be a character");
             }
 
-            return OutputFormatter.FormatPrint(args[0]);
+            sb.Append(c, k);
+        }
+        else
+        {
+            sb.Append(' ', k);
         }
 
-        public static object? Prn(object?[] args)
+        return sb;
+    }
+
+    public static object? String(object?[] args)
+    {
+        var sb = new StringBuilder();
+
+        foreach (var c in args.Cast<char>())
         {
-            string output = string.Join(' ', args.Select(OutputFormatter.FormatPr));
-
-            Console.WriteLine(output);
-
-            return Nil.Value;
+            sb.Append(c);
         }
 
-        public static object? Pr(object?[] args)
+        return sb.ToString();
+    }
+
+    public static object? StringLength(object?[] args)
+    {
+        if (args.Length != 1)
         {
-            string output = string.Join(' ', args.Select(OutputFormatter.FormatPr));
-
-            Console.Write(output);
-
-            return Nil.Value;
+            throw new ArgumentException("string-length requires one argument");
         }
 
-        public static object? MakeString(object?[] args)
+        return args[0] switch
         {
-            if (args.Length is 0 or > 2)
+            string s => s.Length,
+            StringBuilder sb => sb.Length,
+            _ => throw new ArgumentException("string-length's argument must be a string")
+        };
+    }
+
+    public static object? StringRef(object?[] args)
+    {
+        if (args.Length != 2)
+        {
+            throw new ArgumentException("string-ref requires two arguments");
+        }
+
+        var k = Convert.ToInt32(args[1]);
+
+        return args[0] switch
+        {
+            string s => s[k],
+            StringBuilder sb => sb[k],
+            _ => throw new ArgumentException("string-ref's first argument must be a string")
+        };
+    }
+
+    public static object? StringSet(object?[] args)
+    {
+        if (args.Length != 3)
+        {
+            throw new ArgumentException("string-set requires three arguments");
+        }
+
+        if (args[0] is not StringBuilder sb)
+        {
+            throw new ArgumentException("string-set's first argument must be a mutable string or StringBuilder");
+        }
+
+        if (args[2] is not char c)
+        {
+            throw new ArgumentException("string-set's third argument must be a character");
+        }
+
+        var k = Convert.ToInt32(args[1]);
+            
+        sb[k] = c;
+
+        return Nil.Value;
+    }
+
+    private static IEnumerable<string> ArgsToStringlikes(this IEnumerable<object?> args)
+    {
+        foreach (var arg in args)
+        {
+            yield return arg switch
             {
-                throw new ArgumentException("make-string requires one or two arguments");
+                string s => s,
+                StringBuilder sb => sb.ToString(),
+                _ => throw new ArgumentException("Object argument is not a string")
+            };
+        }
+    }
+
+    public static object? Equals(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null && !arg.Equals(last, StringComparison.InvariantCulture))
+                return false;
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? LessThan(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null)
+            {
+                var comp = string.Compare(last, arg, StringComparison.InvariantCulture);
+
+                if (comp >= 0)
+                    return false;
             }
 
-            int k = Convert.ToInt32(args[0]);
-            var sb = new StringBuilder(k);
+            last = arg;
+        }
 
-            if (args.Length == 2)
+        return true;
+    }
+
+    public static object? GreaterThan(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null)
             {
-                if (args[1] is not char c)
-                {
-                    throw new ArgumentException("make-string's second argument must be a character");
-                }
+                var comp = string.Compare(last, arg, StringComparison.InvariantCulture);
 
-                sb.Append(c, k);
+                if (comp <= 0)
+                    return false;
+            }
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? LessThanOrEqualTo(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null)
+            {
+                var comp = string.Compare(last, arg, StringComparison.InvariantCulture);
+
+                if (comp > 0)
+                    return false;
+            }
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? GreaterThanOrEqualTo(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null)
+            {
+                var comp = string.Compare(last, arg, StringComparison.InvariantCulture);
+
+                if (comp < 0)
+                    return false;
+            }
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? CaseInsensitiveEquals(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null && !arg.Equals(last, StringComparison.InvariantCultureIgnoreCase))
+                return false;
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? CaseInsensitiveLessThan(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null)
+            {
+                var comp = string.Compare(last, arg, StringComparison.InvariantCultureIgnoreCase);
+
+                if (comp >= 0)
+                    return false;
+            }
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? CaseInsensitiveGreaterThan(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null)
+            {
+                var comp = string.Compare(last, arg, StringComparison.InvariantCultureIgnoreCase);
+
+                if (comp <= 0)
+                    return false;
+            }
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? CaseInsensitiveLessThanOrEqualTo(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null)
+            {
+                var comp = string.Compare(last, arg, StringComparison.InvariantCultureIgnoreCase);
+
+                if (comp > 0)
+                    return false;
+            }
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? CaseInsensitiveGreaterThanOrEqualTo(object?[] args)
+    {
+        string? last = null;
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            if (last != null)
+            {
+                var comp = string.Compare(last, arg, StringComparison.InvariantCultureIgnoreCase);
+
+                if (comp < 0)
+                    return false;
+            }
+
+            last = arg;
+        }
+
+        return true;
+    }
+
+    public static object? Upcase(object?[] args)
+    {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("string-upcase takes one argument");
+        }
+
+        return args[0] switch
+        {
+            string s => s.ToUpper(),
+            StringBuilder sb => sb.ToString().ToUpper(),
+            _ => throw new ArgumentException("string-upcase's first argument must be a string")
+        };
+    }
+
+    public static object? Downcase(object?[] args)
+    {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("string-downcase takes one argument");
+        }
+
+        return args[0] switch
+        {
+            string s => s.ToLower(),
+            StringBuilder sb => sb.ToString().ToLower(),
+            _ => throw new ArgumentException("string-downcase's first argument must be a string")
+        };
+    }
+
+    public static object? Foldcase(object?[] args)
+    {
+        if (args.Length == 0)
+        {
+            throw new ArgumentException("string-foldcase takes one argument");
+        }
+
+        return args[0] switch
+        {
+            string s => s.ToLowerInvariant(),
+            StringBuilder sb => sb.ToString().ToLowerInvariant(),
+            _ => throw new ArgumentException("string-foldcase's first argument must be a string")
+        };
+    }
+
+    public static object? Substring(object?[] args)
+    {
+        if (args.Length != 3)
+        {
+            throw new ArgumentException("substring requires three arguments");
+        }
+
+        int start = Convert.ToInt32(args[1]);
+        int end = Convert.ToInt32(args[2]);
+
+        return args[0] switch
+        {
+            string s => s[start..end],
+            StringBuilder sb => sb.ToString()[start..end], // HACK: could this be improved?
+            _ => throw new ArgumentException("substring's first argument must be a string")
+        };
+    }
+
+    public static object? StringAppend(object?[] args)
+    {
+        var sb = new StringBuilder();
+
+        foreach (var arg in args.ArgsToStringlikes())
+        {
+            sb.Append(arg);
+        }
+
+        return sb.ToString();
+    }
+
+    public static object? StringCopy(object?[] args)
+    {
+        if (args.Length is 0 or > 3)
+        {
+            throw new ArgumentException("string-copy requires one to three arguments");
+        }
+
+        if (args[0] is not string str)
+        {
+            if (args[0] is StringBuilder sb)
+            {
+                str = sb.ToString();
             }
             else
             {
-                sb.Append(' ', k);
+                throw new ArgumentException("string-copy's first argument must be a string");
             }
-
-            return sb;
         }
 
-        public static object? String(object?[] args)
+        int start = 0, end = str.Length;
+
+        if (args.Length > 1)
         {
-            var sb = new StringBuilder();
-
-            foreach (var c in args.Cast<char>())
-            {
-                sb.Append(c);
-            }
-
-            return sb.ToString();
+            start = Convert.ToInt32(args[1]);
         }
 
-        public static object? StringLength(object?[] args)
+        if (args.Length == 3)
         {
-            if (args.Length != 1)
-            {
-                throw new ArgumentException("string-length requires one argument");
-            }
-
-            return args[0] switch
-            {
-                string s => s.Length,
-                StringBuilder sb => sb.Length,
-                _ => throw new ArgumentException("string-length's argument must be a string")
-            };
+            end = Convert.ToInt32(args[2]);
         }
 
-        public static object? StringRef(object?[] args)
+        return new StringBuilder(str[start..end]);
+    }
+
+    public static object? StringCopyTo(object?[] args)
+    {
+        if (args.Length is < 3 or > 5)
         {
-            if (args.Length != 2)
-            {
-                throw new ArgumentException("string-ref requires two arguments");
-            }
-
-            var k = Convert.ToInt32(args[1]);
-
-            return args[0] switch
-            {
-                string s => s[k],
-                StringBuilder sb => sb[k],
-                _ => throw new ArgumentException("string-ref's first argument must be a string")
-            };
+            throw new ArgumentException("string-copy! requires 3 to 5 arguments");
         }
 
-        public static object? StringSet(object?[] args)
+        if (args[0] is not StringBuilder to)
         {
-            if (args.Length != 3)
-            {
-                throw new ArgumentException("string-set requires three arguments");
-            }
-
-            if (args[0] is not StringBuilder sb)
-            {
-                throw new ArgumentException("string-set's first argument must be a mutable string or StringBuilder");
-            }
-
-            if (args[2] is not char c)
-            {
-                throw new ArgumentException("string-set's third argument must be a character");
-            }
-
-            var k = Convert.ToInt32(args[1]);
-            
-            sb[k] = c;
-
-            return Nil.Value;
+            throw new ArgumentException("string-copy!'s first argument must be a mutable string");
         }
 
-        private static IEnumerable<string> ArgsToStringlikes(this IEnumerable<object?> args)
+        if (args[2] is not string from)
         {
-            foreach (var arg in args)
+            if (args[2] is StringBuilder sbfrom)
             {
-                yield return arg switch
-                {
-                    string s => s,
-                    StringBuilder sb => sb.ToString(),
-                    _ => throw new ArgumentException("Object argument is not a string")
-                };
+                from = sbfrom.ToString(); // TODO: is there a more efficient way of doing this?
+            }
+            else
+            {
+                throw new ArgumentException("string-copy!'s third argument must be a string");
             }
         }
 
-        public static object? Equals(object?[] args)
+        var at = Convert.ToInt32(args[1]);
+        int start = 0, end = from.Length;
+
+        if (args.Length > 3)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null && !arg.Equals(last, StringComparison.InvariantCulture))
-                    return false;
-
-                last = arg;
-            }
-
-            return true;
+            start = Convert.ToInt32(args[3]);
         }
 
-        public static object? LessThan(object?[] args)
+        if (args.Length == 5)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null)
-                {
-                    var comp = string.Compare(last, arg, StringComparison.InvariantCulture);
-
-                    if (comp >= 0)
-                        return false;
-                }
-
-                last = arg;
-            }
-
-            return true;
+            end = Convert.ToInt32(args[4]);
         }
 
-        public static object? GreaterThan(object?[] args)
+        if ((to.Length - at) < (end - start))
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null)
-                {
-                    var comp = string.Compare(last, arg, StringComparison.InvariantCulture);
-
-                    if (comp <= 0)
-                        return false;
-                }
-
-                last = arg;
-            }
-
-            return true;
+            throw new ArgumentException("(- (string-length to) at) must not be less than (- end start)");
         }
 
-        public static object? LessThanOrEqualTo(object?[] args)
+        for (int i = start; i < end; i++)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null)
-                {
-                    var comp = string.Compare(last, arg, StringComparison.InvariantCulture);
-
-                    if (comp > 0)
-                        return false;
-                }
-
-                last = arg;
-            }
-
-            return true;
+            to[at++] = from[i];
         }
 
-        public static object? GreaterThanOrEqualTo(object?[] args)
+        return Nil.Value; // TODO: is this correct?
+    }
+
+    public static object? StringFill(object?[] args)
+    {
+        if (args.Length is < 2 or > 4)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null)
-                {
-                    var comp = string.Compare(last, arg, StringComparison.InvariantCulture);
-
-                    if (comp < 0)
-                        return false;
-                }
-
-                last = arg;
-            }
-
-            return true;
+            throw new ArgumentException("string-fill! requires 2 to 4 arguments");
         }
 
-        public static object? CaseInsensitiveEquals(object?[] args)
+        if (args[0] is not StringBuilder sb)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null && !arg.Equals(last, StringComparison.InvariantCultureIgnoreCase))
-                    return false;
-
-                last = arg;
-            }
-
-            return true;
+            throw new ArgumentException("string-fill!'s first argument must be a mutable string");
         }
 
-        public static object? CaseInsensitiveLessThan(object?[] args)
+        if (args[1] is not char fill)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null)
-                {
-                    var comp = string.Compare(last, arg, StringComparison.InvariantCultureIgnoreCase);
-
-                    if (comp >= 0)
-                        return false;
-                }
-
-                last = arg;
-            }
-
-            return true;
+            throw new ArgumentException("string-fill!'s second argument must be a character");
         }
 
-        public static object? CaseInsensitiveGreaterThan(object?[] args)
+        int start = 0, end = sb.Length;
+
+        if (args.Length > 2)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null)
-                {
-                    var comp = string.Compare(last, arg, StringComparison.InvariantCultureIgnoreCase);
-
-                    if (comp <= 0)
-                        return false;
-                }
-
-                last = arg;
-            }
-
-            return true;
+            start = Convert.ToInt32(args[2]);
         }
 
-        public static object? CaseInsensitiveLessThanOrEqualTo(object?[] args)
+        if (args.Length == 4)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null)
-                {
-                    var comp = string.Compare(last, arg, StringComparison.InvariantCultureIgnoreCase);
-
-                    if (comp > 0)
-                        return false;
-                }
-
-                last = arg;
-            }
-
-            return true;
+            end = Convert.ToInt32(args[3]);
         }
 
-        public static object? CaseInsensitiveGreaterThanOrEqualTo(object?[] args)
+        for (int i = start; i < end; i++)
         {
-            string? last = null;
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                if (last != null)
-                {
-                    var comp = string.Compare(last, arg, StringComparison.InvariantCultureIgnoreCase);
-
-                    if (comp < 0)
-                        return false;
-                }
-
-                last = arg;
-            }
-
-            return true;
+            sb[i] = fill;
         }
 
-        public static object? Upcase(object?[] args)
-        {
-            if (args.Length == 0)
-            {
-                throw new ArgumentException("string-upcase takes one argument");
-            }
-
-            return args[0] switch
-            {
-                string s => s.ToUpper(),
-                StringBuilder sb => sb.ToString().ToUpper(),
-                _ => throw new ArgumentException("string-upcase's first argument must be a string")
-            };
-        }
-
-        public static object? Downcase(object?[] args)
-        {
-            if (args.Length == 0)
-            {
-                throw new ArgumentException("string-downcase takes one argument");
-            }
-
-            return args[0] switch
-            {
-                string s => s.ToLower(),
-                StringBuilder sb => sb.ToString().ToLower(),
-                _ => throw new ArgumentException("string-downcase's first argument must be a string")
-            };
-        }
-
-        public static object? Foldcase(object?[] args)
-        {
-            if (args.Length == 0)
-            {
-                throw new ArgumentException("string-foldcase takes one argument");
-            }
-
-            return args[0] switch
-            {
-                string s => s.ToLowerInvariant(),
-                StringBuilder sb => sb.ToString().ToLowerInvariant(),
-                _ => throw new ArgumentException("string-foldcase's first argument must be a string")
-            };
-        }
-
-        public static object? Substring(object?[] args)
-        {
-            if (args.Length != 3)
-            {
-                throw new ArgumentException("substring requires three arguments");
-            }
-
-            int start = Convert.ToInt32(args[1]);
-            int end = Convert.ToInt32(args[2]);
-
-            return args[0] switch
-            {
-                string s => s[start..end],
-                StringBuilder sb => sb.ToString()[start..end], // HACK: could this be improved?
-                _ => throw new ArgumentException("substring's first argument must be a string")
-            };
-        }
-
-        public static object? StringAppend(object?[] args)
-        {
-            var sb = new StringBuilder();
-
-            foreach (var arg in args.ArgsToStringlikes())
-            {
-                sb.Append(arg);
-            }
-
-            return sb.ToString();
-        }
-
-        public static object? StringCopy(object?[] args)
-        {
-            if (args.Length is 0 or > 3)
-            {
-                throw new ArgumentException("string-copy requires one to three arguments");
-            }
-
-            if (args[0] is not string str)
-            {
-                if (args[0] is StringBuilder sb)
-                {
-                    str = sb.ToString();
-                }
-                else
-                {
-                    throw new ArgumentException("string-copy's first argument must be a string");
-                }
-            }
-
-            int start = 0, end = str.Length;
-
-            if (args.Length > 1)
-            {
-                start = Convert.ToInt32(args[1]);
-            }
-
-            if (args.Length == 3)
-            {
-                end = Convert.ToInt32(args[2]);
-            }
-
-            return new StringBuilder(str[start..end]);
-        }
-
-        public static object? StringCopyTo(object?[] args)
-        {
-            if (args.Length is < 3 or > 5)
-            {
-                throw new ArgumentException("string-copy! requires 3 to 5 arguments");
-            }
-
-            if (args[0] is not StringBuilder to)
-            {
-                throw new ArgumentException("string-copy!'s first argument must be a mutable string");
-            }
-
-            if (args[2] is not string from)
-            {
-                if (args[2] is StringBuilder sbfrom)
-                {
-                    from = sbfrom.ToString(); // TODO: is there a more efficient way of doing this?
-                }
-                else
-                {
-                    throw new ArgumentException("string-copy!'s third argument must be a string");
-                }
-            }
-
-            var at = Convert.ToInt32(args[1]);
-            int start = 0, end = from.Length;
-
-            if (args.Length > 3)
-            {
-                start = Convert.ToInt32(args[3]);
-            }
-
-            if (args.Length == 5)
-            {
-                end = Convert.ToInt32(args[4]);
-            }
-
-            if ((to.Length - at) < (end - start))
-            {
-                throw new ArgumentException("(- (string-length to) at) must not be less than (- end start)");
-            }
-
-            for (int i = start; i < end; i++)
-            {
-                to[at++] = from[i];
-            }
-
-            return Nil.Value; // TODO: is this correct?
-        }
-
-        public static object? StringFill(object?[] args)
-        {
-            if (args.Length is < 2 or > 4)
-            {
-                throw new ArgumentException("string-fill! requires 2 to 4 arguments");
-            }
-
-            if (args[0] is not StringBuilder sb)
-            {
-                throw new ArgumentException("string-fill!'s first argument must be a mutable string");
-            }
-
-            if (args[1] is not char fill)
-            {
-                throw new ArgumentException("string-fill!'s second argument must be a character");
-            }
-
-            int start = 0, end = sb.Length;
-
-            if (args.Length > 2)
-            {
-                start = Convert.ToInt32(args[2]);
-            }
-
-            if (args.Length == 4)
-            {
-                end = Convert.ToInt32(args[3]);
-            }
-
-            for (int i = start; i < end; i++)
-            {
-                sb[i] = fill;
-            }
-
-            return Nil.Value; // TODO: is this correct?
-        }
+        return Nil.Value; // TODO: is this correct?
     }
 }

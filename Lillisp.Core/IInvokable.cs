@@ -1,7 +1,6 @@
-﻿namespace Lillisp.Core
+﻿namespace Lillisp.Core;
+
+public interface IInvokable
 {
-    public interface IInvokable
-    {
-        object? Invoke(LillispRuntime runtime, Scope scope, object?[] args);
-    }
+    object? Invoke(LillispRuntime runtime, Scope scope, object?[] args);
 }
