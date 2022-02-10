@@ -145,7 +145,7 @@ public class MathTests
         var result = runtime.EvaluateProgram(input);
 
         Assert.NotNull(result);
-        Assert.Equal(expected, (double)result, 6);
+        Assert.Equal(expected, (double)result!, 6);
     }
 
     private const double eSquared = 7.3890560989306495;

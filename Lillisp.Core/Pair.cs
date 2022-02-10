@@ -98,7 +98,6 @@ public class Pair : Node, IEnumerable<object?>
     {
         private readonly Pair _startPair;
         private Pair? _current;
-        private object? _currentNode;
         private bool _pairStop;
 
         public PairEnumerator(Pair pair)
@@ -117,7 +116,7 @@ public class Pair : Node, IEnumerable<object?>
             if (_current == null)
             {
                 _current = _startPair;
-                _currentNode = _current.Car;
+                Current = _current.Car;
                 return true;
             }
                 
@@ -128,26 +127,26 @@ public class Pair : Node, IEnumerable<object?>
                     return false;
                 }
 
-                _currentNode = _current.Cdr;
+                Current = _current.Cdr;
                 _pairStop = true;
                 return true;
             }
 
             _current = p;
-            _currentNode = p.Car;
+            Current = p.Car;
             return true;
         }
 
         public void Reset()
         {
             _current = null;
-            _currentNode = null;
+            Current = null;
             _pairStop = false;
         }
+        
+        public object? Current { get; private set; }
 
-        public object? Current => _currentNode;
-
-        object IEnumerator.Current => Current;
+        object? IEnumerator.Current => Current;
 
         public void Dispose()
         {

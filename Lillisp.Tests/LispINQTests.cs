@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Lillisp.Core;
+// ReSharper disable StringLiteralTypo
 
 namespace Lillisp.Tests;
 
@@ -22,7 +23,7 @@ public class LispINQTests
 
         Assert.NotNull(result);
 
-        Assert.Equal(2, result.Length);
+        Assert.Equal(2, result!.Length);
         Assert.Equal("foo", result[0]);
         Assert.Equal("fizz", result[1]);
     }
@@ -49,7 +50,7 @@ public class LispINQTests
         var resultArray = result as object[];
         Assert.NotNull(resultArray);
 
-        Assert.Equal(2, resultArray.Length);
+        Assert.Equal(2, resultArray!.Length);
         Assert.Equal("foo", resultArray[0]);
         Assert.Equal("fizz", resultArray[1]);
     }
@@ -73,7 +74,7 @@ public class LispINQTests
         var resultArray = result as object[];
         Assert.NotNull(resultArray);
 
-        Assert.Equal(2, resultArray.Length);
+        Assert.Equal(2, resultArray!.Length);
         Assert.Equal("FOO", resultArray[0]);
         Assert.Equal("BAR", resultArray[1]);
     }
@@ -97,7 +98,7 @@ public class LispINQTests
         var resultArray = result as object[];
         Assert.NotNull(resultArray);
 
-        Assert.Equal(2, resultArray.Length);
+        Assert.Equal(2, resultArray!.Length);
         Assert.Equal("bar", resultArray[0]);
         Assert.Equal("foo", resultArray[1]);
     }
@@ -122,7 +123,7 @@ public class LispINQTests
         var resultArray = result as object[];
         Assert.NotNull(resultArray);
 
-        Assert.Equal(3, resultArray.Length);
+        Assert.Equal(3, resultArray!.Length);
         Assert.Equal("zzz", resultArray[0]);
         Assert.Equal("yyy", resultArray[1]);
         Assert.Equal("xyz", resultArray[2]);
@@ -148,7 +149,7 @@ public class LispINQTests
         var resultArray = result as object[];
         Assert.NotNull(resultArray);
 
-        Assert.Equal(3, resultArray.Length);
+        Assert.Equal(3, resultArray!.Length);
         Assert.Equal("yyy", resultArray[0]);
         Assert.Equal("xyz", resultArray[1]);            
         Assert.Equal("zzz", resultArray[2]);

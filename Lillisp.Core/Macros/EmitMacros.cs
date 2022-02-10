@@ -8,10 +8,10 @@ namespace Lillisp.Core.Macros;
 
 public static class EmitMacros
 {
-    private static MethodInfo appendString = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(string) })!;
-    private static MethodInfo appendChar = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(char) })!;
-    private static MethodInfo appendObject = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(object) })!;
-    private static MethodInfo objectToString = typeof(object).GetMethod(nameof(object.ToString), Type.EmptyTypes)!;
+    private static readonly MethodInfo appendString = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(string) })!;
+    private static readonly MethodInfo appendChar = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(char) })!;
+    private static readonly MethodInfo appendObject = typeof(StringBuilder).GetMethod(nameof(StringBuilder.Append), new[] { typeof(object) })!;
+    private static readonly MethodInfo objectToString = typeof(object).GetMethod(nameof(object.ToString), Type.EmptyTypes)!;
 
     public static object? DefineRecord(LillispRuntime runtime, Scope scope, object?[] args)
     {

@@ -75,7 +75,7 @@ public class ExceptionTests
         var result = (runtime.EvaluateProgram(prog) as Pair)?.ToArray();
 
         Assert.NotNull(result);
-        Assert.Equal(2, result.Length);
+        Assert.Equal(2, result!.Length);
         Assert.Equal(65, result[0]);
         Assert.Equal(1, result[1]);
     }
@@ -142,7 +142,7 @@ public class ExceptionTests
         var result = runtime.EvaluateProgram(prog) as IList<object>;
 
         Assert.NotNull(result);
-        Assert.Equal(3, result.Count);
+        Assert.Equal(3, result!.Count);
         Assert.Equal(1, result[0]);
         Assert.Equal("foo", result[1]);
         Assert.Equal(3, result[2]);

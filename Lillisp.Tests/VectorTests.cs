@@ -14,7 +14,7 @@ public class VectorTests
         var vector = result as Vector;
             
         Assert.NotNull(vector);
-        Assert.Equal(10, vector.Count);
+        Assert.Equal(10, vector!.Count);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class VectorTests
         var vector = result as Vector;
 
         Assert.NotNull(vector);
-        Assert.Equal(3, vector.Count);
+        Assert.Equal(3, vector!.Count);
         Assert.Equal(42d, vector[0]);
         Assert.Equal(42d, vector[1]);
         Assert.Equal(42d, vector[2]);
@@ -62,7 +62,7 @@ public class VectorTests
         var vector = result as Vector;
 
         Assert.NotNull(vector);
-        Assert.Equal(3, vector.Count);
+        Assert.Equal(3, vector!.Count);
         Assert.Equal(1, vector[0]);
         Assert.Equal(2, vector[1]);
         Assert.Equal(3, vector[2]);
@@ -105,13 +105,13 @@ public class VectorTests
         var vector = result as Vector;
 
         Assert.NotNull(vector);
-        Assert.Equal(3, vector.Count);
+        Assert.Equal(3, vector!.Count);
         Assert.Equal(0, vector[0]);
 
         var list = (vector[1] as Pair)?.ToList();
 
         Assert.NotNull(list);
-        Assert.Equal("Sue", list[0]);
+        Assert.Equal("Sue", list![0]);
         Assert.Equal("Sue", list[1]);
 
         Assert.Equal("Anna", vector[2]);
@@ -147,7 +147,7 @@ public class VectorTests
         var vector = result as Vector;
 
         Assert.NotNull(vector);
-        Assert.Equal(5, vector.Count);
+        Assert.Equal(5, vector!.Count);
         Assert.Equal(10, vector[0]);
         Assert.Equal(1, vector[1]);
         Assert.Equal(2, vector[2]);
@@ -181,7 +181,7 @@ public class VectorTests
         var vector = result as Vector;
 
         Assert.NotNull(vector);
-        Assert.Equal(5, vector.Count);
+        Assert.Equal(5, vector!.Count);
         Assert.Equal(1, vector[0]);
         Assert.Equal(2, vector[1]);
         Assert.Equal("smash", vector[2]);
@@ -201,22 +201,9 @@ public class VectorTests
 
     [InlineData("(let ((v (make-list 5))) (vector-for-each (lambda (i) (list-set! v i (* i i))) '#(0 1 2 3 4)) v)", new object[] { 0, 1, 4, 9, 16 })]
     [Theory]
-    public void VectorForEachTests(string input, object[] expected)
+    public void VectorForEachTests(string input, object expected)
     {
-        var runtime = new LillispRuntime();
-
-        var result = runtime.EvaluateProgram(input) as Pair;
-
-        Assert.NotNull(result);
-
-        var resultList = result.ToList();
-
-        Assert.Equal(5, resultList.Count);
-        Assert.Equal(0, resultList[0]);
-        Assert.Equal(1, resultList[1]);
-        Assert.Equal(4, resultList[2]);
-        Assert.Equal(9, resultList[3]);
-        Assert.Equal(16, resultList[4]);
+        TestHelper.DefaultTest(input, expected);
     }
 
     private static void VectorTest(string input, object[] expectedVector)
@@ -226,7 +213,7 @@ public class VectorTests
         var result = runtime.EvaluateProgram(input) as Vector;
 
         Assert.NotNull(result);
-        Assert.Equal(expectedVector.Length, result.Count);
+        Assert.Equal(expectedVector.Length, result!.Count);
 
         for (int i = 0; i < expectedVector.Length; i++)
         {

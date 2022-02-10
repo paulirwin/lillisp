@@ -72,7 +72,7 @@ public static class ExceptionExpressions
             throw new ArgumentException("error-object-message requires one error object argument");
         }
 
-        if (args[0] is not ErrorException errorException)
+        if (ex is not ErrorException errorException)
         {
             return Array.Empty<object?>();
         }

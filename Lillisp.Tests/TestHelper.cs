@@ -4,7 +4,7 @@ namespace Lillisp.Tests;
 
 public static class TestHelper
 {
-    public static void DefaultTest(string input, object expected)
+    public static void DefaultTest(string input, object? expected)
     {
         var runtime = new LillispRuntime();
 
@@ -18,7 +18,7 @@ public static class TestHelper
 
             Assert.NotNull(enumerable);
 
-            var list = enumerable.ToList();
+            var list = enumerable!.ToList();
 
             Assert.Equal(objArr.Length, list.Count);
 

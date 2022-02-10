@@ -1,4 +1,5 @@
 ﻿using Lillisp.Core;
+// ReSharper disable StringLiteralTypo
 
 namespace Lillisp.Tests;
 
@@ -7,13 +8,9 @@ public class MacroTests
     [InlineData("(quote (1 2 3))", new object[] { 1, 2, 3 })]
     [InlineData("'(1 2 3)", new object[] { 1, 2, 3 })]
     [Theory]
-    public void QuoteTests(string input, object[] expected)
+    public void QuoteTests(string input, object expected)
     {
-        var runtime = new LillispRuntime();
-
-        var result = runtime.EvaluateProgram(input);
-
-        Assert.Equal(expected, (IEnumerable<object>)result);
+        TestHelper.DefaultTest(input, expected);
     }
 
     [InlineData("(list 1 2 3)", new object[] { 1, 2, 3 })]
@@ -23,11 +20,7 @@ public class MacroTests
     [Theory]
     public void ListTests(string input, object[] expected)
     {
-        var runtime = new LillispRuntime();
-
-        var result = runtime.EvaluateProgram(input);
-
-        Assert.Equal(expected, (IEnumerable<object>)result);
+        TestHelper.DefaultTest(input, expected);
     }
 
     [InlineData("(apply + (list 1 2 3))", 6)]
@@ -129,7 +122,7 @@ public class MacroTests
     [Fact]
     public void DefineSyntaxBasicTest()
     {
-        string program = @"
+        const string program = @"
 (define-syntax kwote
   (syntax-rules ()
     ((kwote exp)
@@ -147,7 +140,7 @@ public class MacroTests
     [Fact]
     public void LetSyntaxBasicTest()
     {
-        string program = @"
+        const string program = @"
 (let-syntax 
     ((given-that (syntax-rules ()
         ((given-that test stmt1 stmt2 ...)
@@ -168,7 +161,7 @@ public class MacroTests
     [Fact]
     public void MacroEllipsisTest()
     {
-        string program = @"
+        const string program = @"
 (define-syntax my-when
   (syntax-rules ()
     ((my-when c e ...)
@@ -186,7 +179,7 @@ public class MacroTests
     [Fact]
     public void LetRecSyntaxTest()
     {
-        string program = @"
+        const string program = @"
 (letrec-syntax
     ((my-or 
         (syntax-rules ()
@@ -211,7 +204,7 @@ public class MacroTests
     [Fact]
     public void SyntaxErrorTest()
     {
-        string program = @"
+        const string program = @"
 (letrec-syntax
     ((err-or
         (syntax-rules ()
@@ -233,7 +226,7 @@ public class MacroTests
         var atom = error.Args[0] as Atom;
 
         Assert.NotNull(atom);
-        Assert.Equal(123, atom.Value);
+        Assert.Equal(123, atom!.Value);
     }
 
     [InlineData("(do () (#t 1))", 1)]
@@ -256,7 +249,7 @@ public class MacroTests
 
         Assert.NotNull(result);
 
-        Assert.Equal(5, result.Count);
+        Assert.Equal(5, result!.Count);
         Assert.Equal(0, result[0]);
         Assert.Equal(1, result[1]);
         Assert.Equal(2, result[2]);
@@ -287,11 +280,11 @@ public class MacroTests
 
         Assert.NotNull(result);
 
-        var carPair = result.Car as Pair;
+        var carPair = result!.Car as Pair;
         
         Assert.NotNull(carPair);
 
-        var carList = carPair.ToList();
+        var carList = carPair!.ToList();
 
         Assert.Equal(3, carList.Count);
         Assert.Equal(6, carList[0]);
@@ -302,11 +295,11 @@ public class MacroTests
 
         Assert.NotNull(cdrPair);
 
-        var cdrCarPair = cdrPair.Car as Pair;
+        var cdrCarPair = cdrPair!.Car as Pair;
 
         Assert.NotNull(cdrCarPair);
 
-        var cdrList = cdrCarPair.ToList();
+        var cdrList = cdrCarPair!.ToList();
 
         Assert.Equal(2, cdrList.Count);
         Assert.Equal(-5, cdrList[0]);
@@ -331,7 +324,7 @@ public class MacroTests
 
         Assert.NotNull(result);
 
-        var resultList = result.ToList();
+        var resultList = result!.ToList();
 
         Assert.Equal(3, resultList.Count);
         Assert.Equal(0, resultList[0]);
@@ -342,7 +335,7 @@ public class MacroTests
 
         Assert.NotNull(result);
 
-        resultList = result.ToList();
+        resultList = result!.ToList();
 
         Assert.Equal(2, resultList.Count);
         Assert.Equal(3, resultList[0]);
@@ -365,7 +358,7 @@ v)
         var result = runtime.EvaluateProgram(program) as Vector;
 
         Assert.NotNull(result);
-        Assert.Equal(5, result.Count);
+        Assert.Equal(5, result!.Count);
         Assert.Equal(0, result[0]);
         Assert.Equal(1, result[1]);
         Assert.Equal(4, result[2]);

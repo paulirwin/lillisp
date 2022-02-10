@@ -713,12 +713,16 @@ public static class CoreMacros
                         return LillispRuntime.TailCall(scope, new Pair(proc, new Pair(new Atom(AtomType.RuntimeReference, key), Nil.Value)));
                     }
 
+                    object? retVal = null;
+
                     for (int i = 1; i < clauseForms.Count; i++)
                     {
                         var expr = clauseForms[i];
 
-                        return (i == clauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
+                        retVal = (i == clauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
                     }
+
+                    return retVal;
                 }
             }
         }
@@ -739,12 +743,16 @@ public static class CoreMacros
                 return LillispRuntime.TailCall(scope, new Pair(proc, new Pair(new Atom(AtomType.RuntimeReference, key), Nil.Value)));
             }
 
+            object? retVal = null;
+
             for (int i = 1; i < elseClauseForms.Count; i++)
             {
                 var expr = elseClauseForms[i];
 
-                return (i == elseClauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
+                retVal = (i == elseClauseForms.Count - 1 && expr is Pair pair) ? LillispRuntime.TailCall(scope, pair) : runtime.Evaluate(scope, expr);
             }
+
+            return retVal;
         }
 
         return false;

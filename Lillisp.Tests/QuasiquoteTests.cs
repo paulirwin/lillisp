@@ -1,4 +1,5 @@
 ﻿using Lillisp.Core;
+// ReSharper disable StringLiteralTypo
 
 namespace Lillisp.Tests;
 
@@ -13,14 +14,14 @@ public class QuasiquoteTests
 
         Assert.NotNull(result);
 
-        var resultList = result.ToList();
+        var resultList = result!.ToList();
 
         Assert.Equal(4, resultList.Count);
 
         var sym = resultList[0] as Symbol;
 
         Assert.NotNull(sym);
-        Assert.Equal("+", sym.Value);
+        Assert.Equal("+", sym!.Value);
 
         Assert.Equal(0d, resultList[1]);
         Assert.Equal(1d, resultList[2]);
@@ -36,14 +37,14 @@ public class QuasiquoteTests
 
         Assert.NotNull(result);
 
-        var resultList = result.ToList();
+        var resultList = result!.ToList();
 
         Assert.Equal(4, resultList.Count);
 
         var sym = resultList[0] as Symbol;
 
         Assert.NotNull(sym);
-        Assert.Equal("+", sym.Value);
+        Assert.Equal("+", sym!.Value);
 
         Assert.Equal(0d, resultList[1]);
         Assert.Equal(1d, resultList[2]);
@@ -65,7 +66,7 @@ public class QuasiquoteTests
     {
         var runtime = new LillispRuntime();
 
-        var program = "(define x 42)\n(eval `(define ,(string->symbol (string-append \"myvar\" (str x))) x))\nmyvar42";
+        const string program = "(define x 42)\n(eval `(define ,(string->symbol (string-append \"myvar\" (str x))) x))\nmyvar42";
 
         var result = runtime.EvaluateProgram(program);
 
@@ -77,7 +78,7 @@ public class QuasiquoteTests
     {
         var runtime = new LillispRuntime();
 
-        var program = "(define x 42)\n(eval (quasiquote (define (unquote (string->symbol (string-append \"myvar\" (str x)))) x)))\nmyvar42";
+        const string program = "(define x 42)\n(eval (quasiquote (define (unquote (string->symbol (string-append \"myvar\" (str x)))) x)))\nmyvar42";
 
         var result = runtime.EvaluateProgram(program);
 

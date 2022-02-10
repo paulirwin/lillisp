@@ -35,7 +35,7 @@ public class Procedure : IInvokable
             {
                 if (list.ElementAt(i) is not Symbol symbol)
                 {
-                    throw new ArgumentException($"Unhandled parameter node type: {list[i].GetType()}");
+                    throw new ArgumentException($"Unhandled parameter node type: {list[i]?.GetType().ToString() ?? "null"}");
                 }
 
                 if (args.Length > i)
@@ -54,7 +54,7 @@ public class Procedure : IInvokable
             {
                 if (list.ElementAt(i) is not Symbol symbol)
                 {
-                    throw new ArgumentException($"Unhandled parameter node type: {list[i].GetType()}");
+                    throw new ArgumentException($"Unhandled parameter node type: {list[i]?.GetType().ToString() ?? "null"}");
                 }
 
                 if (i == list.Count - 1)

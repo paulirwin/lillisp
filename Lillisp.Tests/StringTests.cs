@@ -42,7 +42,7 @@ public class StringTests
         var sb = result as StringBuilder;
 
         Assert.NotNull(sb);
-        Assert.Equal(expectedAfterToString, sb.ToString());
+        Assert.Equal(expectedAfterToString, sb!.ToString());
     }
 
     [InlineData("(string #\\a)", "a")]
@@ -192,7 +192,7 @@ v)
 
         Assert.NotNull(result);
 
-        var resultList = result.ToList();
+        var resultList = result!.ToList();
 
         Assert.Equal(5, resultList.Count);
         Assert.Equal(101, resultList[0]);

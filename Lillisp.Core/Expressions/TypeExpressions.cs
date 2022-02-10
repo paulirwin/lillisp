@@ -13,7 +13,7 @@ public static class TypeExpressions
         {
             throw new ArgumentException("typeof requires one argument");
         }
-
+        
         if (args[0] is null)
         {
             return null;
@@ -24,7 +24,7 @@ public static class TypeExpressions
             return type;
         }
 
-        return args[0].GetType();
+        return args[0]?.GetType();
     }
 
     public static object? IsBoolean(object?[] args)

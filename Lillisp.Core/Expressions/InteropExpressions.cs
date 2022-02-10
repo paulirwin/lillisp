@@ -4,7 +4,7 @@ namespace Lillisp.Core.Expressions;
 
 public class InteropExpressions
 {
-    private record CastPair(Type input, Type output);
+    private record CastPair(Type Input, Type Output);
 
     private static readonly IDictionary<CastPair, Delegate> _castMethodCache = new Dictionary<CastPair, Delegate>();
 
@@ -29,7 +29,7 @@ public class InteropExpressions
 
         var pair = new CastPair(arg0Type, type);
 
-        if (_castMethodCache.TryGetValue(pair, out Delegate? cast) && cast != null)
+        if (_castMethodCache.TryGetValue(pair, out var cast))
         {
             return cast.DynamicInvoke(args[0]);
         }

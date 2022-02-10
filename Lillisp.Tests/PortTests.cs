@@ -7,7 +7,7 @@ public class PortTests
     [Fact]
     public void ParameterizedOpenOutputStringPortTest()
     {
-        string program = "(parameterize ((current-output-port (open-output-string))) (display \"piece\") (display \" by piece \") (display \"by piece.\") (newline) (get-output-string (current-output-port)))";
+        const string program = "(parameterize ((current-output-port (open-output-string))) (display \"piece\") (display \" by piece \") (display \"by piece.\") (newline) (get-output-string (current-output-port)))";
 
         var runtime = new LillispRuntime();
 
@@ -28,7 +28,7 @@ public class PortTests
     [Fact]
     public void ParameterizedOpenInputStringPortTest()
     {
-        string program = "(parameterize ((current-input-port (open-input-string \"ABC\"))) (list (read-char) (read-char) (read-char) (eof-object? (read-char))))";
+        const string program = "(parameterize ((current-input-port (open-input-string \"ABC\"))) (list (read-char) (read-char) (read-char) (eof-object? (read-char))))";
 
         var runtime = new LillispRuntime();
 
@@ -36,7 +36,7 @@ public class PortTests
 
         Assert.NotNull(result);
 
-        var list = result.ToList();
+        var list = result!.ToList();
 
         Assert.Equal('A', list[0]);
         Assert.Equal('B', list[1]);

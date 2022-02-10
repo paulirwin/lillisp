@@ -89,7 +89,7 @@ public static class MathExpressions
 
         if (args.All(a => a.IsRationalNumber()))
         {
-            return args.Select(a => a.ToRational()).Aggregate((result, next) => result / next).CanonicalForm;
+            return args.Select(a => a!.ToRational()).Aggregate((result, next) => result / next).CanonicalForm;
         }
 
         return args.Cast<dynamic>().Aggregate((result, next) => result / next);

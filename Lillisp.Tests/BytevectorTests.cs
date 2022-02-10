@@ -63,7 +63,7 @@ public class BytevectorTests
         var vector = result as Bytevector;
 
         Assert.NotNull(vector);
-        Assert.Equal(4, vector.Count);
+        Assert.Equal(4, vector!.Count);
         Assert.Equal((byte)1, vector[0]);
         Assert.Equal((byte)3, vector[1]);
         Assert.Equal((byte)3, vector[2]);
@@ -91,7 +91,7 @@ public class BytevectorTests
         var vector = result as Bytevector;
 
         Assert.NotNull(vector);
-        Assert.Equal(5, vector.Count);
+        Assert.Equal(5, vector!.Count);
         Assert.Equal((byte)10, vector[0]);
         Assert.Equal((byte)1, vector[1]);
         Assert.Equal((byte)2, vector[2]);

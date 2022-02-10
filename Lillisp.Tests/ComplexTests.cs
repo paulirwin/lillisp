@@ -22,7 +22,7 @@ public class ComplexTests
 
         Assert.IsType<Complex>(result);
 
-        var complex = (Complex)result;
+        var complex = (Complex)result!;
 
         Assert.Equal(real, complex.Real, 6);
         Assert.Equal(imaginary, complex.Imaginary, 6);
@@ -41,7 +41,7 @@ public class ComplexTests
 
         Assert.IsType<Complex>(result);
 
-        var complex = (Complex)result;
+        var complex = (Complex)result!;
 
         Assert.Equal(phase, complex.Phase, 6);
         Assert.Equal(magnitude, complex.Magnitude, 6);
@@ -63,7 +63,7 @@ public class ComplexTests
         var result = runtime.EvaluateProgram(input);
 
         Assert.IsType<double>(result);
-        Assert.Equal(real, (double)result, 6);
+        Assert.Equal(real, (double)result!, 6);
     }
 
     [InlineData("(imag-part 42+7i)", 7d)]
@@ -82,7 +82,7 @@ public class ComplexTests
         var result = runtime.EvaluateProgram(input);
 
         Assert.IsType<double>(result);
-        Assert.Equal(imaginary, (double)result, 6);
+        Assert.Equal(imaginary, (double)result!, 6);
     }
 
     [InlineData("(angle 0+0i)", 0d)]
@@ -96,7 +96,7 @@ public class ComplexTests
         var result = runtime.EvaluateProgram(input);
 
         Assert.IsType<double>(result);
-        Assert.Equal(angle, (double)result, 6);
+        Assert.Equal(angle, (double)result!, 6);
     }
 
     [InlineData("(magnitude 0+0i)", 0d)]
@@ -110,6 +110,6 @@ public class ComplexTests
         var result = runtime.EvaluateProgram(input);
 
         Assert.IsType<double>(result);
-        Assert.Equal(magnitude, (double)result, 6);
+        Assert.Equal(magnitude, (double)result!, 6);
     }
 }
