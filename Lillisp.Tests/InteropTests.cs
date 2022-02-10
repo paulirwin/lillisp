@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using Lillisp.Core;
-using Xunit;
 
 namespace Lillisp.Tests;
 

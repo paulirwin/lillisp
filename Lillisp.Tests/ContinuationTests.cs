@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using Lillisp.Core;
-using Xunit;
+﻿using Lillisp.Core;
 
 namespace Lillisp.Tests;
 

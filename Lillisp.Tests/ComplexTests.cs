@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using Lillisp.Core;
-using Xunit;
 
 namespace Lillisp.Tests;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using Xunit;
-
-namespace Lillisp.Tests;
+﻿namespace Lillisp.Tests;
 
 public class TypeTests
 {

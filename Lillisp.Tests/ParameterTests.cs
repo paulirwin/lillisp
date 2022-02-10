@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace Lillisp.Tests;
+﻿namespace Lillisp.Tests;
 
 public class ParameterTests
 {

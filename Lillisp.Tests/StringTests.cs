@@ -1,7 +1,6 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 using Lillisp.Core;
-using Xunit;
+
 // ReSharper disable StringLiteralTypo
 
 namespace Lillisp.Tests;

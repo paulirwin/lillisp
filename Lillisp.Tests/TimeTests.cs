@@ -1,5 +1,4 @@
 ﻿using Lillisp.Core;
-using Xunit;
 
 namespace Lillisp.Tests;
 

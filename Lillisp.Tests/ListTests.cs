@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Lillisp.Core;
-using Xunit;
+﻿using Lillisp.Core;
 
 namespace Lillisp.Tests;
 
