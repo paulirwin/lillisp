@@ -22,7 +22,7 @@ public static class Interop
 
         if (args[0] is null)
         {
-            throw new ArgumentException("First parameter must be an object instance");
+            throw new ArgumentException($"Attempt to invoke member {symbol} on a null reference");
         }
 
         symbol = symbol.TrimStart('.');
@@ -207,7 +207,7 @@ public static class Interop
         return typeHierarchy;
     }
 
-    public static object? ResolveSymbol(Scope scope, string symbol, int? arity)
+    public static bool TryResolveSymbol(Scope scope, string symbol, int? arity, out object? value)
     {
         string? staticMember = null;
 
@@ -222,7 +222,8 @@ public static class Interop
 
         if (type == null)
         {
-            return null;
+            value = null;
+            return false;
         }
 
         if (type is Type typeObj && !string.IsNullOrEmpty(staticMember))
@@ -233,26 +234,32 @@ public static class Interop
             {
                 if (memberInfo[0] is FieldInfo field)
                 {
-                    return field.GetValue(null);
+                    value = field.GetValue(null);
+                    return true;
                 }
 
                 if (memberInfo[0] is PropertyInfo { CanWrite: false } roProp)
                 {
-                    return roProp.GetValue(null);
+                    value = roProp.GetValue(null);
+                    return true;
                 }
 
-                return memberInfo[0];
+                value = memberInfo[0];
+                return true;
             }
 
             if (memberInfo.Length > 1)
             {
-                return new InteropStaticOverloadSet(typeObj, memberInfo[0].Name, memberInfo);
+                value = new InteropStaticOverloadSet(typeObj, memberInfo[0].Name, memberInfo);
+                return true;
             }
 
-            return null;
+            value = null;
+            return false;
         }
 
-        return type;
+        value = type;
+        return true;
     }
 
     private static object? FindType(Scope scope, string name, int? arity)

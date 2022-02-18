@@ -5,6 +5,13 @@ namespace Lillisp.Tests;
 
 public class InteropTests
 {
+    [InlineData("(def x null) x", null)]
+    [Theory]
+    public void DotNetNullVariableTests(string input, object? expected)
+    {
+        TestHelper.DefaultTest(input, expected);
+    }
+
     [InlineData("(begin (use 'System.Text) (typeof (new StringBuilder)))", typeof(StringBuilder))]
     [InlineData("(typeof (new Uri \"https://www.google.com\"))", typeof(Uri))]
     [InlineData("(begin (def x (new DateTime)) (typeof x))", typeof(DateTime))]

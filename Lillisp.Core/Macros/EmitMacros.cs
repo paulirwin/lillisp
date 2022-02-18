@@ -391,7 +391,7 @@ public static class EmitMacros
     private static void CreatePropertyWithField(Scope scope, TypeBuilder type, List<DynamicPropertyInfo> props, object? member)
     {
         string name = "";
-        Type fieldType = typeof(object);
+        var fieldType = typeof(object);
 
         if (member is Symbol memsym)
         {
@@ -401,14 +401,18 @@ public static class EmitMacros
         {
             name = mempairsym.Value;
             // TODO: support generics here with the arity parameter (null below)
-            fieldType = Interop.ResolveSymbol(scope, memtypesym.Value, null) as Type ?? throw new InvalidOperationException($"Expression for field {name} did not resolve to a type");
+            if (!Interop.TryResolveSymbol(scope, memtypesym.Value, null, out var resolvedValue)
+                || resolvedValue is not Type resolvedType) 
+                throw new InvalidOperationException($"Expression for field {name} did not resolve to a type");
+
+            fieldType = resolvedType;
         }
 
         var fieldName = $"<{name}>k__BackingField";
 
         var field = type.DefineField(fieldName, fieldType, FieldAttributes.Private | FieldAttributes.InitOnly);
-        field.SetCustomAttribute(new CustomAttributeBuilder(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes)!, new object?[0]));
-        field.SetCustomAttribute(new CustomAttributeBuilder(typeof(DebuggerBrowsableAttribute).GetConstructor(new Type[] { typeof(DebuggerBrowsableState) })!, new object?[] { DebuggerBrowsableState.Never }));
+        field.SetCustomAttribute(new CustomAttributeBuilder(typeof(CompilerGeneratedAttribute).GetConstructor(Type.EmptyTypes)!, Array.Empty<object?>()));
+        field.SetCustomAttribute(new CustomAttributeBuilder(typeof(DebuggerBrowsableAttribute).GetConstructor(new[] { typeof(DebuggerBrowsableState) })!, new object?[] { DebuggerBrowsableState.Never }));
 
         GenerateProperty(type, name, fieldType, field, out var getter, out var setter);
 

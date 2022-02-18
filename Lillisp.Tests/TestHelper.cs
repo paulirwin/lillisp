@@ -27,6 +27,10 @@ public static class TestHelper
                 Assert.Equal(objArr[i], list[i]);
             }
         }
+        else if (expected == null)
+        {
+            Assert.Null(result);
+        }
         else
         {
             Assert.Equal(expected, result);

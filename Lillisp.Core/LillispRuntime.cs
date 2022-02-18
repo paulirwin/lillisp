@@ -493,14 +493,13 @@ public class LillispRuntime
             return true;
         }
 
-        value = scope.Resolve(symbol);
-
-        if (value != null)
+        if (scope.TryResolve(symbol, out value))
             return true;
 
-        value = Interop.ResolveSymbol(scope, symbol, arity);
+        if (Interop.TryResolveSymbol(scope, symbol, arity, out value))
+            return true;
 
-        return value != null;
+        return false;
     }
 
     private object? EvaluateExpression(Scope scope, Pair pair)

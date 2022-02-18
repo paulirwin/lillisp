@@ -59,6 +59,22 @@ public class Scope
         return null;
     }
 
+    public bool TryResolve(string key, out object? value)
+    {
+        var scope = this;
+
+        while (scope != null)
+        {
+            if (scope.Env.TryGetValue(key, out value))
+                return true;
+
+            scope = scope.Parent;
+        }
+
+        value = null;
+        return false;
+    }
+
     public void AddAllFrom<TValue>(IReadOnlyDictionary<string, TValue> dict)
     {
         foreach (var (key, value) in dict)
