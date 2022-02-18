@@ -5,7 +5,13 @@ namespace Lillisp.Core;
 
 public static class Interop
 {
-    public static readonly string[] DefaultNamespaces = { "System" };
+    public static readonly string[] DefaultNamespaces =
+    {
+        "System",
+        "System.Collections.Generic",
+        "System.Linq",
+        "System.Text",
+    };
 
     public static object? InvokeMember(LillispRuntime runtime, Scope scope, string symbol, object?[] args)
     {

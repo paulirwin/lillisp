@@ -97,34 +97,33 @@ public static class ListExpressions
             return Array.Empty<object>();
         }
 
-        double start = 0;
-        double step = 1;
-        double end = 0;
+        dynamic start = 0;
+        dynamic step = 1;
+        dynamic end = 0;
 
         if (args.Length == 1)
         {
-            end = Convert.ToDouble(args[0]);
+            end = args[0] ?? throw new ArgumentException("end argument must not be null");
         }
         else if (args.Length >= 2)
         {
-            start = Convert.ToDouble(args[0]);
-            end = Convert.ToDouble(args[1]);
+            start = args[0] ?? throw new ArgumentException("start argument must not be null");
+            end = args[1] ?? throw new ArgumentException("end argument must not be null");
         }
             
         if (args.Length == 3)
         {
-            step = Convert.ToDouble(args[2]);
+            step = args[2] ?? throw new ArgumentException("step argument must not be null");
         }
 
-        return Core.List.FromNodes(RangeGenerator(start, end, step).ToArray());
-    }
+        var items = new List<dynamic>();
 
-    private static IEnumerable<object> RangeGenerator(double start, double end, double step)
-    {
-        for (double i = start; i < end; i += step)
+        for (var i = start; i < end; i += step)
         {
-            yield return i;
+            items.Add(i);
         }
+
+        return Core.List.FromNodes(items);
     }
 
     public static object? List(object?[] args)

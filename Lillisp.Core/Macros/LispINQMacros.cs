@@ -30,7 +30,12 @@ public static class LispINQMacros
         {
             var next = args[i];
 
-            if (next is Symbol { Value: "select" })
+            if (next is not Symbol nextSymbol)
+            {
+                throw new InvalidOperationException("Invalid LispINQ syntax");
+            }
+
+            if (nextSymbol.Value == "select")
             {
                 var projection = args[++i];
 
@@ -44,13 +49,13 @@ public static class LispINQMacros
                     enumerable = Select(runtime, scope, enumerable, alias, projection);
                 }
             }
-            else if (next is Symbol { Value: "where" })
+            else if (nextSymbol.Value == "where")
             {
                 var condition = args[++i];
 
                 enumerable = Where(runtime, scope, enumerable, alias, condition);
             }
-            else if (next is Symbol { Value: "orderby" })
+            else if (nextSymbol.Value == "orderby")
             {
                 var selector = args[++i];
                 bool desc = false;
@@ -63,7 +68,7 @@ public static class LispINQMacros
 
                 enumerable = OrderBy(runtime, scope, enumerable, alias, selector, desc);
             }
-            else if (next is Symbol { Value: "thenby" })
+            else if (nextSymbol.Value == "thenby")
             {
                 var selector = args[++i];
                 bool desc = false;
@@ -81,13 +86,63 @@ public static class LispINQMacros
 
                 enumerable = ThenBy(runtime, scope, orderedEnumerable, alias, selector, desc);
             }
+            else if (nextSymbol.Value == "let")
+            {
+                var bindings = args[++i];
+
+                if (bindings is not Pair bindingsPair)
+                {
+                    throw new InvalidOperationException("Following 'let' must be a list of bindings");
+                }
+
+                scope = scope.CreateChildScope();
+
+                enumerable = Let(runtime, scope, enumerable, alias, bindingsPair);
+            }
             else
             {
-                throw new NotImplementedException("LispINQ operator not yet implemented");
+                throw new NotImplementedException($"LispINQ operator {nextSymbol.Value} not implemented");
             }
         }
 
         return enumerable;
+    }
+
+    private static IEnumerable<object?> Let(LillispRuntime runtime, Scope scope, IEnumerable<object?> enumerable, string alias, Pair bindingsPair)
+    {
+        var bindings = new List<(Symbol Symbol, Node Expression)>();
+
+        foreach (var bindingValue in bindingsPair)
+        {
+            if (bindingValue is not Pair bindingPair)
+            {
+                throw new InvalidOperationException("Invalid LispINQ syntax: 'let' bindings must be lists");
+            }
+
+            if (bindingPair.Car is not Symbol bindingSymbol)
+            {
+                throw new InvalidOperationException("Invalid LispINQ syntax: car of 'let' binding pair must be a symbol");
+            }
+
+            if (bindingPair.Cdr is not Pair { Car: Node bindingExpression })
+            {
+                throw new InvalidOperationException("Invalid LispINQ syntax: cadr of 'let' binding pair must be an expression");
+            }
+
+            bindings.Add((bindingSymbol, bindingExpression));
+        }
+
+        foreach (var item in enumerable)
+        {
+            scope.DefineOrSet(alias, item);
+
+            foreach (var (symbol, expression) in bindings)
+            {
+                scope.DefineOrSet(symbol.Value, runtime.Evaluate(scope, expression));
+            }
+
+            yield return item;
+        }
     }
 
     private static IEnumerable<object?> OrderBy(LillispRuntime runtime, 

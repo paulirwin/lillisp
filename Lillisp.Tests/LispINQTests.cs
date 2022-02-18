@@ -12,8 +12,7 @@ public class LispINQTests
         var runtime = new LillispRuntime();
 
         var prog = new StringBuilder();
-
-        prog.AppendLine("(use 'System.Collections.Generic)");
+        
         prog.AppendLine("(define mylist (new (List String)))");
         prog.AppendLine("(.Add mylist \"foo\")");
         prog.AppendLine("(.Add mylist \"fizz\")");
@@ -34,9 +33,7 @@ public class LispINQTests
         var runtime = new LillispRuntime();
 
         var prog = new StringBuilder();
-
-        prog.AppendLine("(use 'System.Collections.Generic)");
-        prog.AppendLine("(use 'System.Linq)");
+        
         prog.AppendLine("(define mylist (new (List String)))");
         prog.AppendLine("(.Add mylist \"foo\")");
         prog.AppendLine("(.Add mylist \"bar\")");
@@ -61,9 +58,7 @@ public class LispINQTests
         var runtime = new LillispRuntime();
 
         var prog = new StringBuilder();
-
-        prog.AppendLine("(use 'System.Collections.Generic)");
-        prog.AppendLine("(use 'System.Linq)");
+        
         prog.AppendLine("(define mylist (new (List String)))");
         prog.AppendLine("(.Add mylist \"foo\")");
         prog.AppendLine("(.Add mylist \"bar\")");
@@ -85,9 +80,7 @@ public class LispINQTests
         var runtime = new LillispRuntime();
 
         var prog = new StringBuilder();
-
-        prog.AppendLine("(use 'System.Collections.Generic)");
-        prog.AppendLine("(use 'System.Linq)");
+        
         prog.AppendLine("(define mylist (new (List String)))");
         prog.AppendLine("(.Add mylist \"foo\")");
         prog.AppendLine("(.Add mylist \"bar\")");
@@ -109,9 +102,7 @@ public class LispINQTests
         var runtime = new LillispRuntime();
 
         var prog = new StringBuilder();
-
-        prog.AppendLine("(use 'System.Collections.Generic)");
-        prog.AppendLine("(use 'System.Linq)");
+        
         prog.AppendLine("(define mylist (new (List String)))");
         prog.AppendLine("(.Add mylist \"xyz\")");
         prog.AppendLine("(.Add mylist \"yyy\")");
@@ -135,9 +126,7 @@ public class LispINQTests
         var runtime = new LillispRuntime();
 
         var prog = new StringBuilder();
-
-        prog.AppendLine("(use 'System.Collections.Generic)");
-        prog.AppendLine("(use 'System.Linq)");
+        
         prog.AppendLine("(define mylist (new (List String)))");
         prog.AppendLine("(.Add mylist \"xyz\")");
         prog.AppendLine("(.Add mylist \"yyy\")");
@@ -153,5 +142,12 @@ public class LispINQTests
         Assert.Equal("yyy", resultArray[0]);
         Assert.Equal("xyz", resultArray[1]);            
         Assert.Equal("zzz", resultArray[2]);
+    }
+
+    [InlineData("(define mylist (range 0 10)) (.ToList (from i in mylist let ((j (% i 2))) where (= j 0) select i))", new object[] { 0, 2, 4, 6, 8 })]
+    [Theory]
+    public void LetTests(string input, object expected)
+    {
+        TestHelper.DefaultTest(input, expected);
     }
 }

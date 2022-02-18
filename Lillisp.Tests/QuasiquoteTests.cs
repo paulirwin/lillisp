@@ -23,9 +23,9 @@ public class QuasiquoteTests
         Assert.NotNull(sym);
         Assert.Equal("+", sym!.Value);
 
-        Assert.Equal(0d, resultList[1]);
-        Assert.Equal(1d, resultList[2]);
-        Assert.Equal(2d, resultList[3]);
+        Assert.Equal(0, resultList[1]);
+        Assert.Equal(1, resultList[2]);
+        Assert.Equal(2, resultList[3]);
     }
 
     [Fact]
@@ -46,9 +46,9 @@ public class QuasiquoteTests
         Assert.NotNull(sym);
         Assert.Equal("+", sym!.Value);
 
-        Assert.Equal(0d, resultList[1]);
-        Assert.Equal(1d, resultList[2]);
-        Assert.Equal(2d, resultList[3]);
+        Assert.Equal(0, resultList[1]);
+        Assert.Equal(1, resultList[2]);
+        Assert.Equal(2, resultList[3]);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class QuasiquoteTests
 
         var result = runtime.EvaluateProgram("(eval `(+ ,@(range 0 10)))");
 
-        Assert.Equal(45d, result);
+        Assert.Equal(45, result);
     }
 
     [Fact]

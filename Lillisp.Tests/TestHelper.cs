@@ -9,12 +9,12 @@ public static class TestHelper
         var runtime = new LillispRuntime();
 
         var result = runtime.EvaluateProgram(input);
-
-        Assert.Equal(expected, result);
-
-        if (expected is object[] objArr)
+        
+        if (expected is IEnumerable<object?> objEnumerable)
         {
-            var enumerable = result as IEnumerable<object>;
+            var objArr = objEnumerable as object?[] ?? objEnumerable.ToArray();
+
+            var enumerable = result as IEnumerable<object?>;
 
             Assert.NotNull(enumerable);
 
@@ -26,6 +26,10 @@ public static class TestHelper
             {
                 Assert.Equal(objArr[i], list[i]);
             }
+        }
+        else
+        {
+            Assert.Equal(expected, result);
         }
     }
 }

@@ -13,7 +13,7 @@ public class DynamicTests
     }
 
     [InlineData("(get '(1 2 3) 0)", 1)]
-    [InlineData("(get (range 0 10 2) 2)", 4d)]
+    [InlineData("(get (range 0 10 2) 2)", 4)]
     [InlineData("(get \"foo bar\" 5)", 'a')]
     [Theory]
     public void GetTests(string input, object expected)
