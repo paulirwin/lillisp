@@ -1,3 +1,7 @@
+# Archived
+
+This project is archived and has been replaced with [Colibri Lisp](https://github.com/paulirwin/colibri).
+
 # Lillisp
 
 [![.NET](https://github.com/paulirwin/lillisp/actions/workflows/dotnet.yml/badge.svg)](https://github.com/paulirwin/lillisp/actions/workflows/dotnet.yml)
